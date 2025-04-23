@@ -46,11 +46,12 @@ window.addEventListener("load", async () => {
     clearProps: "all" // Clear all GSAP-controlled properties
   });
 
-  // Set initial state of background video
+  // Set initial state of background video container
   timeline.set(".bg-video", {
-    width: "0rem",
-    height: "0rem",
-    opacity: 0
+    width: "90vw", // Set full width immediately
+    height: "45vw", // Set full height immediately
+    opacity: 1,
+    clipPath: "inset(0 100% 0 0)" // Hide it by clipping from the right
   });
 
   // Create the split text
@@ -66,11 +67,9 @@ window.addEventListener("load", async () => {
     opacity: 0
   });
 
-  // Animate the background video immediately
+  // Animate the background video container by unmasking it
   timeline.to(".bg-video", {
-    width: "90vw",
-    height: "45vw",
-    opacity: 1,
+    clipPath: "inset(0 0% 0 0)", // Reveal by animating the clip path
     duration: 2,
     ease: "power4.inOut"
   }, 0);
