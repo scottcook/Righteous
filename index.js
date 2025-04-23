@@ -51,7 +51,7 @@ window.addEventListener("load", async () => {
     width: "90vw", // Set full width immediately
     height: "45vw", // Set full height immediately
     opacity: 1,
-    clipPath: "inset(0 100% 0 0)" // Hide it by clipping from the right
+    clipPath: "inset(0 50% 0 50%)" // Hide it by clipping from the center
   });
 
   // Create the split text
@@ -67,9 +67,9 @@ window.addEventListener("load", async () => {
     opacity: 0
   });
 
-  // Animate the background video container by unmasking it
+  // Animate the background video container by unmasking from center
   timeline.to(".bg-video", {
-    clipPath: "inset(0 0% 0 0)", // Reveal by animating the clip path
+    clipPath: "inset(0 0% 0 0%)", // Reveal by animating the clip path outwards
     duration: 2,
     ease: "power4.inOut"
   }, 0);
