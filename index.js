@@ -84,7 +84,7 @@ window.addEventListener("load", async () => {
     duration: 1,
     stagger: 0.05,
     ease: "back.out(1.7)",
-  }, "+=0.2");
+  }, "+=0.1");
 
   // Log final position after animation setup
   const finalRect = logo.getBoundingClientRect();
