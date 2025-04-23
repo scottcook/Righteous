@@ -27,6 +27,7 @@ window.addEventListener("load", async () => {
   // Kill any existing animations
   gsap.killTweensOf(".main-logo");
   gsap.killTweensOf(".bg-video");
+  gsap.killTweensOf(".top-logo");
   console.log('🧹 Killed any existing animations');
 
   // Create a GSAP timeline
@@ -47,6 +48,21 @@ window.addEventListener("load", async () => {
     opacity: 0 // Ensure we start from 0 opacity
   });
 
+  // Set up top logo animation
+  const topLogo = document.querySelector('.top-logo');
+  const topLogoSplit = new SplitText(topLogo, {
+    type: "chars,words",
+    position: "relative"
+  });
+  
+  // Set initial state for top logo characters
+  gsap.set(topLogoSplit.chars, {
+    opacity: 0,
+    scale: 0,
+    rotationX: -90,
+    transformOrigin: "50% 50%"
+  });
+
   // Calculate center position (50% of viewport width)
   const centerPos = 50;
   
@@ -58,8 +74,7 @@ window.addEventListener("load", async () => {
     clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)` // Start as a vertical line in the center
   });
 
-  // Create the split text
-  const text = document.querySelector('.main-logo');
+  // Create the split text for main logo
   const split = new SplitText(text, {
     type: "chars",
     position: "relative"
@@ -93,6 +108,19 @@ window.addEventListener("load", async () => {
     stagger: 0.05,
     ease: "back.out(1.7)",
   }, "+=0");
+
+  // Animate top logo characters
+  timeline.to(topLogoSplit.chars, {
+    opacity: 1,
+    scale: 1,
+    rotationX: 0,
+    duration: 1.2,
+    stagger: {
+      each: 0.05,
+      from: "random"
+    },
+    ease: "back.out(1.7)"
+  }, "-=0.5");
 
   // Log final position after animation setup
   const finalRect = logo.getBoundingClientRect();
