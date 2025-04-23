@@ -45,12 +45,12 @@ async function initAnimation() {
   try {
     // Create a timeline for more control
     const tl = gsap.timeline();
-
+/* 
     // Set initial state
     gsap.set(logoElement, {
       opacity: 0,
       y: 30
-    });
+    }); */
 
     // Animate the logo
     tl.to(logoElement, {
@@ -112,43 +112,41 @@ window.addEventListener("load", () => {
   // Create a GSAP timeline
   const timeline = gsap.timeline();
 
-  // Set the initial size of .main-logo
-  timeline.set(".main-logo", {
-    opacity: 0,
-    scale: 0.8,
-    y: 0 // Start at original position
+  // Set initial state of background video
+  timeline.set(".bg-video", {
+    width: "0rem",
+    height: "0rem",
+    opacity: 0
   });
 
-  // Set initial state of underline
-  timeline.set(".logo-underline", {
-    width: 0,
+  // Create the split text
+  const text = document.querySelector('.main-logo');
+  const split = new SplitText(text, {
+    type: "chars",
+    position: "relative"
   });
 
-  // First stage: Fade in and scale up
-  timeline.to(".main-logo", {
-    duration: 1.0,
-    opacity: 1,
-    scale: 1,
-    ease: "circ.out"
+  // Set initial state of split characters
+  gsap.set(split.chars, {
+    y: 50,
+    opacity: 0
   });
 
-  // Pause for dramatic effect
-  timeline.to({}, {
-    duration: 1
-  });
-
-  // Final stage: Slide up and shrink
-  timeline.to(".main-logo", {
-    duration: 2,
-    y: "-46vh", // Slide up by 46% of viewport height
-    scale: 0.28, // Shrink to 28% of original size
-    ease: "power4.inOut" // Smooth acceleration and deceleration
-  });
-
-  // Animate the underline after logo reaches final position
-  timeline.to(".logo-underline", {
+  // Animate the background video immediately
+  timeline.to(".bg-video", {
     width: "90vw",
+    height: "45vw",
+    opacity: 1,
+    duration: 2,
+    ease: "power4.inOut"
+  }, 0);
+
+  // Animate split text characters with a slight delay
+  timeline.to(split.chars, {
+    y: 0,
+    opacity: 1,
     duration: 1,
-    ease: "circ.out"
-  });
+    stagger: 0.05,
+    ease: "back.out(1.7)",
+  }, "+=0.4"); // Start 0.4 seconds after the background video begins
 });
