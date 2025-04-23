@@ -1,0 +1,16 @@
+.main-logo {
+    /* Ensure the logo has proper spacing */
+    display: inline-block;
+    position: relative;
+}
+
+.logo-char {
+    /* Ensure characters maintain their spacing */
+    display: inline-block;
+    position: relative;
+    /* Prevent layout shift during animation */
+    will-change: transform;
+    /* Smooth out any potential pixelation during animation */
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+} 
