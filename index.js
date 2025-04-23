@@ -46,12 +46,15 @@ window.addEventListener("load", async () => {
     clearProps: "all" // Clear all GSAP-controlled properties
   });
 
+  // Calculate center position (50% of viewport width)
+  const centerPos = 50;
+  
   // Set initial state of background video container
   timeline.set(".bg-video", {
     width: "90vw", // Set full width immediately
     height: "45vw", // Set full height immediately
     opacity: 1,
-    clipPath: "inset(0 50% 0 50%)" // Hide it by clipping from the center
+    clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)` // Start as a vertical line in the center
   });
 
   // Create the split text
@@ -67,9 +70,9 @@ window.addEventListener("load", async () => {
     opacity: 0
   });
 
-  // Animate the background video container by unmasking from center
+  // Animate the background video container by expanding from center line
   timeline.to(".bg-video", {
-    clipPath: "inset(0 0% 0 0%)", // Reveal by animating the clip path outwards
+    clipPath: "polygon(0% 0, 0% 100%, 100% 100%, 100% 0)", // Expand to full width
     duration: 2,
     ease: "power4.inOut"
   }, 0);
@@ -81,7 +84,7 @@ window.addEventListener("load", async () => {
     duration: 1,
     stagger: 0.05,
     ease: "back.out(1.7)",
-  }, "+=0.4");
+  }, "+=0.2");
 
   // Log final position after animation setup
   const finalRect = logo.getBoundingClientRect();
