@@ -25,6 +25,13 @@ window.addEventListener("load", async () => {
   // Create a GSAP timeline
   const timeline = gsap.timeline();
 
+  // Force the logo to stay in its original position
+  timeline.set(".main-logo", {
+    y: 0,
+    scale: 1,
+    clearProps: "y,scale" // This ensures no transform properties persist
+  });
+
   // Set initial state of background video
   timeline.set(".bg-video", {
     width: "0rem",
@@ -62,4 +69,12 @@ window.addEventListener("load", async () => {
     stagger: 0.05,
     ease: "back.out(1.7)",
   }, "+=0.4"); // Start 0.4 seconds after the background video begins
+
+  // Ensure the logo stays in place
+  timeline.to(".main-logo", {
+    y: 0,
+    scale: 1,
+    duration: 0.01,
+    overwrite: "auto" // This will override any other animations trying to affect these properties
+  }, 0);
 });
