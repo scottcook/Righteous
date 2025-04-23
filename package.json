@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Webflow MCP Integration Test",
   "main": "index.js",
+  "scripts": {
+    "dev": "WEBFLOW_TOKEN=acf8e929d620d21e0342b4e532cc9452aa36f664035e7a3182a298a21502d5dd PORT=3000 npx webflow-mcp-server@0.4.1"
+  },
   "dependencies": {
     "gsap": "^3.12.7",
     "webflow-mcp-server": "0.4.1"
@@ -15,7 +18,8 @@
         "webflow-mcp-server@0.4.1"
       ],
       "env": {
-        "WEBFLOW_TOKEN": "acf8e929d620d21e0342b4e532cc9452aa36f664035e7a3182a298a21502d5dd"
+        "WEBFLOW_TOKEN": "acf8e929d620d21e0342b4e532cc9452aa36f664035e7a3182a298a21502d5dd",
+        "PORT": "3000"
       }
     }
   }

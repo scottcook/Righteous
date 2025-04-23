@@ -3,44 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Righteous - Local Test</title>
+    <title>Righteous Animation Test</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #000;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            color: white;
-            font-family: 'Canela Web', serif;
+            background: #000;
         }
         .main-logo {
-            font-size: 100px;
-            position: relative;
+            color: white;
+            font-size: 48px;
+            font-family: Arial, sans-serif;
+            position: absolute;
             z-index: 2;
         }
         .bg-video {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #111;
+            position: absolute;
+            width: 90vw;
+            height: 45vw;
+            background: #333; /* Placeholder for video */
             z-index: 1;
         }
-
     </style>
-    <!-- GSAP and SplitText -->
+    <!-- GSAP from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
+    <!-- SplitText locally -->
     <script src="lib/gsap-premium/minified/SplitText.min.js"></script>
+    <!-- Your animation code - served by MCP in production, local for testing -->
+    <script src="http://localhost:5500/index.js"></script>
 </head>
 <body>
+    <!-- Match your Webflow structure -->
+    <div class="main-logo">RIGHTEOUS</div>
     <div class="bg-video"></div>
-    <div class="main-logo">Righteous</div>
-    <div class="logo-underline"></div>
-
-    <!-- Your local JavaScript -->
-    <script src="index.js"></script>
 </body>
 </html> 

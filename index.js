@@ -41,9 +41,10 @@ window.addEventListener("load", async () => {
     transform: window.getComputedStyle(logo).transform
   });
 
-  // Force the logo to stay in its original position
+  // Force the logo to stay in its original position and set initial opacity
   gsap.set(".main-logo", {
-    clearProps: "all" // Clear all GSAP-controlled properties
+    clearProps: "all", // Clear all GSAP-controlled properties
+    opacity: 0 // Ensure we start from 0 opacity
   });
 
   // Calculate center position (50% of viewport width)
@@ -77,14 +78,21 @@ window.addEventListener("load", async () => {
     ease: "power4.inOut"
   }, 0);
 
-  // Animate split text characters with a slight delay
+  // Animate the main logo to full opacity first
+  timeline.to(".main-logo", {
+    opacity: 1,
+    duration: 1,
+    ease: "power2.inOut"
+  }, 0);
+
+  // Animate split text characters
   timeline.to(split.chars, {
     y: 0,
     opacity: 1,
     duration: 1,
     stagger: 0.05,
     ease: "back.out(1.7)",
-  }, "+=0.1");
+  }, "+=0");
 
   // Log final position after animation setup
   const finalRect = logo.getBoundingClientRect();
@@ -114,3 +122,4 @@ window.addEventListener("load", async () => {
     subtree: false
   });
 });
+
