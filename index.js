@@ -16,20 +16,34 @@ function waitForGSAP() {
 
 // GSAP animation for .main-logo element on window load
 window.addEventListener("load", async () => {
+  console.log('🚀 Starting animation setup...');
+  
   // Wait for GSAP to be ready
   await waitForGSAP();
   
   // Register SplitText plugin
   gsap.registerPlugin(SplitText);
   
+  // Kill any existing animations
+  gsap.killTweensOf(".main-logo");
+  gsap.killTweensOf(".bg-video");
+  console.log('🧹 Killed any existing animations');
+
   // Create a GSAP timeline
   const timeline = gsap.timeline();
+  
+  // Log initial position
+  const logo = document.querySelector('.main-logo');
+  const rect = logo.getBoundingClientRect();
+  console.log('📏 Initial logo position:', {
+    top: rect.top,
+    left: rect.left,
+    transform: window.getComputedStyle(logo).transform
+  });
 
   // Force the logo to stay in its original position
-  timeline.set(".main-logo", {
-    y: 0,
-    scale: 1,
-    clearProps: "y,scale" // This ensures no transform properties persist
+  gsap.set(".main-logo", {
+    clearProps: "all" // Clear all GSAP-controlled properties
   });
 
   // Set initial state of background video
@@ -68,13 +82,33 @@ window.addEventListener("load", async () => {
     duration: 1,
     stagger: 0.05,
     ease: "back.out(1.7)",
-  }, "+=0.4"); // Start 0.4 seconds after the background video begins
+  }, "+=0.4");
 
-  // Ensure the logo stays in place
-  timeline.to(".main-logo", {
-    y: 0,
-    scale: 1,
-    duration: 0.01,
-    overwrite: "auto" // This will override any other animations trying to affect these properties
-  }, 0);
+  // Log final position after animation setup
+  const finalRect = logo.getBoundingClientRect();
+  console.log('📏 Final logo position after setup:', {
+    top: finalRect.top,
+    left: finalRect.left,
+    transform: window.getComputedStyle(logo).transform
+  });
+
+  // Monitor for any position changes
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'style' || mutation.type === 'attributes') {
+        const currentRect = logo.getBoundingClientRect();
+        console.log('🔄 Logo position changed:', {
+          top: currentRect.top,
+          left: currentRect.left,
+          transform: window.getComputedStyle(logo).transform
+        });
+      }
+    });
+  });
+
+  observer.observe(logo, {
+    attributes: true,
+    attributeFilter: ['style', 'class'],
+    subtree: false
+  });
 });
