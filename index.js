@@ -105,7 +105,7 @@ window.addEventListener("load", async () => {
   
   // Set initial state of background video container
   timeline.set(".bg-video", {
-    width: "96vw", // Set full width immediately
+    width: "100vw", // Set full width immediately
     // height: "45vh",  Set full height immediately
     opacity: 1,
     clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)` // Start as a vertical line in the center
@@ -266,54 +266,5 @@ window.addEventListener("load", async () => {
       scrub: 1
     }
   });
-
-  // Create container for masked video
-  const bgVideo = document.querySelector('.Background.Video');
-  
-  // Set up the masking effect
-  const heroArea = document.querySelector('.hero-area');
-
-  // Ensure proper stacking context
-  gsap.set(heroArea, {
-    position: 'relative',
-    overflow: 'hidden'
-  });
-
-  // Set up the main logo for masking
-  gsap.set('.main-logo', {
-    position: 'relative',
-    zIndex: 2,
-    mixBlendMode: 'screen',
-    backgroundColor: '#000000',
-    webkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    webkitTextFillColor: 'transparent',
-    textFillColor: 'transparent',
-    filter: 'invert(1)'
-  });
-
-  // Set up the background video
-  gsap.set('.Background.Video', {
-    position: 'absolute',
-    top: '0',
-    left: '0',
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    zIndex: 1
-  });
-
-  // Create a dark overlay for better masking
-  const overlay = document.createElement('div');
-  overlay.style.position = 'absolute';
-  overlay.style.top = '0';
-  overlay.style.left = '0';
-  overlay.style.width = '100%';
-  overlay.style.height = '100%';
-  overlay.style.backgroundColor = '#000000';
-  overlay.style.mixBlendMode = 'multiply';
-  overlay.style.zIndex = 3;
-  
-  heroArea.appendChild(overlay);
 });
 
