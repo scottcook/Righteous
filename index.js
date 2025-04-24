@@ -271,60 +271,49 @@ window.addEventListener("load", async () => {
   const bgVideo = document.querySelector('.Background.Video');
   
   // Set up the masking effect
-  const wrapper = document.createElement('div');
-  wrapper.style.position = 'absolute';
-  wrapper.style.top = '0';
-  wrapper.style.left = '0';
-  wrapper.style.width = '100%';
-  wrapper.style.height = '100%';
-  wrapper.style.overflow = 'hidden';
+  const heroArea = document.querySelector('.hero-area');
 
-  // Move the video inside the wrapper
-  bgVideo.parentNode.insertBefore(wrapper, bgVideo);
-  wrapper.appendChild(bgVideo);
+  // Ensure proper stacking context
+  gsap.set(heroArea, {
+    position: 'relative',
+    overflow: 'hidden'
+  });
 
-  // Set up the masking properties
-  gsap.set(mainLogo, {
+  // Set up the main logo for masking
+  gsap.set('.main-logo', {
+    position: 'relative',
+    zIndex: 2,
     mixBlendMode: 'screen',
-    color: '#000000',
-    zIndex: 2
+    backgroundColor: '#000000',
+    webkitBackgroundClip: 'text',
+    backgroundClip: 'text',
+    webkitTextFillColor: 'transparent',
+    textFillColor: 'transparent',
+    filter: 'invert(1)'
   });
 
-  gsap.set(bgVideo, {
-    webkitClipPath: 'url(#logoMask)',
-    clipPath: 'url(#logoMask)'
-  });
-
-  // Create SVG mask
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.style.position = 'absolute';
-  svg.style.width = '0';
-  svg.style.height = '0';
-  svg.innerHTML = `
-    <defs>
-      <clipPath id="logoMask">
-        <text id="maskText" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
-              font-family="${window.getComputedStyle(mainLogo).fontFamily}"
-              font-size="${window.getComputedStyle(mainLogo).fontSize}"
-              font-weight="${window.getComputedStyle(mainLogo).fontWeight}">
-          ${mainLogo.textContent}
-        </text>
-      </clipPath>
-    </defs>
-  `;
-  document.body.appendChild(svg);
-
-  // Position the video relative to the text
-  const logoRect = mainLogo.getBoundingClientRect();
-  gsap.set(bgVideo, {
+  // Set up the background video
+  gsap.set('.Background.Video', {
     position: 'absolute',
-    width: '100vw',
-    height: '100vh',
-    top: '50%',
-    left: '50%',
-    xPercent: -50,
-    yPercent: -50,
-    objectFit: 'cover'
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    zIndex: 1
   });
+
+  // Create a dark overlay for better masking
+  const overlay = document.createElement('div');
+  overlay.style.position = 'absolute';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = '#000000';
+  overlay.style.mixBlendMode = 'multiply';
+  overlay.style.zIndex = 3;
+  
+  heroArea.appendChild(overlay);
 });
 
