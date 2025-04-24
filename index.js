@@ -271,35 +271,60 @@ window.addEventListener("load", async () => {
   const bgVideo = document.querySelector('.Background.Video');
   
   // Set up the masking effect
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'absolute';
+  wrapper.style.top = '0';
+  wrapper.style.left = '0';
+  wrapper.style.width = '100%';
+  wrapper.style.height = '100%';
+  wrapper.style.overflow = 'hidden';
+
+  // Move the video inside the wrapper
+  bgVideo.parentNode.insertBefore(wrapper, bgVideo);
+  wrapper.appendChild(bgVideo);
+
+  // Set up the masking properties
   gsap.set(mainLogo, {
-    webkitTextFillColor: 'transparent',
-    webkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    background: 'none',
-    zIndex: 2,
-    fontWeight: 'bold',
-    color: 'transparent',
-    willChange: 'transform',
-    textShadow: 'none'
+    mixBlendMode: 'screen',
+    color: '#000000',
+    zIndex: 2
   });
 
-  // Clone the background video and position it behind the text
-  const videoClone = bgVideo.cloneNode(true);
-  videoClone.style.position = 'absolute';
-  videoClone.style.width = '100%';
-  videoClone.style.height = '100%';
-  videoClone.style.top = '0';
-  videoClone.style.left = '0';
-  videoClone.style.zIndex = '1';
-  videoClone.style.objectFit = 'cover';
-  
-  // Insert the cloned video before the original
-  mainLogo.style.position = 'relative';
-  mainLogo.appendChild(videoClone);
-
-  // Hide original background video
   gsap.set(bgVideo, {
-    opacity: 0
+    webkitClipPath: 'url(#logoMask)',
+    clipPath: 'url(#logoMask)'
+  });
+
+  // Create SVG mask
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.style.position = 'absolute';
+  svg.style.width = '0';
+  svg.style.height = '0';
+  svg.innerHTML = `
+    <defs>
+      <clipPath id="logoMask">
+        <text id="maskText" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+              font-family="${window.getComputedStyle(mainLogo).fontFamily}"
+              font-size="${window.getComputedStyle(mainLogo).fontSize}"
+              font-weight="${window.getComputedStyle(mainLogo).fontWeight}">
+          ${mainLogo.textContent}
+        </text>
+      </clipPath>
+    </defs>
+  `;
+  document.body.appendChild(svg);
+
+  // Position the video relative to the text
+  const logoRect = mainLogo.getBoundingClientRect();
+  gsap.set(bgVideo, {
+    position: 'absolute',
+    width: '100vw',
+    height: '100vh',
+    top: '50%',
+    left: '50%',
+    xPercent: -50,
+    yPercent: -50,
+    objectFit: 'cover'
   });
 });
 
