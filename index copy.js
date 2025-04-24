@@ -266,40 +266,5 @@ window.addEventListener("load", async () => {
       scrub: 1
     }
   });
-
-  // Create container for masked video
-  const bgVideo = document.querySelector('.Background.Video');
-  
-  // Set up the masking effect
-  gsap.set(mainLogo, {
-    webkitTextFillColor: 'transparent',
-    webkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    background: 'none',
-    zIndex: 2,
-    fontWeight: 'bold',
-    color: 'transparent',
-    willChange: 'transform',
-    textShadow: 'none'
-  });
-
-  // Clone the background video and position it behind the text
-  const videoClone = bgVideo.cloneNode(true);
-  videoClone.style.position = 'absolute';
-  videoClone.style.width = '100%';
-  videoClone.style.height = '100%';
-  videoClone.style.top = '0';
-  videoClone.style.left = '0';
-  videoClone.style.zIndex = '1';
-  videoClone.style.objectFit = 'cover';
-  
-  // Insert the cloned video before the original
-  mainLogo.style.position = 'relative';
-  mainLogo.appendChild(videoClone);
-
-  // Hide original background video
-  gsap.set(bgVideo, {
-    opacity: 0
-  });
 });
 
