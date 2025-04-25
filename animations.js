@@ -9,8 +9,12 @@ window.Webflow.push(function() {
     try {
         // First, ensure nav bar and background are visible
         gsap.set(".nav-bar-main", { opacity: 1 });
-        gsap.set(".background-video", { opacity: 1 });
-        console.log("Set initial visibility for nav and background");
+        gsap.set(".background-video-wrapper", { opacity: 0 }); // Start background hidden
+        gsap.set(".nav-underline", { 
+            scaleX: 0,
+            transformOrigin: "left center"
+        });
+        console.log("Set initial visibility states");
 
         // Initialize SplitText for main logo
         const mainLogoSplit = new SplitText(".main-logo", {
@@ -62,9 +66,9 @@ window.Webflow.push(function() {
 
         mainTl
             // Background video fade in
-            .to(".background-video", {
+            .to(".background-video-wrapper", {
                 opacity: 1,
-                duration: 1,
+                duration: 2,
                 ease: "power2.inOut"
             })
 
@@ -77,7 +81,7 @@ window.Webflow.push(function() {
                 duration: 0.4,
                 ease: "back.out(1.7)",
                 onStart: () => console.log("Starting main logo animation")
-            }, "-=0.5")
+            }, "-=1.5")
 
             // Top logo animation
             .to(topLogoSplit.chars, {
@@ -110,12 +114,20 @@ window.Webflow.push(function() {
                 stagger: 0.05,
                 duration: 0.3,
                 ease: "power2.out"
-            }, "-=0.1");
+            }, "-=0.1")
+
+            // Nav underline animation
+            .to(".nav-underline", {
+                scaleX: 1,
+                duration: 0.6,
+                ease: "power2.inOut"
+            }, "-=0.3");
 
         // Log the current state of key elements
         console.log("Element visibility check:", {
             navBar: document.querySelector(".nav-bar-main")?.style.opacity,
-            background: document.querySelector(".background-video")?.style.opacity,
+            background: document.querySelector(".background-video-wrapper")?.style.opacity,
+            underline: document.querySelector(".nav-underline")?.style.transform,
             topLogo: document.querySelector(".top-logo")?.style.opacity
         });
 
@@ -127,7 +139,8 @@ window.Webflow.push(function() {
             cities: document.querySelector(".text-block")?.innerHTML,
             navLinks: Array.from(document.querySelectorAll(".top-navlink")).map(el => el.innerHTML),
             navBar: document.querySelector(".nav-bar-main"),
-            background: document.querySelector(".background-video")
+            background: document.querySelector(".background-video-wrapper"),
+            underline: document.querySelector(".nav-underline")
         });
     }
 }); 
