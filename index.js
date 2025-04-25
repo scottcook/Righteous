@@ -169,39 +169,41 @@ function initStackingSections() {
   const sections = gsap.utils.toArray('.stack-section');
   console.log("Found stack sections:", sections.length);
   
+  // Set initial states
+  sections.forEach((section, i) => {
+    gsap.set(section, {
+      yPercent: 100,
+      rotateX: 5,
+      zIndex: i + 2,
+      opacity: 1
+    });
+  });
+
+  // Create scroll-triggered animations
   sections.forEach((section, i) => {
     console.log(`Setting up section ${i + 1}`);
     
-    // Add a temporary background color to visualize the section
-    gsap.set(section, {
-      backgroundColor: `hsl(${i * 40}, 70%, 80%)`,
-      transformOrigin: "center center",
-      position: "relative",
-      zIndex: i + 2  // Start at 2 since hero is 1
-    });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top bottom",
-        end: "top top",
-        scrub: 1.5,
-        markers: true, // Add markers to visualize trigger points
-        onEnter: () => console.log(`Section ${i + 1} enter`),
-        onLeave: () => console.log(`Section ${i + 1} leave`),
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      end: "+=100%",
+      scrub: 1,
+      markers: true,
+      onUpdate: (self) => {
+        // Calculate progress for smooth animation
+        const progress = self.progress;
+        
+        // Animate current section
+        gsap.to(section, {
+          yPercent: 100 - (progress * 100),
+          rotateX: 5 - (progress * 5),
+          duration: 0,
+          ease: "none"
+        });
+        
+        // Log for debugging
+        console.log(`Section ${i + 1} progress:`, progress);
       }
-    });
-
-    // Animate from bottom with rotation
-    tl.fromTo(section, {
-      y: "100vh",
-      rotation: 5,
-    }, {
-      y: 0,
-      rotation: 0,
-      ease: "power2.inOut",
-      onStart: () => console.log(`Section ${i + 1} animation started`),
-      onComplete: () => console.log(`Section ${i + 1} animation completed`)
     });
   });
 }
