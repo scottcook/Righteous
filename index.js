@@ -172,6 +172,12 @@ window.Webflow.push(function() {
 function initStackingSections() {
     console.log("Initializing stacking sections");
 
+    // Debug DOM structure
+    console.log("Main wrapper exists:", !!document.querySelector('.main-wrapper'));
+    console.log("Hero area exists:", !!document.querySelector('.hero-area'));
+    console.log("Stack sections found:", document.querySelectorAll('.stack-section').length);
+    console.log("DOM Structure:", document.body.innerHTML);
+
     // Add scroll spacer if it doesn't exist
     if (!document.querySelector('.scroll-spacer')) {
         const spacer = document.createElement('div');
@@ -248,6 +254,53 @@ function initStackingSections() {
     // Force a refresh of ScrollTrigger
     ScrollTrigger.refresh();
     console.log("ScrollTrigger refreshed");
+
+    // Create and append mask containers
+    sections.forEach((section, index) => {
+        // Create and append mask container
+        const maskContainer = document.createElement('div');
+        maskContainer.className = 'mask-container';
+        maskContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            transform: translateY(100%);
+        `;
+        
+        // Wrap section content in the mask container
+        section.appendChild(maskContainer);
+        
+        // Move original content into mask container
+        while (section.firstChild !== maskContainer) {
+            maskContainer.appendChild(section.firstChild);
+        }
+        
+        // Create animation for each section
+        ScrollTrigger.create({
+            trigger: section,
+            start: 'top center',
+            end: 'bottom center',
+            markers: true, // Helpful for debugging, remove in production
+            onEnter: () => {
+                gsap.to(maskContainer, {
+                    y: '0%',
+                    duration: 1.5,
+                    ease: 'power4.inOut'
+                });
+            },
+            onLeaveBack: () => {
+                gsap.to(maskContainer, {
+                    y: '100%',
+                    duration: 1.5,
+                    ease: 'power4.inOut'
+                });
+            }
+        });
+    });
 }
 
 // Initialize all animations
