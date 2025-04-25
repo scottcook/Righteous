@@ -7,13 +7,21 @@ window.Webflow.push(function() {
     console.log("Animation script initializing after Webflow ready");
 
     try {
-        // First, ensure nav bar and background are visible
+        // First, ensure nav bar is visible immediately
         gsap.set(".nav-bar-main", { opacity: 1 });
-        gsap.set(".background-video-wrapper", { opacity: 0 }); // Start background hidden
-        gsap.set(".nav-underline", { 
+        
+        // Set initial states for background and underline
+        gsap.set(".bg-video", { 
+            opacity: 0,
+            visibility: "visible" // Ensure it's visible before animation
+        });
+        
+        gsap.set(".logo-underline", { 
+            opacity: 1, // Ensure the underline is fully visible
             scaleX: 0,
             transformOrigin: "left center"
         });
+        
         console.log("Set initial visibility states");
 
         // Initialize SplitText for main logo
@@ -65,11 +73,12 @@ window.Webflow.push(function() {
         const mainTl = gsap.timeline();
 
         mainTl
-            // Background video fade in
-            .to(".background-video-wrapper", {
+            // Background video fade in first
+            .to(".bg-video", {
                 opacity: 1,
-                duration: 2,
-                ease: "power2.inOut"
+                duration: 1.5,
+                ease: "power2.inOut",
+                onStart: () => console.log("Starting background fade in")
             })
 
             // Main logo animation
@@ -81,7 +90,7 @@ window.Webflow.push(function() {
                 duration: 0.4,
                 ease: "back.out(1.7)",
                 onStart: () => console.log("Starting main logo animation")
-            }, "-=1.5")
+            }, "-=0.8")
 
             // Top logo animation
             .to(topLogoSplit.chars, {
@@ -116,18 +125,26 @@ window.Webflow.push(function() {
                 ease: "power2.out"
             }, "-=0.1")
 
-            // Nav underline animation
-            .to(".nav-underline", {
+            // Logo underline animation
+            .to(".logo-underline", {
                 scaleX: 1,
                 duration: 0.6,
-                ease: "power2.inOut"
+                ease: "power2.inOut",
+                onComplete: () => {
+                    // Double check final states
+                    console.log("Animation sequence complete, checking final states");
+                    console.log("Final visibility check:", {
+                        bgVideo: document.querySelector(".bg-video")?.style.opacity,
+                        underline: document.querySelector(".logo-underline")?.style.transform
+                    });
+                }
             }, "-=0.3");
 
         // Log the current state of key elements
         console.log("Element visibility check:", {
             navBar: document.querySelector(".nav-bar-main")?.style.opacity,
-            background: document.querySelector(".background-video-wrapper")?.style.opacity,
-            underline: document.querySelector(".nav-underline")?.style.transform,
+            background: document.querySelector(".bg-video")?.style.opacity,
+            underline: document.querySelector(".logo-underline")?.style.transform,
             topLogo: document.querySelector(".top-logo")?.style.opacity
         });
 
@@ -139,8 +156,8 @@ window.Webflow.push(function() {
             cities: document.querySelector(".text-block")?.innerHTML,
             navLinks: Array.from(document.querySelectorAll(".top-navlink")).map(el => el.innerHTML),
             navBar: document.querySelector(".nav-bar-main"),
-            background: document.querySelector(".background-video-wrapper"),
-            underline: document.querySelector(".nav-underline")
+            background: document.querySelector(".bg-video"),
+            underline: document.querySelector(".logo-underline")
         });
     }
 }); 
