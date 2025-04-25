@@ -146,30 +146,67 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Error in animation setup:", error);
     }
 
-    // Add scroll animations separately
+    // Set up scroll animations with responsive handling
     try {
         console.log("Setting up scroll animations");
-        ScrollTrigger.create({
-            trigger: ".hero-area",
+
+        // Get the height of the hero area
+        const heroArea = document.querySelector(".hero-area");
+        const stackSection = document.querySelector(".stack-section");
+        
+        if (!heroArea || !stackSection) {
+            console.error("Hero area or stack section not found");
+            return;
+        }
+        
+        // Ensure the stack section covers the full width
+        gsap.set(stackSection, {
+            width: "100vw",
+            left: 0
+        });
+        
+        // Fix for the gap at the bottom
+        // Ensure stack section is tall enough to fill viewport even at the end
+        gsap.set(stackSection, {
+            minHeight: "100vh"
+        });
+        
+        // Create a scroll trigger for pinning
+        const pinST = ScrollTrigger.create({
+            trigger: heroArea,
             start: "top top",
-            end: "bottom top",
+            endTrigger: "body",  // Use body as end trigger to ensure it goes to bottom of page
+            end: "bottom bottom",
             pin: true,
             pinSpacing: false,
-            onEnter: () => console.log("Hero area pinned")
+            onEnter: () => console.log("Hero area pinned"),
+            onUpdate: (self) => {
+                console.log("ScrollTrigger progress:", self.progress.toFixed(2));
+            }
         });
 
-        gsap.to(".stack-section", {
+        // Animation for the stack section
+        gsap.to(stackSection, {
             yPercent: 0,
             ease: "none",
             scrollTrigger: {
-                trigger: ".hero-area",
+                trigger: heroArea,
                 start: "top top",
-                end: "bottom top",
+                endTrigger: "body",
+                end: "bottom bottom",
                 scrub: 1,
                 markers: true,
                 onEnter: () => console.log("Stack section animation triggered")
             }
         });
+        
+        // Handle browser resize
+        window.addEventListener("resize", function() {
+            // Force ScrollTrigger to recalculate positions and dimensions
+            ScrollTrigger.refresh();
+            console.log("ScrollTrigger refreshed on resize");
+        });
+        
     } catch (error) {
         console.error("Error in scroll setup:", error);
     }
