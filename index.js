@@ -148,10 +148,32 @@ document.addEventListener("DOMContentLoaded", function() {
         // Get the hero and stack elements
         const heroArea = document.querySelector(".hero-area");
         const stackSection = document.querySelector(".stack-section");
+        const mainWrapper = document.querySelector(".main-wrapper");
         
         if (!heroArea || !stackSection) {
             console.error("Hero area or stack section not found");
             return;
+        }
+        
+        // Calculate document height and make sure there's enough space
+        const docHeight = Math.max(
+            document.body.scrollHeight, 
+            document.body.offsetHeight, 
+            document.documentElement.clientHeight, 
+            document.documentElement.scrollHeight, 
+            document.documentElement.offsetHeight
+        );
+        
+        // Calculate viewport height
+        const vh = window.innerHeight;
+        
+        console.log("Document height:", docHeight, "Viewport height:", vh);
+        
+        // Ensure main wrapper is tall enough
+        if (mainWrapper) {
+            gsap.set(mainWrapper, {
+                minHeight: docHeight + vh  // Add extra viewport height to prevent gap
+            });
         }
         
         // Ensure proper positioning for the stack section to create mask effect
@@ -161,14 +183,16 @@ document.addEventListener("DOMContentLoaded", function() {
             left: "0",
             width: "100%",
             height: "100vh",
-            yPercent: 100,  // Start below the viewport
+            minHeight: "100vh",
+            yPercent: 100,  // Start below the viewport (invisible on page load)
             zIndex: 2  // Higher than hero area
         });
         
         // Set hero area styling
         gsap.set(heroArea, {
             position: "relative", 
-            zIndex: 1
+            zIndex: 1,
+            height: "100vh" // Ensure hero fills viewport
         });
         
         // Create the scroll-based reveal animation
@@ -177,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function() {
             pin: true,
             pinSpacing: false,
             start: "top top",
-            end: "+=100%",
+            end: "bottom bottom", // Pin until the bottom of the document
             onEnter: () => console.log("Hero area pinned")
         });
         
@@ -188,11 +212,14 @@ document.addEventListener("DOMContentLoaded", function() {
             scrollTrigger: {
                 trigger: heroArea,
                 start: "top top",
-                end: "+=100%",
+                endTrigger: "html", // Use the entire document as end trigger
+                end: "bottom bottom",
                 scrub: true,
-                markers: true,
+                markers: false, // Set to true for debugging
                 onUpdate: (self) => {
-                    console.log("Stack section reveal progress:", self.progress.toFixed(2));
+                    if (self.progress > 0.95) {
+                        console.log("Near bottom:", self.progress.toFixed(2));
+                    }
                 }
             }
         });
@@ -200,7 +227,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Handle browser resize
         window.addEventListener("resize", function() {
             // Force ScrollTrigger to recalculate positions and dimensions
-            ScrollTrigger.refresh();
+            ScrollTrigger.refresh(true); // true = deep refresh
             console.log("ScrollTrigger refreshed on resize");
         });
         
