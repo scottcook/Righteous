@@ -1,3 +1,8 @@
+/**
+ * This file should be loaded from:
+ * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
+ */
+
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +19,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // Set initial states
     gsap.set([".main-logo", ".top-logo", ".text-block", ".top-navlink"], {
         opacity: 0
+    });
+
+    // Set initial state for stack-section
+    gsap.set(".stack-section", {
+        yPercent: 100,  // Start below the viewport
+        opacity: 1
     });
 
     // Animation Sequence
@@ -56,16 +67,23 @@ document.addEventListener("DOMContentLoaded", function() {
         }, "-=0.4");
 
     // Stack Section Scroll Animation
+    ScrollTrigger.create({
+        trigger: ".hero-area",
+        start: "top top",
+        end: "bottom top",
+        pin: true,
+        pinSpacing: false
+    });
+
     gsap.to(".stack-section", {
+        yPercent: 0,
+        ease: "none",
         scrollTrigger: {
             trigger: ".hero-area",
             start: "top top",
             end: "bottom top",
-            scrub: true,
-            pin: true,
-            pinSpacing: false
-        },
-        y: 0,
-        ease: "none"
+            scrub: 1,
+            markers: true // This will help us debug - remove after fixing
+        }
     });
 }); 
