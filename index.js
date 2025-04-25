@@ -9,7 +9,12 @@ gsap.registerPlugin(ScrollTrigger);
 // Wait for DOM content and web fonts to load
 document.addEventListener("DOMContentLoaded", function() {
     // Create main timeline
-    const mainTl = gsap.timeline();
+    const mainTl = gsap.timeline({
+        onComplete: () => {
+            // Only initialize scroll animations after intro animation completes
+            initScrollAnimations();
+        }
+    });
 
     // Initialize SplitText
     const mainLogoSplit = new SplitText(".main-logo", {type: "chars, words"});
@@ -66,24 +71,26 @@ document.addEventListener("DOMContentLoaded", function() {
             ease: "power2.out"
         }, "-=0.4");
 
-    // Stack Section Scroll Animation
-    ScrollTrigger.create({
-        trigger: ".hero-area",
-        start: "top top",
-        end: "bottom top",
-        pin: true,
-        pinSpacing: false
-    });
-
-    gsap.to(".stack-section", {
-        yPercent: 0,
-        ease: "none",
-        scrollTrigger: {
+    // Function to initialize scroll animations
+    function initScrollAnimations() {
+        ScrollTrigger.create({
             trigger: ".hero-area",
             start: "top top",
             end: "bottom top",
-            scrub: 1,
-            markers: true // This will help us debug - remove after fixing
-        }
-    });
+            pin: true,
+            pinSpacing: false
+        });
+
+        gsap.to(".stack-section", {
+            yPercent: 0,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero-area",
+                start: "top top",
+                end: "bottom top",
+                scrub: 1,
+                markers: true // This will help us debug - remove after fixing
+            }
+        });
+    }
 }); 
