@@ -14,16 +14,25 @@ document.addEventListener("DOMContentLoaded", function() {
     // Create main timeline
     const mainTl = gsap.timeline();
 
-    // Initialize SplitText
+    // Initialize SplitText with error checking
     try {
+        // Check if elements exist first
+        const mainLogoElement = document.querySelector(".main-logo");
+        const topLogoElement = document.querySelector(".top-logo");
+        const textBlockElement = document.querySelector(".text-block");
+        
+        if (!mainLogoElement) console.error("main-logo element not found");
+        if (!topLogoElement) console.error("top-logo element not found");
+        if (!textBlockElement) console.error("text-block element not found");
+
         console.log("Initializing SplitText");
-        const mainLogoSplit = new SplitText(".main-logo-container .main-logo", {type: "chars, words"});
-        const topLogoSplit = new SplitText(".logo-lockup .top-logo", {type: "chars, words"});
-        const citiesTextSplit = new SplitText(".cities .text-block", {type: "chars, words"});
+        const mainLogoSplit = new SplitText(".main-logo", {type: "chars, words"});
+        const topLogoSplit = new SplitText(".top-logo", {type: "chars, words"});
+        const citiesTextSplit = new SplitText(".text-block", {type: "chars, words"});
         console.log("SplitText initialized successfully");
 
         // Set initial states
-        gsap.set([".main-logo-container .main-logo", ".logo-lockup .top-logo", ".cities .text-block", ".nav-bar-main .top-navlink"], {
+        gsap.set([".main-logo", ".top-logo", ".text-block", ".top-navlink"], {
             opacity: 0
         });
         console.log("Initial states set");
@@ -68,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function() {
             })
 
             // Fade in navigation elements
-            .to(".nav-bar-main .top-navlink", {
+            .to(".top-navlink", {
                 opacity: 1,
                 y: 0,
                 duration: 0.8,
