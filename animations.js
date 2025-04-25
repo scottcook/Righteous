@@ -7,10 +7,10 @@ gsap.registerPlugin(ScrollTrigger);
 
     // Debug: Log all elements with relevant classes
     console.log("All logo-related elements:", {
-        logoLockups: document.querySelectorAll('.logo-lockup'),
-        topLogos: document.querySelectorAll('.top-logo'),
-        mainLogos: document.querySelectorAll('.main-logo'),
-        exactSelector: document.querySelectorAll('.logo-lockup .top-logo')
+        heroArea: document.querySelector('.hero-area'),
+        navBar: document.querySelector('.nav-bar-main'),
+        logoLockup: document.querySelector('.logo-lockup'),
+        fullPath: document.querySelector('.hero-area .nav-bar-main .logo-lockup .top-logo')
     });
 
     // Create main timeline
@@ -24,9 +24,9 @@ gsap.registerPlugin(ScrollTrigger);
         });
         console.log("Main logo split:", mainLogoSplit.chars.length, "chars");
 
-        // Be more specific with the top logo selector and add more debugging
-        console.log("Searching for top logo with class '.logo-lockup .top-logo'");
-        const topLogoElement = document.querySelector(".logo-lockup .top-logo");
+        // Use the full path for the top logo selector
+        console.log("Searching for top logo with full path");
+        const topLogoElement = document.querySelector(".hero-area .nav-bar-main .logo-lockup .top-logo");
         console.log("Found top logo element:", topLogoElement);
         console.log("Top logo element details:", {
             element: topLogoElement,
@@ -146,18 +146,11 @@ gsap.registerPlugin(ScrollTrigger);
         console.error("Error in animation setup:", error);
         // Log the complete DOM structure for debugging
         console.log("Complete DOM structure for debugging:", {
-            mainLogo: document.querySelector(".main-logo"),
+            heroArea: document.querySelector(".hero-area"),
             navBar: document.querySelector(".nav-bar-main"),
-            topLogo: document.querySelector(".logo-lockup .top-logo"),
-            cities: document.querySelector(".text-block"),
-            allLogoLockups: Array.from(document.querySelectorAll('.logo-lockup')).map(el => ({
-                element: el,
-                classes: el.classList.toString(),
-                children: Array.from(el.children).map(child => ({
-                    element: child,
-                    classes: child.classList.toString()
-                }))
-            }))
+            logoLockup: document.querySelector(".logo-lockup"),
+            topLogo: document.querySelector(".hero-area .nav-bar-main .logo-lockup .top-logo"),
+            cities: document.querySelector(".text-block")
         });
     }
 })(); 
