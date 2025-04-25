@@ -11,31 +11,62 @@ console.log("GSAP and ScrollTrigger registered");
 document.addEventListener("DOMContentLoaded", function() {
     console.log("DOM Content Loaded");
     
+    // Full hierarchical selectors
+    const mainLogoSelector = ".main-wrapper .hero-area .main-logo-container .main-logo";
+    const topLogoSelector = ".main-wrapper .hero-area .nav-bar-main .logo-lockup .top-logo";
+    const textBlockSelector = ".main-wrapper .hero-area .cities .text-block";
+    const navLinksSelector = ".main-wrapper .hero-area .nav-bar-main .top-navlink";
+    
     // Create main timeline
     const mainTl = gsap.timeline();
 
-    // Initialize SplitText with error checking
+    // Check if elements exist first
+    const mainLogoElement = document.querySelector(mainLogoSelector);
+    const topLogoElement = document.querySelector(topLogoSelector);
+    const textBlockElement = document.querySelector(textBlockSelector);
+    
+    if (!mainLogoElement) {
+        console.error("Main logo element not found:", mainLogoSelector);
+    } else {
+        console.log("Main logo found:", mainLogoElement);
+    }
+    
+    if (!topLogoElement) {
+        console.error("Top logo element not found:", topLogoSelector);
+    } else {
+        console.log("Top logo found:", topLogoElement);
+    }
+    
+    if (!textBlockElement) {
+        console.error("Text block element not found:", textBlockSelector);
+    } else {
+        console.log("Text block found:", textBlockElement);
+    }
+
+    // Don't run animations if elements aren't found
+    if (!mainLogoElement || !topLogoElement || !textBlockElement) {
+        console.error("Critical elements missing - not running animations");
+        return;
+    }
+
     try {
-        // Check if elements exist first
-        const mainLogoElement = document.querySelector(".main-logo");
-        const topLogoElement = document.querySelector(".top-logo");
-        const textBlockElement = document.querySelector(".text-block");
-        
-        if (!mainLogoElement) console.error("main-logo element not found");
-        if (!topLogoElement) console.error("top-logo element not found");
-        if (!textBlockElement) console.error("text-block element not found");
-
         console.log("Initializing SplitText");
-        const mainLogoSplit = new SplitText(".main-logo", {type: "chars, words"});
-        const topLogoSplit = new SplitText(".top-logo", {type: "chars, words"});
-        const citiesTextSplit = new SplitText(".text-block", {type: "chars, words"});
-        console.log("SplitText initialized successfully");
+        
+        // Initialize SplitText
+        const mainLogoSplit = new SplitText(mainLogoSelector, {type: "chars, words"});
+        const topLogoSplit = new SplitText(topLogoSelector, {type: "chars, words"});
+        const citiesTextSplit = new SplitText(textBlockSelector, {type: "chars, words"});
+        
+        console.log("SplitText initialized successfully with:");
+        console.log("- Main logo chars:", mainLogoSplit.chars.length);
+        console.log("- Top logo chars:", topLogoSplit.chars.length);
+        console.log("- Cities text chars:", citiesTextSplit.chars.length);
 
-        // Set initial states
-        gsap.set([".main-logo", ".top-logo", ".text-block", ".top-navlink"], {
+        // Set initial states - start with opacity 0
+        gsap.set([mainLogoSelector, topLogoSelector, textBlockSelector, navLinksSelector], {
             opacity: 0
         });
-        console.log("Initial states set");
+        console.log("Initial states set to opacity 0");
 
         // Set initial state for stack-section
         gsap.set(".stack-section", {
@@ -55,6 +86,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 ease: "back.out(1.7)",
                 onStart: () => console.log("Main logo animation started")
             })
+            .to(mainLogoSelector, {
+                opacity: 1,
+                duration: 0.1,
+                onComplete: () => console.log("Main logo opacity set to 1")
+            })
 
             // Animate top logo
             .from(topLogoSplit.chars, {
@@ -64,6 +100,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 duration: 0.5,
                 ease: "power2.out",
                 onStart: () => console.log("Top logo animation started")
+            })
+            .to(topLogoSelector, {
+                opacity: 1,
+                duration: 0.1,
+                onComplete: () => console.log("Top logo opacity set to 1")
             })
 
             // Animate cities text
@@ -75,15 +116,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 ease: "power2.out",
                 onStart: () => console.log("Cities text animation started")
             })
+            .to(textBlockSelector, {
+                opacity: 1,
+                duration: 0.1,
+                onComplete: () => console.log("Cities text opacity set to 1")
+            })
 
             // Fade in navigation elements
-            .to(".top-navlink", {
+            .to(navLinksSelector, {
                 opacity: 1,
                 y: 0,
                 duration: 0.8,
                 stagger: 0.2,
                 ease: "power2.out",
-                onStart: () => console.log("Nav links animation started")
+                onStart: () => console.log("Nav links animation started"),
+                onComplete: () => console.log("Nav links animation completed")
             }, "-=0.4");
 
     } catch (error) {
