@@ -160,4 +160,64 @@ window.Webflow.push(function() {
             underline: document.querySelector(".logo-underline")
         });
     }
+});
+
+// Stacking Sections Animation
+function initStackingSections() {
+  console.log("initStackingSections called");
+  
+  const sections = gsap.utils.toArray('.stack-section');
+  console.log("Found stack sections:", sections.length);
+  
+  sections.forEach((section, i) => {
+    console.log(`Setting up section ${i + 1}`);
+    
+    // Add a temporary background color to visualize the section
+    gsap.set(section, {
+      backgroundColor: `hsl(${i * 40}, 70%, 80%)`,
+      transformOrigin: "center center",
+      position: "relative",
+      zIndex: i + 2  // Start at 2 since hero is 1
+    });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: "top bottom",
+        end: "top top",
+        scrub: 1.5,
+        markers: true, // Add markers to visualize trigger points
+        onEnter: () => console.log(`Section ${i + 1} enter`),
+        onLeave: () => console.log(`Section ${i + 1} leave`),
+      }
+    });
+
+    // Animate from bottom with rotation
+    tl.fromTo(section, {
+      y: "100vh",
+      rotation: 5,
+    }, {
+      y: 0,
+      rotation: 0,
+      ease: "power2.inOut",
+      onStart: () => console.log(`Section ${i + 1} animation started`),
+      onComplete: () => console.log(`Section ${i + 1} animation completed`)
+    });
+  });
+}
+
+// Initialize all animations
+window.addEventListener('DOMContentLoaded', () => {
+  console.log("DOM Content Loaded");
+  
+  // Initialize existing animations
+  try {
+    // ... existing initialization code ...
+    
+    // Initialize stacking sections
+    initStackingSections();
+    console.log("Stack sections initialization complete");
+  } catch (error) {
+    console.error("Error during initialization:", error);
+  }
 }); 
