@@ -80,6 +80,19 @@ window.addEventListener('load', async () => {
   // Register plugins
   gsap.registerPlugin(SplitText, ScrollTrigger);
   
+  // Set initial visibility for hero area
+  gsap.set('.hero-area', {
+    visibility: 'visible',
+    opacity: 1,
+    display: 'block'
+  });
+
+  // Ensure main elements are visible
+  gsap.set(['.main-logo', '.bg-video', '.nav-bar-main'], {
+    visibility: 'visible',
+    display: 'block'
+  });
+  
   // Kill any existing animations
   gsap.killTweensOf(".main-logo");
   gsap.killTweensOf(".bg-video");
@@ -103,25 +116,50 @@ window.addEventListener('load', async () => {
 
 // Hero animations setup
 function setupHeroAnimations(timeline) {
+  console.log('🎭 Setting up hero animations...');
+  
+  // Force immediate visibility of hero area elements
+  gsap.set('.hero-area', {
+    visibility: 'visible',
+    opacity: 1,
+    display: 'block'
+  });
+  
   // Create separate timeline for nav bar animation
   const navTimeline = gsap.timeline();
   
   // Set initial state of nav bar and animate it
   gsap.set(".nav-bar-main", {
     y: -88,
+    opacity: 1,
+    visibility: 'visible',
+    display: 'block'
+  });
+
+  // Ensure main logo is visible before animation
+  gsap.set(".main-logo", {
+    visibility: 'visible',
+    display: 'block',
     opacity: 1
   });
 
+  // Set initial states for other elements
   gsap.set([".Nav Menu", ".Brand", ".top-navlink", ".Menu Button"], {
-    opacity: 0
+    opacity: 0,
+    visibility: 'visible',
+    display: 'block'
   });
 
   gsap.set(".top-logo", {
-    opacity: 0
+    opacity: 0,
+    visibility: 'visible',
+    display: 'block'
   });
 
   gsap.set(".cities-label", {
-    opacity: 0
+    opacity: 0,
+    visibility: 'visible',
+    display: 'block'
   });
 
   // Get the main logo element
@@ -132,12 +170,6 @@ function setupHeroAnimations(timeline) {
       top: rect.top,
       left: rect.left,
       transform: window.getComputedStyle(mainLogo).transform
-    });
-
-    // Force the logo to stay in its original position and set initial opacity
-    gsap.set(".main-logo", {
-      clearProps: "all",
-      opacity: 1
     });
 
     // Create the split text for main logo
