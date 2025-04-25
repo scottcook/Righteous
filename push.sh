@@ -3,14 +3,14 @@
 # Add all changes
 git add .
 
-# Get current timestamp for commit message
-timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+# Get the current timestamp
+timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
 # Commit with timestamp
-git commit -m "Update animation - $timestamp"
+git commit -m "Update site - $timestamp"
 
-# Push to main branch
-git push origin main
+# Force push to main branch
+git push -f origin main
 
 # Get the latest commit hash
 commit_hash=$(git rev-parse HEAD)
