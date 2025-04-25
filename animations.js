@@ -2,7 +2,7 @@
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 // Wait for DOM content and web fonts to load
-window.addEventListener("load", () => {
+document.addEventListener("DOMContentLoaded", function() {
     // Create main timeline
     const mainTl = gsap.timeline();
 
@@ -105,5 +105,4 @@ window.addEventListener("load", () => {
             duration: 1,
             ease: "elastic.out(1, 0.5)"
         }, "-=0.2");
-});
-
+}); 

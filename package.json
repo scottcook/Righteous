@@ -4,7 +4,7 @@
   "description": "Local development environment for Righteous Webflow site",
   "main": "index.js",
   "scripts": {
-    "start": "http-server . -p 5500 -c-1"
+    "start": "http-server . -p 3000 -c-1"
   },
   "dependencies": {
     "gsap": "^3.12.5"
