@@ -166,45 +166,58 @@ window.Webflow.push(function() {
 function initStackingSections() {
   console.log("initStackingSections called");
   
+  // Add scroll spacer if it doesn't exist
+  if (!document.querySelector('.scroll-spacer')) {
+    const spacer = document.createElement('div');
+    spacer.className = 'scroll-spacer';
+    document.querySelector('.main-wrapper').appendChild(spacer);
+  }
+
   const sections = gsap.utils.toArray('.stack-section');
   console.log("Found stack sections:", sections.length);
-  
+
   // Set initial states
-  sections.forEach((section, i) => {
-    gsap.set(section, {
-      yPercent: 100,
-      rotateX: 5,
-      zIndex: i + 2,
-      opacity: 1
-    });
+  gsap.set(sections, {
+    yPercent: 100,
+    rotateX: 15,
+    opacity: 1,
+    transformPerspective: 1000
   });
 
-  // Create scroll-triggered animations
-  sections.forEach((section, i) => {
-    console.log(`Setting up section ${i + 1}`);
-    
-    ScrollTrigger.create({
-      trigger: section,
-      start: "top bottom",
-      end: "+=100%",
+  // Create the main timeline
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".main-wrapper",
+      start: "top top",
+      end: "+=400%",
       scrub: 1,
+      pin: true,
+      anticipatePin: 1,
       markers: true,
       onUpdate: (self) => {
-        // Calculate progress for smooth animation
-        const progress = self.progress;
-        
-        // Animate current section
-        gsap.to(section, {
-          yPercent: 100 - (progress * 100),
-          rotateX: 5 - (progress * 5),
-          duration: 0,
-          ease: "none"
-        });
-        
-        // Log for debugging
-        console.log(`Section ${i + 1} progress:`, progress);
+        console.log("Scroll progress:", self.progress);
       }
-    });
+    }
+  });
+
+  // Add each section to the timeline
+  sections.forEach((section, i) => {
+    tl.to(section, {
+      yPercent: 0,
+      rotateX: 0,
+      ease: "none",
+      duration: 1
+    }, i);
+  });
+
+  // Ensure hero area stays in place
+  ScrollTrigger.create({
+    trigger: ".hero-area",
+    start: "top top",
+    endTrigger: ".main-wrapper",
+    end: "bottom bottom",
+    pin: true,
+    pinSpacing: false
   });
 }
 

@@ -1,9 +1,15 @@
+html, body {
+  overflow: auto;
+  height: 100%;
+  margin: 0;
+}
+
 /* Stacking Sections Styles */
 .main-wrapper {
-  position: relative;
+  height: 100%;
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  position: relative;
+  overflow: visible;
 }
 
 .hero-area {
@@ -21,17 +27,23 @@
   left: 0;
   width: 100%;
   height: 100vh;
+  background-color: #fff; /* Ensure sections have a background */
   transform-style: preserve-3d;
   will-change: transform;
-  backface-visibility: hidden;
+  visibility: visible !important; /* Ensure sections remain visible */
   
-  /* Ensure content is visible */
-  color: #000;
-  padding: 2rem;
+  /* Content styling */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
+}
+
+/* Create a spacer to allow scrolling */
+.scroll-spacer {
+  height: 500vh; /* Adjust based on number of sections */
+  pointer-events: none;
+  visibility: hidden;
 }
 
 /* Optional: Add perspective to the main container */
