@@ -83,7 +83,7 @@ window.addEventListener('load', async () => {
   // Set initial states before creating timeline
   gsap.set('.hero-area', {
     visibility: 'visible',
-    opacity: 1
+    opacity: 0
   });
 
   // Set initial states for background video
