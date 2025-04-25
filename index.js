@@ -70,8 +70,8 @@ function setupSectionTransitions() {
   });
 }
 
-// GSAP animation for .main-logo element on window load
-window.addEventListener("load", async () => {
+// Initialize all animations
+window.addEventListener('load', async () => {
   console.log('🚀 Starting animation setup...');
   
   // Wait for GSAP to be ready
@@ -89,9 +89,20 @@ window.addEventListener("load", async () => {
   gsap.killTweensOf(".Nav Menu");
   console.log('🧹 Killed any existing animations');
 
-  // Create a GSAP timeline
+  // Create a GSAP timeline for hero animations
   const timeline = gsap.timeline();
   
+  // Set up hero animations
+  setupHeroAnimations(timeline);
+  
+  // Set up section transitions
+  setupSectionTransitions();
+  
+  console.log('✅ All animations initialized');
+});
+
+// Hero animations setup
+function setupHeroAnimations(timeline) {
   // Create separate timeline for nav bar animation
   const navTimeline = gsap.timeline();
   
@@ -115,45 +126,83 @@ window.addEventListener("load", async () => {
 
   // Get the main logo element
   const mainLogo = document.querySelector('.main-logo');
-  const rect = mainLogo.getBoundingClientRect();
-  console.log('📏 Initial logo position:', {
-    top: rect.top,
-    left: rect.left,
-    transform: window.getComputedStyle(mainLogo).transform
-  });
+  if (mainLogo) {
+    const rect = mainLogo.getBoundingClientRect();
+    console.log('📏 Initial logo position:', {
+      top: rect.top,
+      left: rect.left,
+      transform: window.getComputedStyle(mainLogo).transform
+    });
 
-  // Force the logo to stay in its original position and set initial opacity
-  gsap.set(".main-logo", {
-    clearProps: "all", // Clear all GSAP-controlled properties
-    opacity: 1 // Ensure we start from 0 opacity
-  });
+    // Force the logo to stay in its original position and set initial opacity
+    gsap.set(".main-logo", {
+      clearProps: "all",
+      opacity: 1
+    });
+
+    // Create the split text for main logo
+    const mainLogoSplit = new SplitText(mainLogo, {
+      type: "chars",
+      position: "relative"
+    });
+
+    // Set initial state of split characters
+    gsap.set(mainLogoSplit.chars, {
+      y: 50,
+      opacity: 0
+    });
+
+    // Animate main logo split text characters
+    timeline.to(mainLogoSplit.chars, {
+      y: 0,
+      opacity: 1,
+      duration: 1,
+      stagger: 0.05,
+      ease: "back.out(1.7)",
+    }, "+=0");
+  }
+
+  // Set up top logo animation
+  const topLogo = document.querySelector('.top-logo');
+  if (topLogo) {
+    const topLogoSplit = new SplitText(topLogo, {
+      type: "chars,words",
+      position: "relative"
+    });
+    
+    // Set initial state for top logo characters
+    gsap.set(topLogoSplit.chars, {
+      opacity: 0,
+      scale: 0,
+      rotationX: -90,
+      transformOrigin: "50% 50%"
+    });
+
+    // Make sure the top logo container is visible
+    gsap.set(".top-logo", {
+      opacity: 1
+    });
+
+    // Animate top logo characters
+    timeline.to(topLogoSplit.chars, {
+      opacity: 1,
+      scale: 1,
+      rotationX: 0,
+      duration: 1.2,
+      stagger: {
+        each: 0.05,
+        from: "random"
+      },
+      ease: "back.out(1.7)"
+    }, 1.2);
+  }
 
   // Set initial state for sticker
   gsap.set('.sticker', {
     opacity: 0,
     rotation: 180,
     transformOrigin: 'center center',
-    y: 0 // Ensure we start from original position
-  });
-
-  // Set up top logo animation
-  const topLogo = document.querySelector('.top-logo');
-  const topLogoSplit = new SplitText(topLogo, {
-    type: "chars,words",
-    position: "relative"
-  });
-  
-  // Set initial state for top logo characters
-  gsap.set(topLogoSplit.chars, {
-    opacity: 0,
-    scale: 0,
-    rotationX: -90,
-    transformOrigin: "50% 50%"
-  });
-
-  // Make sure the top logo container is visible
-  gsap.set(".top-logo", {
-    opacity: 1
+    y: 0
   });
 
   // Calculate center position (50% of viewport width)
@@ -162,78 +211,37 @@ window.addEventListener("load", async () => {
   // Set initial state of background video container
   timeline.set(".bg-video", {
     width: "100vw",
-    height: "100vh", // Explicitly set full viewport height
+    height: "100vh",
     opacity: 1,
-    position: "fixed", // Ensure it stays fixed
+    position: "fixed",
     top: 0,
     left: 0,
-    clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)` // Start as a vertical line in the center
+    clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)`
   });
 
-  // Create the split text for main logo
-  const mainLogoSplit = new SplitText(mainLogo, {
-    type: "chars",
-    position: "relative"
-  });
-
-  // Set initial state of split characters
-  gsap.set(mainLogoSplit.chars, {
-    y: 50,
-    opacity: 0
-  });
-
-  // Animate the background video container by expanding from center line
+  // Animate the background video container
   timeline.to(".bg-video", {
-    clipPath: "polygon(0% 0, 0% 100%, 100% 100%, 100% 0)", // Expand to full width
+    clipPath: "polygon(0% 0, 0% 100%, 100% 100%, 100% 0)",
     duration: 2,
     ease: "power4.inOut"
   }, 0);
 
-  // Animate nav-bar-main first
+  // Animate nav-bar-main
   timeline.to(".nav-bar-main", {
     y: 0,
     duration: 1.2,
     ease: "power3.inOut"
   }, 0.5);
 
-  // Animate top logo characters after nav starts sliding
-  timeline.to(topLogoSplit.chars, {
-    opacity: 1,
-    scale: 1,
-    rotationX: 0,
-    duration: 1.2,
-    stagger: {
-      each: 0.05,
-      from: "random"
-    },
-    ease: "back.out(1.7)"
-  }, 1.2); // Increased delay
-
-  // Animate all nav items together
+  // Animate nav items
   timeline.to([".Nav Menu", ".Brand", ".top-navlink", ".Menu Button"], {
     opacity: 1,
     duration: 1,
     stagger: 0.1,
     ease: "power2.out"
-  }, 1.3); // Changed from ">" to 1.3 to match nav items
+  }, 1.3);
 
-  // Animate the main logo to full opacity first
-  timeline.to(".main-logo", {
-    opacity: 1,
-    duration: 1,
-    ease: "power2.inOut"
-  }, 0);
-
-  // Animate main logo split text characters
-  timeline.to(mainLogoSplit.chars, {
-    y: 0,
-    opacity: 1,
-    duration: 1,
-    stagger: 0.05,
-    ease: "back.out(1.7)",
-  }, "+=0");
-
-  // Animate cities label after main logo
+  // Animate cities label
   timeline.to(".cities-label", {
     opacity: 1,
     duration: 1.2,
@@ -244,7 +252,7 @@ window.addEventListener("load", async () => {
   timeline.to('.sticker', {
     opacity: 1,
     rotation: 0,
-    y: '2px', 
+    y: '2px',
     duration: 1.2,
     ease: 'power3.out'
   }, "-=0.5")
@@ -256,105 +264,11 @@ window.addEventListener("load", async () => {
     ease: 'back.in(1.7)',
     delay: 2,
     onComplete: () => {
-      // Remove the sticker element from DOM
       const sticker = document.querySelector('.sticker');
       if (sticker) sticker.remove();
     }
   });
 
-  // First, set the initial state of the underline
-  gsap.set(".logo-underline", {
-    width: "0vw",
-    opacity: 0
-  });
-
-  // Move the animation to match nav items timing (around 1.3s mark)
-  timeline.to(".logo-underline", {
-    width: "99vw",
-    opacity: 1,
-    duration: 1.4,
-    ease: "power3.out",
-  }, 1.3);  // Changed from ">" to 1.3 to match nav items
-
-  // Log final position after animation setup
-  const finalRect = mainLogo.getBoundingClientRect();
-  console.log('📏 Final logo position after setup:', {
-    top: finalRect.top,
-    left: finalRect.left,
-    transform: window.getComputedStyle(mainLogo).transform
-  });
-
-  // Monitor for any position changes
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'style' || mutation.type === 'attributes') {
-        const currentRect = mainLogo.getBoundingClientRect();
-        console.log('🔄 Logo position changed:', {
-          top: currentRect.top,
-          left: currentRect.left,
-          transform: window.getComputedStyle(mainLogo).transform
-        });
-      }
-    });
-  });
-
-  observer.observe(mainLogo, {
-    attributes: true,
-    attributeFilter: ['style', 'class'],
-    subtree: false
-  });
-
-  // Set up scroll-triggered animations for secondary section
-  gsap.set(".skeleton-hand", {
-    rotation: -25,
-    transformOrigin: "left bottom"
-  });
-
-  gsap.set(".about-blurb", {
-    clipPath: "polygon(0 0, 0 0, 0 100%, 0% 100%)"
-  });
-
-  // Create rotation animation for skeleton hand
-  gsap.to(".skeleton-hand", {
-    rotation: 0,
-    duration: 1.5,
-    ease: "power2.out",
-    scrollTrigger: {
-      trigger: ".secondary",
-      start: "top 75%",
-      end: "top 25%",
-      scrub: 1
-    }
-  });
-
-  // Create reveal animation for about blurb
-  gsap.to(".about-blurb", {
-    clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-    duration: 1.5,
-    ease: "power2.inOut",
-    scrollTrigger: {
-      trigger: ".secondary",
-      start: "top 70%",
-      end: "top 20%",
-      scrub: 1
-    }
-  });
-
-  // Set initial state for cities
-  gsap.set(".cities", {
-    opacity: 0,
-    x: -30 // Start slightly to the left
-  });
-
-  // Animate cities alongside main logo
-  timeline.to(".cities", {
-    opacity: 1,
-    x: 0,
-    duration: 1,
-    ease: "power2.out"
-  }, 3); // The "<" makes it start at the same time as the previous animation
-
-  // After all the existing animations are set up, add:
-  setupSectionTransitions();
-});
+  return timeline;
+}
 
