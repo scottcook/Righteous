@@ -1,3 +1,8 @@
+/*
+ * This file should be hosted at:
+ * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
+ */
+
 // Wait for GSAP and SplitText to be available
 function waitForGSAP() {
   return new Promise((resolve) => {
@@ -11,6 +16,36 @@ function waitForGSAP() {
       }
     };
     check();
+  });
+}
+
+// Create our section transition function
+function setupSectionTransitions() {
+  const sections = document.querySelectorAll('.section-mask');
+  
+  sections.forEach((section) => {
+    // Set initial state
+    gsap.set(section, {
+      rotationX: 5,
+      opacity: 0,
+      yPercent: 20
+    });
+
+    // Create the scroll-triggered animation
+    gsap.to(section, {
+      rotationX: 0,
+      opacity: 1,
+      yPercent: 0,
+      duration: 1.4,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: section,
+        start: "top 80%",
+        end: "top 20%",
+        toggleActions: "play none none reverse",
+        markers: false, // Set to true for debugging
+      }
+    });
   });
 }
 
@@ -105,9 +140,12 @@ window.addEventListener("load", async () => {
   
   // Set initial state of background video container
   timeline.set(".bg-video", {
-    width: "100vw", // Set full width immediately
-    // height: "45vh",  Set full height immediately
+    width: "100vw",
+    height: "100vh", // Explicitly set full viewport height
     opacity: 1,
+    position: "fixed", // Ensure it stays fixed
+    top: 0,
+    left: 0,
     clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)` // Start as a vertical line in the center
   });
 
@@ -156,7 +194,7 @@ window.addEventListener("load", async () => {
     duration: 1,
     stagger: 0.1,
     ease: "power2.out"
-  }, 1.3); // Increased delay
+  }, 1.3); // Changed from ">" to 1.3 to match nav items
 
   // Animate the main logo to full opacity first
   timeline.to(".main-logo", {
@@ -202,6 +240,20 @@ window.addEventListener("load", async () => {
       if (sticker) sticker.remove();
     }
   });
+
+  // First, set the initial state of the underline
+  gsap.set(".logo-underline", {
+    width: "0vw",
+    opacity: 0
+  });
+
+  // Move the animation to match nav items timing (around 1.3s mark)
+  timeline.to(".logo-underline", {
+    width: "99vw",
+    opacity: 1,
+    duration: 1.4,
+    ease: "power3.out",
+  }, 1.3);  // Changed from ">" to 1.3 to match nav items
 
   // Log final position after animation setup
   const finalRect = mainLogo.getBoundingClientRect();
@@ -266,5 +318,22 @@ window.addEventListener("load", async () => {
       scrub: 1
     }
   });
+
+  // Set initial state for cities
+  gsap.set(".cities", {
+    opacity: 0,
+    x: -30 // Start slightly to the left
+  });
+
+  // Animate cities alongside main logo
+  timeline.to(".cities", {
+    opacity: 1,
+    x: 0,
+    duration: 1,
+    ease: "power2.out"
+  }, 3); // The "<" makes it start at the same time as the previous animation
+
+  // After all the existing animations are set up, add:
+  setupSectionTransitions();
 });
 
