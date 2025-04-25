@@ -9,12 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 // Wait for DOM content and web fonts to load
 document.addEventListener("DOMContentLoaded", function() {
     // Create main timeline
-    const mainTl = gsap.timeline({
-        onComplete: () => {
-            // Only initialize scroll animations after intro animation completes
-            initScrollAnimations();
-        }
-    });
+    const mainTl = gsap.timeline();
 
     // Initialize SplitText
     const mainLogoSplit = new SplitText(".main-logo", {type: "chars, words"});
@@ -28,8 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Set initial state for stack-section
     gsap.set(".stack-section", {
-        yPercent: 100,  // Start below the viewport
-        opacity: 1
+        yPercent: 100  // Start below the viewport
     });
 
     // Animation Sequence
@@ -71,26 +65,24 @@ document.addEventListener("DOMContentLoaded", function() {
             ease: "power2.out"
         }, "-=0.4");
 
-    // Function to initialize scroll animations
-    function initScrollAnimations() {
-        ScrollTrigger.create({
+    // Add scroll animations separately
+    ScrollTrigger.create({
+        trigger: ".hero-area",
+        start: "top top",
+        end: "bottom top",
+        pin: true,
+        pinSpacing: false
+    });
+
+    gsap.to(".stack-section", {
+        yPercent: 0,
+        ease: "none",
+        scrollTrigger: {
             trigger: ".hero-area",
             start: "top top",
             end: "bottom top",
-            pin: true,
-            pinSpacing: false
-        });
-
-        gsap.to(".stack-section", {
-            yPercent: 0,
-            ease: "none",
-            scrollTrigger: {
-                trigger: ".hero-area",
-                start: "top top",
-                end: "bottom top",
-                scrub: 1,
-                markers: true // This will help us debug - remove after fixing
-            }
-        });
-    }
+            scrub: 1,
+            markers: true // This will help us debug - remove after fixing
+        }
+    });
 }); 
