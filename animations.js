@@ -46,6 +46,7 @@ gsap.registerPlugin(ScrollTrigger);
             rotateX: -30
         });
 
+        // Set initial states for navigation elements
         gsap.set(".top-navlink", { 
             opacity: 0, 
             y: 20 
@@ -63,7 +64,13 @@ gsap.registerPlugin(ScrollTrigger);
                 ease: "back.out(1.7)"
             })
 
-            // Animate top logo characters with more pronounced effect
+            // Show nav-bar-main container first
+            .to(".nav-bar-main", {
+                opacity: 1,
+                duration: 0.1
+            })
+
+            // Then animate top logo characters
             .to(topLogoSplit.chars, {
                 opacity: 1,
                 y: 0,
@@ -74,7 +81,7 @@ gsap.registerPlugin(ScrollTrigger);
                 },
                 duration: 0.4,
                 ease: "back.out(1.7)"
-            }, "-=0.2")
+            })
 
             // Animate cities text
             .to(citiesTextSplit.chars, {
@@ -99,6 +106,7 @@ gsap.registerPlugin(ScrollTrigger);
         console.error("Error in animation setup:", error);
         console.log("DOM at time of error:", {
             mainLogo: document.querySelector(".main-logo"),
+            navBar: document.querySelector(".nav-bar-main"),
             topLogo: document.querySelector(".logo-lockup .top-logo"),
             cities: document.querySelector(".text-block")
         });
