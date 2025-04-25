@@ -23,29 +23,50 @@ function waitForGSAP() {
 function setupSectionTransitions() {
   const sections = document.querySelectorAll('.section-mask');
   
-  sections.forEach((section) => {
-    // Set initial state
+  sections.forEach((section, index) => {
+    // Set initial state - rotated up and out of view
     gsap.set(section, {
-      rotationX: 5,
-      opacity: 0,
-      yPercent: 20
+      rotationX: 90,
+      transformOrigin: "center top",
+      transformStyle: "preserve-3d",
+      backfaceVisibility: "hidden"
     });
 
     // Create the scroll-triggered animation
-    gsap.to(section, {
-      rotationX: 0,
-      opacity: 1,
-      yPercent: 0,
-      duration: 1.4,
-      ease: "power3.out",
+    const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: section,
+        trigger: section.parentElement,
         start: "top 80%",
         end: "top 20%",
-        toggleActions: "play none none reverse",
-        markers: false, // Set to true for debugging
+        scrub: 1.5, // Increased scrub for more inertia
+        markers: false,
+        onEnter: () => {
+          section.style.willChange = "transform";
+          gsap.set(section, { visibility: "visible" });
+        },
+        onLeave: () => {
+          section.style.willChange = "auto";
+        }
       }
     });
+
+    // Main rotation animation
+    tl.to(section, {
+      rotationX: 0,
+      duration: 2,
+      ease: "power2.out",
+    })
+    // Subtle push effect
+    .from(section, {
+      y: "100%",
+      scale: 0.95,
+      duration: 2,
+    }, 0);
+  });
+
+  // Ensure hero area stays above other sections initially
+  gsap.set('.hero-area', {
+    zIndex: 1
   });
 }
 
