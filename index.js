@@ -92,12 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         console.log("Initial animation states set");
 
-        // Set initial state for stack-section
-        gsap.set(".stack-section", {
-            yPercent: 100  // Start below the viewport
-        });
-
-        // Animation Sequence
+        // Animation Sequence for intro elements
         console.log("Starting animation sequence");
         mainTl
             // Animate main logo text characters
@@ -146,11 +141,11 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Error in animation setup:", error);
     }
 
-    // Set up scroll animations with responsive handling
+    // Set up scroll animations with mask effect
     try {
         console.log("Setting up scroll animations");
 
-        // Get the height of the hero area
+        // Get the hero and stack elements
         const heroArea = document.querySelector(".hero-area");
         const stackSection = document.querySelector(".stack-section");
         
@@ -159,44 +154,46 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         
-        // Ensure the stack section covers the full width
+        // Ensure proper positioning for the stack section to create mask effect
         gsap.set(stackSection, {
-            width: "100vw",
-            left: 0
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100vh",
+            yPercent: 100,  // Start below the viewport
+            zIndex: 2  // Higher than hero area
         });
         
-        // Fix for the gap at the bottom
-        // Ensure stack section is tall enough to fill viewport even at the end
-        gsap.set(stackSection, {
-            minHeight: "100vh"
+        // Set hero area styling
+        gsap.set(heroArea, {
+            position: "relative", 
+            zIndex: 1
         });
         
-        // Create a scroll trigger for pinning
-        const pinST = ScrollTrigger.create({
+        // Create the scroll-based reveal animation
+        ScrollTrigger.create({
             trigger: heroArea,
-            start: "top top",
-            endTrigger: "body",  // Use body as end trigger to ensure it goes to bottom of page
-            end: "bottom bottom",
             pin: true,
             pinSpacing: false,
-            onEnter: () => console.log("Hero area pinned"),
-            onUpdate: (self) => {
-                console.log("ScrollTrigger progress:", self.progress.toFixed(2));
-            }
+            start: "top top",
+            end: "+=100%",
+            onEnter: () => console.log("Hero area pinned")
         });
-
-        // Animation for the stack section
+        
+        // Create the sliding animation for the stack section
         gsap.to(stackSection, {
-            yPercent: 0,
+            yPercent: 0,  // Move to 0 (fully visible)
             ease: "none",
             scrollTrigger: {
                 trigger: heroArea,
                 start: "top top",
-                endTrigger: "body",
-                end: "bottom bottom",
-                scrub: 1,
+                end: "+=100%",
+                scrub: true,
                 markers: true,
-                onEnter: () => console.log("Stack section animation triggered")
+                onUpdate: (self) => {
+                    console.log("Stack section reveal progress:", self.progress.toFixed(2));
+                }
             }
         });
         
