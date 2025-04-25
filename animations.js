@@ -7,28 +7,33 @@ window.Webflow.push(function() {
     console.log("Animation script initializing after Webflow ready");
 
     try {
-        // Initialize SplitText for main logo - exact class from Webflow
+        // First, ensure nav bar and background are visible
+        gsap.set(".nav-bar-main", { opacity: 1 });
+        gsap.set(".background-video", { opacity: 1 });
+        console.log("Set initial visibility for nav and background");
+
+        // Initialize SplitText for main logo
         const mainLogoSplit = new SplitText(".main-logo", {
             type: "chars",
             position: "relative"
         });
         console.log("Main logo split:", mainLogoSplit.chars.length, "chars");
 
-        // Initialize SplitText for top logo - exact class from Webflow
+        // Initialize SplitText for top logo
         const topLogoSplit = new SplitText(".top-logo", {
             type: "chars",
             position: "relative"
         });
         console.log("Top logo split:", topLogoSplit.chars.length, "chars");
 
-        // Initialize SplitText for cities text - exact class from Webflow
+        // Initialize SplitText for cities text
         const citiesTextSplit = new SplitText(".text-block", {
             type: "chars",
             position: "relative"
         });
         console.log("Cities text split:", citiesTextSplit.chars.length, "chars");
 
-        // Set initial states
+        // Set initial states for animations
         gsap.set(mainLogoSplit.chars, { 
             opacity: 0,
             y: 50,
@@ -47,7 +52,6 @@ window.Webflow.push(function() {
             rotateX: -30
         });
 
-        // Set initial state for nav links
         gsap.set(".top-navlink", {
             opacity: 0,
             y: 20
@@ -57,6 +61,13 @@ window.Webflow.push(function() {
         const mainTl = gsap.timeline();
 
         mainTl
+            // Background video fade in
+            .to(".background-video", {
+                opacity: 1,
+                duration: 1,
+                ease: "power2.inOut"
+            })
+
             // Main logo animation
             .to(mainLogoSplit.chars, {
                 opacity: 1,
@@ -66,7 +77,7 @@ window.Webflow.push(function() {
                 duration: 0.4,
                 ease: "back.out(1.7)",
                 onStart: () => console.log("Starting main logo animation")
-            })
+            }, "-=0.5")
 
             // Top logo animation
             .to(topLogoSplit.chars, {
@@ -101,14 +112,22 @@ window.Webflow.push(function() {
                 ease: "power2.out"
             }, "-=0.1");
 
+        // Log the current state of key elements
+        console.log("Element visibility check:", {
+            navBar: document.querySelector(".nav-bar-main")?.style.opacity,
+            background: document.querySelector(".background-video")?.style.opacity,
+            topLogo: document.querySelector(".top-logo")?.style.opacity
+        });
+
     } catch (error) {
         console.error("Error in animation setup:", error);
-        // Log all elements we're trying to animate
         console.log("Elements check:", {
             mainLogo: document.querySelector(".main-logo")?.innerHTML,
             topLogo: document.querySelector(".top-logo")?.innerHTML,
             cities: document.querySelector(".text-block")?.innerHTML,
-            navLinks: Array.from(document.querySelectorAll(".top-navlink")).map(el => el.innerHTML)
+            navLinks: Array.from(document.querySelectorAll(".top-navlink")).map(el => el.innerHTML),
+            navBar: document.querySelector(".nav-bar-main"),
+            background: document.querySelector(".background-video")
         });
     }
 }); 
