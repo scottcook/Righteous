@@ -54,4 +54,18 @@ document.addEventListener("DOMContentLoaded", function() {
             stagger: 0.2,
             ease: "power2.out"
         }, "-=0.4");
+
+    // Stack Section Scroll Animation
+    gsap.to(".stack-section", {
+        scrollTrigger: {
+            trigger: ".hero-area",
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+            pin: true,
+            pinSpacing: false
+        },
+        y: 0,
+        ease: "none"
+    });
 }); 
