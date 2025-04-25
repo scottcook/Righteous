@@ -42,6 +42,11 @@ gsap.registerPlugin(ScrollTrigger);
             rotateX: -90
         });
 
+        // Set initial state for nav bar container
+        gsap.set(".nav-bar-main", {
+            opacity: 0
+        });
+
         // Ensure we're setting initial state for top logo chars
         if (topLogoSplit.chars && topLogoSplit.chars.length > 0) {
             console.log("Setting initial state for top logo chars");
@@ -76,13 +81,16 @@ gsap.registerPlugin(ScrollTrigger);
                 ease: "back.out(1.7)"
             })
 
-            // Show nav-bar-main container first
+            // Immediately show nav-bar-main container with minimal duration
             .to(".nav-bar-main", {
                 opacity: 1,
-                duration: 0.1
+                duration: 0.01
             })
 
-            // Then animate top logo characters - ensure we're animating the chars
+            // Small pause to ensure container is visible
+            .addLabel("navVisible")
+
+            // Then animate top logo characters
             .to(topLogoSplit.chars, {
                 opacity: 1,
                 y: 0,
@@ -95,9 +103,10 @@ gsap.registerPlugin(ScrollTrigger);
                 ease: "back.out(1.7)",
                 onStart: () => console.log("Starting top logo animation", {
                     chars: topLogoSplit.chars,
-                    length: topLogoSplit.chars.length
+                    length: topLogoSplit.chars.length,
+                    containerOpacity: document.querySelector(".nav-bar-main").style.opacity
                 })
-            })
+            }, "navVisible+=0.01")
 
             // Animate cities text
             .to(citiesTextSplit.chars, {
