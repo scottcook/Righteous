@@ -16,7 +16,15 @@ gsap.registerPlugin(ScrollTrigger);
         });
         console.log("Main logo split:", mainLogoSplit.chars.length, "chars");
 
-        const topLogoSplit = new SplitText(".logo-lockup .top-logo", {
+        // Be more specific with the top logo selector
+        const topLogoElement = document.querySelector(".logo-lockup .top-logo");
+        console.log("Found top logo element:", topLogoElement);
+        
+        if (!topLogoElement) {
+            throw new Error("Top logo element not found");
+        }
+
+        const topLogoSplit = new SplitText(topLogoElement, {
             type: "chars",
             position: "relative"
         });
@@ -34,11 +42,15 @@ gsap.registerPlugin(ScrollTrigger);
             rotateX: -90
         });
 
-        gsap.set(topLogoSplit.chars, {
-            opacity: 0,
-            y: 30,
-            rotateX: -60
-        });
+        // Ensure we're setting initial state for top logo chars
+        if (topLogoSplit.chars && topLogoSplit.chars.length > 0) {
+            console.log("Setting initial state for top logo chars");
+            gsap.set(topLogoSplit.chars, {
+                opacity: 0,
+                y: 30,
+                rotateX: -60
+            });
+        }
 
         gsap.set(citiesTextSplit.chars, {
             opacity: 0,
@@ -70,7 +82,7 @@ gsap.registerPlugin(ScrollTrigger);
                 duration: 0.1
             })
 
-            // Then animate top logo characters
+            // Then animate top logo characters - ensure we're animating the chars
             .to(topLogoSplit.chars, {
                 opacity: 1,
                 y: 0,
@@ -80,7 +92,11 @@ gsap.registerPlugin(ScrollTrigger);
                     from: "start"
                 },
                 duration: 0.4,
-                ease: "back.out(1.7)"
+                ease: "back.out(1.7)",
+                onStart: () => console.log("Starting top logo animation", {
+                    chars: topLogoSplit.chars,
+                    length: topLogoSplit.chars.length
+                })
             })
 
             // Animate cities text
