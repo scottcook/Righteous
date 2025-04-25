@@ -80,33 +80,39 @@ window.addEventListener('load', async () => {
   // Register plugins
   gsap.registerPlugin(SplitText, ScrollTrigger);
   
-  // Set initial visibility for hero area
+  // Set initial states before creating timeline
   gsap.set('.hero-area', {
     visibility: 'visible',
-    opacity: 1,
-    display: 'block'
+    opacity: 1
   });
 
-  // Ensure main elements are visible
-  gsap.set(['.main-logo', '.bg-video', '.nav-bar-main'], {
-    visibility: 'visible',
-    display: 'block'
+  // Set initial states for background video
+  gsap.set(".bg-video", {
+    width: "100vw",
+    height: "100vh",
+    opacity: 0,
+    position: "fixed",
+    top: 0,
+    left: 0
+  });
+
+  // Set initial states for navigation
+  gsap.set(".nav-bar-main", {
+    y: -88,
+    opacity: 0
+  });
+
+  gsap.set([".Nav Menu", ".Brand", ".top-navlink", ".Menu Button"], {
+    opacity: 0
+  });
+
+  gsap.set([".main-logo", ".top-logo", ".cities-label"], {
+    opacity: 0
   });
   
-  // Kill any existing animations
-  gsap.killTweensOf(".main-logo");
-  gsap.killTweensOf(".bg-video");
-  gsap.killTweensOf(".top-logo");
-  gsap.killTweensOf(".sticker");
-  gsap.killTweensOf(".nav-bar-main");
-  gsap.killTweensOf(".Nav Menu");
-  console.log('🧹 Killed any existing animations');
-
-  // Create a GSAP timeline for hero animations
-  const timeline = gsap.timeline();
-  
-  // Set up hero animations
-  setupHeroAnimations(timeline);
+  // Create and play the main timeline
+  const mainTimeline = gsap.timeline();
+  setupHeroAnimations(mainTimeline);
   
   // Set up section transitions
   setupSectionTransitions();
@@ -117,82 +123,56 @@ window.addEventListener('load', async () => {
 // Hero animations setup
 function setupHeroAnimations(timeline) {
   console.log('🎭 Setting up hero animations...');
+
+  // Calculate center position (50% of viewport width)
+  const centerPos = 50;
   
-  // Force immediate visibility of hero area elements
-  gsap.set('.hero-area', {
-    visibility: 'visible',
+  // Animate the background video first
+  timeline.to(".bg-video", {
     opacity: 1,
-    display: 'block'
-  });
-  
-  // Create separate timeline for nav bar animation
-  const navTimeline = gsap.timeline();
-  
-  // Set initial state of nav bar and animate it
-  gsap.set(".nav-bar-main", {
-    y: -88,
-    opacity: 1,
-    visibility: 'visible',
-    display: 'block'
-  });
-
-  // Ensure main logo is visible before animation
-  gsap.set(".main-logo", {
-    visibility: 'visible',
-    display: 'block',
-    opacity: 1
-  });
-
-  // Set initial states for other elements
-  gsap.set([".Nav Menu", ".Brand", ".top-navlink", ".Menu Button"], {
-    opacity: 0,
-    visibility: 'visible',
-    display: 'block'
-  });
-
-  gsap.set(".top-logo", {
-    opacity: 0,
-    visibility: 'visible',
-    display: 'block'
-  });
-
-  gsap.set(".cities-label", {
-    opacity: 0,
-    visibility: 'visible',
-    display: 'block'
-  });
+    duration: 0.5
+  })
+  .fromTo(".bg-video", {
+    clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)`
+  }, {
+    clipPath: "polygon(0% 0, 0% 100%, 100% 100%, 100% 0)",
+    duration: 2,
+    ease: "power4.inOut"
+  }, "<");
 
   // Get the main logo element
   const mainLogo = document.querySelector('.main-logo');
   if (mainLogo) {
-    const rect = mainLogo.getBoundingClientRect();
-    console.log('📏 Initial logo position:', {
-      top: rect.top,
-      left: rect.left,
-      transform: window.getComputedStyle(mainLogo).transform
-    });
-
     // Create the split text for main logo
     const mainLogoSplit = new SplitText(mainLogo, {
       type: "chars",
       position: "relative"
     });
 
-    // Set initial state of split characters
-    gsap.set(mainLogoSplit.chars, {
+    // Animate main logo
+    timeline.to(".main-logo", {
+      opacity: 1,
+      duration: 0.5
+    }, "-=1.5")
+    .fromTo(mainLogoSplit.chars, {
       y: 50,
       opacity: 0
-    });
-
-    // Animate main logo split text characters
-    timeline.to(mainLogoSplit.chars, {
+    }, {
       y: 0,
       opacity: 1,
       duration: 1,
       stagger: 0.05,
-      ease: "back.out(1.7)",
-    }, "+=0");
+      ease: "back.out(1.7)"
+    }, "<");
   }
+
+  // Animate nav-bar-main
+  timeline.to(".nav-bar-main", {
+    y: 0,
+    opacity: 1,
+    duration: 1.2,
+    ease: "power3.inOut"
+  }, "-=0.5");
 
   // Set up top logo animation
   const topLogo = document.querySelector('.top-logo');
@@ -201,22 +181,16 @@ function setupHeroAnimations(timeline) {
       type: "chars,words",
       position: "relative"
     });
-    
-    // Set initial state for top logo characters
-    gsap.set(topLogoSplit.chars, {
+
+    timeline.to(".top-logo", {
+      opacity: 1,
+      duration: 0.5
+    }, "-=0.8")
+    .fromTo(topLogoSplit.chars, {
       opacity: 0,
       scale: 0,
-      rotationX: -90,
-      transformOrigin: "50% 50%"
-    });
-
-    // Make sure the top logo container is visible
-    gsap.set(".top-logo", {
-      opacity: 1
-    });
-
-    // Animate top logo characters
-    timeline.to(topLogoSplit.chars, {
+      rotationX: -90
+    }, {
       opacity: 1,
       scale: 1,
       rotationX: 0,
@@ -226,44 +200,8 @@ function setupHeroAnimations(timeline) {
         from: "random"
       },
       ease: "back.out(1.7)"
-    }, 1.2);
+    }, "<");
   }
-
-  // Set initial state for sticker
-  gsap.set('.sticker', {
-    opacity: 0,
-    rotation: 180,
-    transformOrigin: 'center center',
-    y: 0
-  });
-
-  // Calculate center position (50% of viewport width)
-  const centerPos = 50;
-  
-  // Set initial state of background video container
-  timeline.set(".bg-video", {
-    width: "100vw",
-    height: "100vh",
-    opacity: 1,
-    position: "fixed",
-    top: 0,
-    left: 0,
-    clipPath: `polygon(${centerPos}% 0, ${centerPos}% 100%, ${centerPos}% 100%, ${centerPos}% 0)`
-  });
-
-  // Animate the background video container
-  timeline.to(".bg-video", {
-    clipPath: "polygon(0% 0, 0% 100%, 100% 100%, 100% 0)",
-    duration: 2,
-    ease: "power4.inOut"
-  }, 0);
-
-  // Animate nav-bar-main
-  timeline.to(".nav-bar-main", {
-    y: 0,
-    duration: 1.2,
-    ease: "power3.inOut"
-  }, 0.5);
 
   // Animate nav items
   timeline.to([".Nav Menu", ".Brand", ".top-navlink", ".Menu Button"], {
@@ -271,24 +209,32 @@ function setupHeroAnimations(timeline) {
     duration: 1,
     stagger: 0.1,
     ease: "power2.out"
-  }, 1.3);
+  }, "-=0.5");
 
   // Animate cities label
   timeline.to(".cities-label", {
     opacity: 1,
     duration: 1.2,
     ease: "power2.out"
-  }, ">");
+  }, "-=0.5");
 
   // Animate the sticker
-  timeline.to('.sticker', {
-    opacity: 1,
-    rotation: 0,
-    y: '2px',
-    duration: 1.2,
-    ease: 'power3.out'
-  }, "-=0.5")
-  .to('.sticker', {
+  timeline.fromTo('.sticker', 
+    {
+      opacity: 0,
+      rotation: 180,
+      scale: 0.5,
+      y: -20
+    },
+    {
+      opacity: 1,
+      rotation: 0,
+      scale: 1,
+      y: 0,
+      duration: 1.2,
+      ease: 'power3.out'
+    }, "-=0.5"
+  ).to('.sticker', {
     opacity: 0,
     rotation: 360,
     scale: 0.5,
@@ -301,6 +247,9 @@ function setupHeroAnimations(timeline) {
     }
   });
 
+  // Play the timeline
+  timeline.play();
+  
   return timeline;
 }
 
