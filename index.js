@@ -5,84 +5,107 @@
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
+console.log("GSAP and ScrollTrigger registered");
 
 // Wait for DOM content and web fonts to load
 document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM Content Loaded");
+    
     // Create main timeline
     const mainTl = gsap.timeline();
 
     // Initialize SplitText
-    const mainLogoSplit = new SplitText(".main-logo", {type: "chars, words"});
-    const topLogoSplit = new SplitText(".top-logo", {type: "chars, words"});
-    const citiesTextSplit = new SplitText(".text-block", {type: "chars, words"});
+    try {
+        console.log("Initializing SplitText");
+        const mainLogoSplit = new SplitText(".main-logo", {type: "chars, words"});
+        const topLogoSplit = new SplitText(".top-logo", {type: "chars, words"});
+        const citiesTextSplit = new SplitText(".text-block", {type: "chars, words"});
+        console.log("SplitText initialized successfully");
 
-    // Set initial states
-    gsap.set([".main-logo", ".top-logo", ".text-block", ".top-navlink"], {
-        opacity: 0
-    });
+        // Set initial states
+        gsap.set([".main-logo", ".top-logo", ".text-block", ".top-navlink"], {
+            opacity: 0
+        });
+        console.log("Initial states set");
 
-    // Set initial state for stack-section
-    gsap.set(".stack-section", {
-        yPercent: 100  // Start below the viewport
-    });
+        // Set initial state for stack-section
+        gsap.set(".stack-section", {
+            yPercent: 100  // Start below the viewport
+        });
 
-    // Animation Sequence
-    mainTl
-        // Animate main logo text characters
-        .from(mainLogoSplit.chars, {
-            opacity: 0,
-            y: 50,
-            rotateX: -90,
-            stagger: 0.05,
-            duration: 0.8,
-            ease: "back.out(1.7)"
-        })
+        // Animation Sequence
+        console.log("Starting animation sequence");
+        mainTl
+            // Animate main logo text characters
+            .from(mainLogoSplit.chars, {
+                opacity: 0,
+                y: 50,
+                rotateX: -90,
+                stagger: 0.05,
+                duration: 0.8,
+                ease: "back.out(1.7)",
+                onStart: () => console.log("Main logo animation started")
+            })
 
-        // Animate top logo
-        .from(topLogoSplit.chars, {
-            opacity: 0,
-            y: 30,
-            stagger: 0.03,
-            duration: 0.5,
-            ease: "power2.out"
-        })
+            // Animate top logo
+            .from(topLogoSplit.chars, {
+                opacity: 0,
+                y: 30,
+                stagger: 0.03,
+                duration: 0.5,
+                ease: "power2.out",
+                onStart: () => console.log("Top logo animation started")
+            })
 
-        // Animate cities text
-        .from(citiesTextSplit.chars, {
-            opacity: 0,
-            y: 20,
-            stagger: 0.02,
-            duration: 0.4,
-            ease: "power2.out"
-        })
+            // Animate cities text
+            .from(citiesTextSplit.chars, {
+                opacity: 0,
+                y: 20,
+                stagger: 0.02,
+                duration: 0.4,
+                ease: "power2.out",
+                onStart: () => console.log("Cities text animation started")
+            })
 
-        // Fade in navigation elements
-        .to(".top-navlink", {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.2,
-            ease: "power2.out"
-        }, "-=0.4");
+            // Fade in navigation elements
+            .to(".top-navlink", {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.2,
+                ease: "power2.out",
+                onStart: () => console.log("Nav links animation started")
+            }, "-=0.4");
+
+    } catch (error) {
+        console.error("Error in animation setup:", error);
+    }
 
     // Add scroll animations separately
-    ScrollTrigger.create({
-        trigger: ".hero-area",
-        start: "top top",
-        end: "bottom top",
-        pin: true,
-        pinSpacing: false
-    });
-
-    gsap.to(".stack-section", {
-        yPercent: 0,
-        ease: "none",
-        scrollTrigger: {
+    try {
+        console.log("Setting up scroll animations");
+        ScrollTrigger.create({
             trigger: ".hero-area",
             start: "top top",
             end: "bottom top",
-            scrub: 1,
-            markers: true // This will help us debug - remove after fixing
-        }
-    });
+            pin: true,
+            pinSpacing: false,
+            onEnter: () => console.log("Hero area pinned")
+        });
+
+        gsap.to(".stack-section", {
+            yPercent: 0,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero-area",
+                start: "top top",
+                end: "bottom top",
+                scrub: 1,
+                markers: true,
+                onEnter: () => console.log("Stack section animation triggered")
+            }
+        });
+    } catch (error) {
+        console.error("Error in scroll setup:", error);
+    }
 }); 
