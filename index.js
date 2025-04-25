@@ -52,21 +52,45 @@ document.addEventListener("DOMContentLoaded", function() {
     try {
         console.log("Initializing SplitText");
         
-        // Initialize SplitText
-        const mainLogoSplit = new SplitText(mainLogoSelector, {type: "chars, words"});
-        const topLogoSplit = new SplitText(topLogoSelector, {type: "chars, words"});
-        const citiesTextSplit = new SplitText(textBlockSelector, {type: "chars, words"});
+        // Make sure SplitText is available
+        if (typeof SplitText === 'undefined') {
+            console.error("SplitText plugin not loaded!");
+            return;
+        }
+        
+        // Initialize SplitText with more split types for more dramatic effect
+        const mainLogoSplit = new SplitText(mainLogoSelector, {type: "chars,words,lines"});
+        const topLogoSplit = new SplitText(topLogoSelector, {type: "chars,words,lines"});
+        const citiesTextSplit = new SplitText(textBlockSelector, {type: "chars,words,lines"});
         
         console.log("SplitText initialized successfully with:");
         console.log("- Main logo chars:", mainLogoSplit.chars.length);
         console.log("- Top logo chars:", topLogoSplit.chars.length);
         console.log("- Cities text chars:", citiesTextSplit.chars.length);
 
-        // Set initial states - start with opacity 0
-        gsap.set([mainLogoSelector, topLogoSelector, textBlockSelector, navLinksSelector], {
-            opacity: 0
+        // Set initial styles for better split text effect
+        gsap.set(mainLogoSplit.chars, { 
+            opacity: 0,
+            y: 80,
+            rotateX: -90
         });
-        console.log("Initial states set to opacity 0");
+        
+        gsap.set(topLogoSplit.chars, { 
+            opacity: 0,
+            y: 50 
+        });
+        
+        gsap.set(citiesTextSplit.chars, { 
+            opacity: 0,
+            y: 30 
+        });
+        
+        gsap.set(navLinksSelector, {
+            opacity: 0,
+            y: 20
+        });
+        
+        console.log("Initial animation states set");
 
         // Set initial state for stack-section
         gsap.set(".stack-section", {
@@ -77,50 +101,35 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("Starting animation sequence");
         mainTl
             // Animate main logo text characters
-            .from(mainLogoSplit.chars, {
-                opacity: 0,
-                y: 50,
-                rotateX: -90,
-                stagger: 0.05,
-                duration: 0.8,
-                ease: "back.out(1.7)",
-                onStart: () => console.log("Main logo animation started")
-            })
-            .to(mainLogoSelector, {
+            .to(mainLogoSplit.chars, {
                 opacity: 1,
-                duration: 0.1,
-                onComplete: () => console.log("Main logo opacity set to 1")
+                y: 0,
+                rotateX: 0,
+                stagger: 0.05,
+                duration: 1.2,
+                ease: "back.out(2)",
+                onStart: () => console.log("Main logo animation started")
             })
 
             // Animate top logo
-            .from(topLogoSplit.chars, {
-                opacity: 0,
-                y: 30,
+            .to(topLogoSplit.chars, {
+                opacity: 1,
+                y: 0,
                 stagger: 0.03,
-                duration: 0.5,
+                duration: 0.7,
                 ease: "power2.out",
                 onStart: () => console.log("Top logo animation started")
-            })
-            .to(topLogoSelector, {
-                opacity: 1,
-                duration: 0.1,
-                onComplete: () => console.log("Top logo opacity set to 1")
-            })
+            }, "-=0.3")
 
             // Animate cities text
-            .from(citiesTextSplit.chars, {
-                opacity: 0,
-                y: 20,
+            .to(citiesTextSplit.chars, {
+                opacity: 1,
+                y: 0,
                 stagger: 0.02,
-                duration: 0.4,
+                duration: 0.5,
                 ease: "power2.out",
                 onStart: () => console.log("Cities text animation started")
-            })
-            .to(textBlockSelector, {
-                opacity: 1,
-                duration: 0.1,
-                onComplete: () => console.log("Cities text opacity set to 1")
-            })
+            }, "-=0.3")
 
             // Fade in navigation elements
             .to(navLinksSelector, {
