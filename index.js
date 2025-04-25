@@ -13,11 +13,11 @@ window.Webflow.push(function() {
         // Set initial states for background and underline
         gsap.set(".bg-video", { 
             opacity: 0,
-            visibility: "visible" // Ensure it's visible before animation
+            visibility: "visible"
         });
         
         gsap.set(".logo-underline", { 
-            opacity: 1, // Ensure the underline is fully visible
+            opacity: 1,
             scaleX: 0,
             transformOrigin: "left center"
         });
@@ -148,6 +148,12 @@ window.Webflow.push(function() {
             topLogo: document.querySelector(".top-logo")?.style.opacity
         });
 
+        // Initialize stacking sections AFTER hero animation
+        mainTl.eventCallback("onComplete", () => {
+            console.log("Hero animation complete, initializing section animations");
+            initStackingSections();
+        });
+
     } catch (error) {
         console.error("Error in animation setup:", error);
         console.log("Elements check:", {
@@ -164,61 +170,84 @@ window.Webflow.push(function() {
 
 // Stacking Sections Animation
 function initStackingSections() {
-  console.log("initStackingSections called");
-  
-  // Add scroll spacer if it doesn't exist
-  if (!document.querySelector('.scroll-spacer')) {
-    const spacer = document.createElement('div');
-    spacer.className = 'scroll-spacer';
-    document.querySelector('.main-wrapper').appendChild(spacer);
-  }
+    console.log("Initializing stacking sections");
 
-  const sections = gsap.utils.toArray('.stack-section');
-  console.log("Found stack sections:", sections.length);
-
-  // Set initial states
-  gsap.set(sections, {
-    yPercent: 100,
-    rotateX: 15,
-    opacity: 1,
-    transformPerspective: 1000
-  });
-
-  // Create the main timeline
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: ".main-wrapper",
-      start: "top top",
-      end: "+=400%",
-      scrub: 1,
-      pin: true,
-      anticipatePin: 1,
-      markers: true,
-      onUpdate: (self) => {
-        console.log("Scroll progress:", self.progress);
-      }
+    // Add scroll spacer if it doesn't exist
+    if (!document.querySelector('.scroll-spacer')) {
+        const spacer = document.createElement('div');
+        spacer.className = 'scroll-spacer';
+        document.querySelector('.main-wrapper').appendChild(spacer);
+        console.log("Added scroll spacer");
     }
-  });
 
-  // Add each section to the timeline
-  sections.forEach((section, i) => {
-    tl.to(section, {
-      yPercent: 0,
-      rotateX: 0,
-      ease: "none",
-      duration: 1
-    }, i);
-  });
+    const sections = gsap.utils.toArray('.stack-section');
+    console.log("Found stack sections:", sections.length);
 
-  // Ensure hero area stays in place
-  ScrollTrigger.create({
-    trigger: ".hero-area",
-    start: "top top",
-    endTrigger: ".main-wrapper",
-    end: "bottom bottom",
-    pin: true,
-    pinSpacing: false
-  });
+    // Debug section positions
+    sections.forEach((section, i) => {
+        console.log(`Section ${i + 1} initial z-index:`, getComputedStyle(section).zIndex);
+    });
+
+    // Set initial states with explicit z-indexing
+    sections.forEach((section, i) => {
+        gsap.set(section, {
+            yPercent: 100,
+            rotateX: 15,
+            opacity: 1,
+            zIndex: i + 2,
+            transformPerspective: 1000
+        });
+        console.log(`Set initial state for section ${i + 1}`);
+    });
+
+    // Create the main timeline
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".main-wrapper",
+            start: "top top",
+            end: "+=400%",
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            markers: true,
+            onUpdate: (self) => {
+                console.log("Scroll progress:", self.progress.toFixed(2));
+            },
+            onToggle: (self) => {
+                console.log("ScrollTrigger toggled:", self.isActive);
+            }
+        }
+    });
+
+    // Add each section to the timeline with logging
+    sections.forEach((section, i) => {
+        console.log(`Adding section ${i + 1} to timeline`);
+        tl.to(section, {
+            yPercent: 0,
+            rotateX: 0,
+            ease: "none",
+            duration: 1,
+            onStart: () => console.log(`Section ${i + 1} animation starting`),
+            onComplete: () => console.log(`Section ${i + 1} animation complete`)
+        }, i);
+    });
+
+    // Pin hero area separately
+    ScrollTrigger.create({
+        trigger: ".hero-area",
+        start: "top top",
+        endTrigger: ".main-wrapper",
+        end: "bottom bottom",
+        pin: true,
+        pinSpacing: false,
+        onToggle: (self) => {
+            console.log("Hero pin state:", self.isActive);
+        }
+    });
+
+    // Force a refresh of ScrollTrigger
+    ScrollTrigger.refresh();
+    console.log("ScrollTrigger refreshed");
 }
 
 // Initialize all animations

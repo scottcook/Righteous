@@ -19,6 +19,7 @@ html, body {
   width: 100%;
   height: 100vh;
   z-index: 1;
+  background-color: #000; /* Ensure hero has a background */
 }
 
 .stack-section {
@@ -27,10 +28,11 @@ html, body {
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: #fff; /* Ensure sections have a background */
+  background-color: #fff; /* Base background color */
   transform-style: preserve-3d;
   will-change: transform;
-  visibility: visible !important; /* Ensure sections remain visible */
+  visibility: visible !important;
+  opacity: 1 !important;
   
   /* Content styling */
   display: flex;
@@ -39,9 +41,15 @@ html, body {
   font-size: 2rem;
 }
 
+/* Individual section colors for visibility */
+.stack-section:nth-child(2) { background-color: #ff0000; z-index: 2; }
+.stack-section:nth-child(3) { background-color: #00ff00; z-index: 3; }
+.stack-section:nth-child(4) { background-color: #0000ff; z-index: 4; }
+.stack-section:nth-child(5) { background-color: #yellow; z-index: 5; }
+
 /* Create a spacer to allow scrolling */
 .scroll-spacer {
-  height: 500vh; /* Adjust based on number of sections */
+  height: 500vh;
   pointer-events: none;
   visibility: hidden;
 }
