@@ -154,67 +154,69 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error("Hero area or stack sections not found");
             return;
         }
-        
-        // Create a spacer div with height based on number of sections
-        const spacer = document.createElement('div');
-        spacer.className = 'scroll-spacer';
-        // Reduce the spacer height to create tighter scrolling
-        spacer.style.height = `${(stackSections.length) * 100}vh`;
-        spacer.style.width = '100%';
-        spacer.style.position = 'relative';
-        spacer.style.zIndex = '1';
-        spacer.style.visibility = 'hidden';
-        document.body.appendChild(spacer);
-        
+
         // Pin the hero section
         ScrollTrigger.create({
             trigger: heroArea,
             start: "top top",
-            end: "bottom top", // End pinning when hero leaves viewport
+            end: "bottom top",
             pin: true,
-            pinSpacing: false, // Changed to false to prevent extra space
-            anticipatePin: 1,
-            onEnter: () => console.log("Hero area pinned"),
-            markers: false
+            pinSpacing: false
         });
 
         // Set up each stack section
         stackSections.forEach((section, index) => {
-            // Calculate z-index to ensure proper stacking
-            const zIndex = 2 + index; // Start at 2 since hero is 1
-            
-            // Set initial positioning for each section
+            // Initial setup for each section
             gsap.set(section, {
                 position: "fixed",
-                top: "0",
-                left: "0",
+                top: 0,
+                left: 0,
                 width: "100%",
                 height: "100vh",
-                yPercent: 100, // Start below viewport
-                zIndex: zIndex
+                yPercent: 100,
+                zIndex: index + 2
             });
 
-            // Create the sliding animation for each section
-            gsap.to(section, {
-                yPercent: 0,
-                ease: "none",
+            // Create scroll-linked animation
+            const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: spacer,
-                    start: () => `top+=${index * 50}vh top`, // Reduced offset to 50vh
-                    end: () => `top+=${(index * 50) + 100}vh top`, // Full viewport height for animation
-                    scrub: 1, // Added slight smoothing
+                    trigger: section,
+                    start: "top bottom", // Animation starts when section's top hits viewport bottom
+                    end: "top top", // Ends when section's top reaches viewport top
+                    scrub: 1,
                     markers: false,
-                    id: `stack-reveal-${index}`,
-                    onEnter: () => console.log(`Section ${index + 1} animation started`),
-                    onLeave: () => console.log(`Section ${index + 1} animation completed`)
+                    onEnter: () => console.log(`Section ${index + 1} entering`),
+                    onLeave: () => console.log(`Section ${index + 1} leaving`),
+                    onEnterBack: () => console.log(`Section ${index + 1} entering back`),
+                    onLeaveBack: () => console.log(`Section ${index + 1} leaving back`),
+                    invalidateOnRefresh: true // Recalculate on resize
                 }
             });
+
+            // Add animation to timeline
+            tl.fromTo(section, 
+                { yPercent: 100 }, // Start position (below viewport)
+                { 
+                    yPercent: 0, // End position (fully visible)
+                    ease: "none"
+                }
+            );
         });
-        
-        // Handle browser resize
+
+        // Create spacer for proper scrolling
+        const spacerHeight = (stackSections.length + 1) * window.innerHeight;
+        const spacer = document.createElement('div');
+        spacer.style.height = `${spacerHeight}px`;
+        spacer.style.position = 'relative';
+        spacer.style.pointerEvents = 'none';
+        document.body.appendChild(spacer);
+
+        // Handle resize
         window.addEventListener("resize", () => {
-            ScrollTrigger.refresh(true);
-            console.log("ScrollTrigger refreshed on resize");
+            // Update spacer height
+            spacer.style.height = `${(stackSections.length + 1) * window.innerHeight}px`;
+            // Refresh all ScrollTriggers
+            ScrollTrigger.refresh();
         });
         
     } catch (error) {
