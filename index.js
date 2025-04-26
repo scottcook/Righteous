@@ -149,32 +149,22 @@ document.addEventListener("DOMContentLoaded", function() {
         const heroArea = document.querySelector(".hero-area");
         const stackSection = document.querySelector(".stack-section");
         const mainWrapper = document.querySelector(".main-wrapper");
+        const body = document.body;
         
         if (!heroArea || !stackSection) {
             console.error("Hero area or stack section not found");
             return;
         }
         
-        // Calculate document height and make sure there's enough space
-        const docHeight = Math.max(
-            document.body.scrollHeight, 
-            document.body.offsetHeight, 
-            document.documentElement.clientHeight, 
-            document.documentElement.scrollHeight, 
-            document.documentElement.offsetHeight
-        );
-        
-        // Calculate viewport height
-        const vh = window.innerHeight;
-        
-        console.log("Document height:", docHeight, "Viewport height:", vh);
-        
-        // Ensure main wrapper is tall enough
-        if (mainWrapper) {
-            gsap.set(mainWrapper, {
-                minHeight: docHeight + vh  // Add extra viewport height to prevent gap
-            });
-        }
+        // Create a spacer div to push content down and prevent the gap
+        const spacer = document.createElement('div');
+        spacer.className = 'scroll-spacer';
+        spacer.style.height = '100vh';
+        spacer.style.width = '100%';
+        spacer.style.position = 'relative';
+        spacer.style.zIndex = '1';
+        spacer.style.visibility = 'hidden';
+        document.body.appendChild(spacer);
         
         // Ensure proper positioning for the stack section to create mask effect
         gsap.set(stackSection, {
@@ -183,51 +173,47 @@ document.addEventListener("DOMContentLoaded", function() {
             left: "0",
             width: "100%",
             height: "100vh",
-            minHeight: "100vh",
             yPercent: 100,  // Start below the viewport (invisible on page load)
             zIndex: 2  // Higher than hero area
         });
         
-        // Set hero area styling
+        // Set hero area styling for proper masking
         gsap.set(heroArea, {
             position: "relative", 
             zIndex: 1,
             height: "100vh" // Ensure hero fills viewport
         });
         
-        // Create the scroll-based reveal animation
-        ScrollTrigger.create({
+        // Pin the hero section and create the mask effect
+        const scrollTrigger = ScrollTrigger.create({
             trigger: heroArea,
-            pin: true,
-            pinSpacing: false,
             start: "top top",
-            end: "bottom bottom", // Pin until the bottom of the document
-            onEnter: () => console.log("Hero area pinned")
+            end: "+=100%", // Animation lasts for one full viewport height of scrolling
+            pin: true,
+            pinSpacing: true, // This creates space in the document for the pinned element
+            anticipatePin: 1, // Helps prevent jitter
+            onEnter: () => console.log("Hero area pinned"),
+            markers: false // Set to true for debugging
         });
         
         // Create the sliding animation for the stack section
         gsap.to(stackSection, {
-            yPercent: 0,  // Move to 0 (fully visible)
+            yPercent: 0,
             ease: "none",
             scrollTrigger: {
                 trigger: heroArea,
                 start: "top top",
-                endTrigger: "html", // Use the entire document as end trigger
-                end: "bottom bottom",
+                end: "+=100%", // Match the pin duration
                 scrub: true,
                 markers: false, // Set to true for debugging
-                onUpdate: (self) => {
-                    if (self.progress > 0.95) {
-                        console.log("Near bottom:", self.progress.toFixed(2));
-                    }
-                }
+                id: "stack-reveal"
             }
         });
         
         // Handle browser resize
         window.addEventListener("resize", function() {
             // Force ScrollTrigger to recalculate positions and dimensions
-            ScrollTrigger.refresh(true); // true = deep refresh
+            ScrollTrigger.refresh(true); 
             console.log("ScrollTrigger refreshed on resize");
         });
         
