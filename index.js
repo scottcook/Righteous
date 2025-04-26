@@ -172,16 +172,18 @@ document.addEventListener("DOMContentLoaded", function() {
         // Create spacer for proper scrolling - each section 100vh
         const spacer = document.createElement('div');
         spacer.className = "scroll-spacer";
-        spacer.style.height = `${stackSections.length * 100}vh`;
+        // Reduce the height to require less scrolling (from 100vh per section to 70vh per section)
+        spacer.style.height = `${stackSections.length * 70}vh`;
         mainWrapper.appendChild(spacer);
 
         // Create a master timeline for all sections
         const masterTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: spacer,
-                start: "top top",
+                // Start the animation sooner (before spacer reaches top of viewport)
+                start: "top 10%", 
                 end: `bottom bottom`,
-                scrub: 0.5,
+                scrub: 0.3,
                 markers: true,
                 id: "master-timeline",
                 onUpdate: self => {
