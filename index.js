@@ -191,16 +191,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Create scroll-linked animation with different logic for first section
             if (index === 0) {
-                // First section starts from bottom of viewport
+                // First section starts at top and ends at bottom of viewport
                 ScrollTrigger.create({
-                    trigger: heroArea, // Use hero area as trigger
-                    start: "top top", // Start when hero's top hits viewport top
-                    endTrigger: spacer,
-                    end: "top top", // End when spacer's top hits viewport top
-                    animation: gsap.to(section, {
-                        yPercent: 0,
-                        ease: "none"
-                    }),
+                    trigger: heroArea,
+                    start: "top top", // Start at the very top
+                    end: "bottom bottom", // End at the bottom of viewport
+                    animation: gsap.fromTo(section, 
+                        {
+                            yPercent: 100,
+                            opacity: 1
+                        },
+                        {
+                            yPercent: 0,
+                            opacity: 1,
+                            ease: "none"
+                        }
+                    ),
                     scrub: true,
                     invalidateOnRefresh: true,
                     markers: true,
@@ -211,12 +217,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Other sections maintain their spacing
                 ScrollTrigger.create({
                     trigger: spacer,
-                    start: `top+=${(index - 1) * 100}vh top`,
-                    end: `top+=${index * 100}vh top`,
-                    animation: gsap.to(section, {
-                        yPercent: 0,
-                        ease: "none"
-                    }),
+                    start: `top+=${(index * 100)}vh top`,
+                    end: `top+=${(index * 100 + 100)}vh top`,
+                    animation: gsap.fromTo(section,
+                        {
+                            yPercent: 100,
+                            opacity: 1
+                        },
+                        {
+                            yPercent: 0,
+                            opacity: 1,
+                            ease: "none"
+                        }
+                    ),
                     scrub: true,
                     invalidateOnRefresh: true,
                     markers: true,
