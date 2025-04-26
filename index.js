@@ -180,8 +180,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const masterTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: spacer,
-                // Start the animation sooner (before spacer reaches top of viewport)
-                start: "top 90vh", 
+                // Start animation with almost no scrolling required
+                start: "top 50%", 
                 end: `bottom bottom`,
                 scrub: 0.3,
                 markers: true,
