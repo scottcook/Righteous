@@ -196,13 +196,18 @@ document.addEventListener("DOMContentLoaded", function() {
         stackSections.forEach((section, index) => {
             gsap.set(section, {
                 position: "fixed",
-                width: "100%",
+                width: "100vw", // Use viewport width instead of percentage
                 height: "100vh",
                 top: 0,
                 left: 0,
                 yPercent: 100, // Start below the viewport
                 zIndex: 2 + index
             });
+        });
+
+        // Also set hero area to viewport width
+        gsap.set(heroArea, {
+            width: "100vw"
         });
 
         // Add each section to the master timeline with precise timing
@@ -227,10 +232,23 @@ document.addEventListener("DOMContentLoaded", function() {
             );
         });
 
-        // Handle resize
+        // Handle resize with debounce for better performance
+        let resizeTimeout;
         window.addEventListener("resize", () => {
-            ScrollTrigger.update();
-            console.log("Resize handled - ScrollTriggers updated");
+            // Clear the timeout if it exists
+            if (resizeTimeout) clearTimeout(resizeTimeout);
+            
+            // Set a new timeout to handle resize after a brief delay
+            resizeTimeout = setTimeout(() => {
+                // Force update width during resize to prevent gaps
+                gsap.set([heroArea, ...stackSections], {
+                    width: "100vw",
+                    left: 0
+                });
+                
+                ScrollTrigger.update();
+                console.log("Resize handled - ScrollTriggers updated");
+            }, 100);
         });
         
     } catch (error) {
