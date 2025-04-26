@@ -158,8 +158,8 @@ document.addEventListener("DOMContentLoaded", function() {
         // Create a spacer div with height based on number of sections
         const spacer = document.createElement('div');
         spacer.className = 'scroll-spacer';
-        // Add extra viewport height for each section plus hero
-        spacer.style.height = `${(stackSections.length + 1) * 100}vh`;
+        // Reduce the spacer height to create tighter scrolling
+        spacer.style.height = `${(stackSections.length) * 100}vh`;
         spacer.style.width = '100%';
         spacer.style.position = 'relative';
         spacer.style.zIndex = '1';
@@ -170,9 +170,9 @@ document.addEventListener("DOMContentLoaded", function() {
         ScrollTrigger.create({
             trigger: heroArea,
             start: "top top",
-            end: () => `+=${spacer.offsetHeight}`, // Pin for the entire scroll duration
+            end: "bottom top", // End pinning when hero leaves viewport
             pin: true,
-            pinSpacing: true,
+            pinSpacing: false, // Changed to false to prevent extra space
             anticipatePin: 1,
             onEnter: () => console.log("Hero area pinned"),
             markers: false
@@ -199,10 +199,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 yPercent: 0,
                 ease: "none",
                 scrollTrigger: {
-                    trigger: spacer, // Use spacer as trigger
-                    start: () => `top+=${(index * 100)}vh top`, // Start when previous section is at top
-                    end: () => `top+=${(index * 100 + 100)}vh top`, // End one viewport height later
-                    scrub: true,
+                    trigger: spacer,
+                    start: () => `top+=${index * 50}vh top`, // Reduced offset to 50vh
+                    end: () => `top+=${(index * 50) + 100}vh top`, // Full viewport height for animation
+                    scrub: 1, // Added slight smoothing
                     markers: false,
                     id: `stack-reveal-${index}`,
                     onEnter: () => console.log(`Section ${index + 1} animation started`),
