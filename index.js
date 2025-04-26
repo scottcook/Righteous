@@ -169,6 +169,12 @@ document.addEventListener("DOMContentLoaded", function() {
             start: "top top"
         });
 
+        // Create spacer for proper scrolling
+        const totalHeight = (stackSections.length + 1) * window.innerHeight;
+        const spacer = document.createElement('div');
+        spacer.style.height = `${totalHeight}px`;
+        mainWrapper.appendChild(spacer);
+
         // Set up each stack section
         stackSections.forEach((section, index) => {
             console.log(`Setting up stack section ${index + 1}`);
@@ -184,26 +190,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 zIndex: 2 + index
             });
 
+            // Calculate trigger points based on section index
+            const startPosition = index * 100;
+            const endPosition = startPosition + 100;
+
             // Create scroll-linked animation
             ScrollTrigger.create({
-                trigger: section,
-                start: "top-=100% top",
-                end: "+=100%",
+                trigger: spacer,
+                start: `top+=${startPosition}vh top`,
+                end: `top+=${endPosition}vh top`,
                 animation: gsap.to(section, {
                     yPercent: 0,
                     ease: "none"
                 }),
                 scrub: true,
                 invalidateOnRefresh: true,
-                markers: true // Remove in production
+                markers: true, // Remove in production
+                onEnter: () => console.log(`Section ${index + 1} entering`),
+                onLeave: () => console.log(`Section ${index + 1} leaving`),
+                onEnterBack: () => console.log(`Section ${index + 1} entering back`),
+                onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
             });
         });
-
-        // Create spacer for proper scrolling
-        const totalHeight = (stackSections.length + 1) * window.innerHeight;
-        const spacer = document.createElement('div');
-        spacer.style.height = `${totalHeight}px`;
-        mainWrapper.appendChild(spacer);
 
         // Handle resize
         window.addEventListener("resize", () => {
