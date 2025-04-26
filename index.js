@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
             scrollTrigger: {
                 trigger: spacer,
                 // Start the animation sooner (before spacer reaches top of viewport)
-                start: "top 10%", 
+                start: "top 90vh", 
                 end: `bottom bottom`,
                 scrub: 0.3,
                 markers: true,
