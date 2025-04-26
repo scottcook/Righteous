@@ -190,11 +190,11 @@ document.addEventListener("DOMContentLoaded", function() {
             // Create scroll-linked animation
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: section,
-                    start: "top bottom", // Start when section enters viewport
-                    end: "top top", // End when section reaches top
+                    trigger: index === 0 ? heroArea : stackSections[index - 1], // First section triggers on hero, others on previous section
+                    start: index === 0 ? "bottom center" : "top top", // First section starts when hero leaves center, others when previous hits top
+                    end: "+=100%",
                     scrub: 1,
-                    markers: true, // Temporary markers for debugging
+                    markers: true,
                     onEnter: () => console.log(`Section ${index + 1} entering`),
                     onLeave: () => console.log(`Section ${index + 1} leaving`),
                     onEnterBack: () => console.log(`Section ${index + 1} entering back`),
