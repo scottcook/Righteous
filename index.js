@@ -200,8 +200,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 ease: "none",
                 scrollTrigger: {
                     trigger: spacer, // Use spacer as trigger
-                    start: () => `top+=${(index + 1) * 100}vh top`, // Offset start for each section
-                    end: () => `top+=${(index + 2) * 100}vh top`, // Animation ends one viewport height later
+                    start: () => `top+=${(index * 100)}vh top`, // Start when previous section is at top
+                    end: () => `top+=${(index * 100 + 100)}vh top`, // End one viewport height later
                     scrub: true,
                     markers: false,
                     id: `stack-reveal-${index}`,
