@@ -166,10 +166,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Create spacer for proper scrolling
         const spacer = document.createElement('div');
-        spacer.style.height = `${(stackSections.length + 1) * 100}vh`;
-        spacer.style.position = 'relative';
-        spacer.style.pointerEvents = 'none';
-        spacer.style.visibility = 'hidden';
+        spacer.style.height = `${stackSections.length * 100}vh`;
         mainWrapper.appendChild(spacer);
 
         // Set up each stack section
@@ -184,15 +181,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 width: "100%",
                 height: "100vh",
                 yPercent: 100,
-                zIndex: index + 2
+                zIndex: 10 + index // Ensure proper stacking
             });
 
             // Create scroll-linked animation
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: heroArea,
-                    start: "top top",
-                    end: "+=100%",
+                    trigger: spacer,
+                    start: () => `top+=${index * 100}vh top`, // Start when previous section hits top
+                    end: () => `top+=${(index + 1) * 100}vh top`,
                     scrub: 1,
                     markers: true,
                     onEnter: () => console.log(`Section ${index + 1} entering`),
@@ -203,20 +200,22 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
 
-            // Add animation to timeline with offset based on index
+            // Add animation to timeline
             tl.fromTo(section, 
-                { yPercent: 100 },
+                { 
+                    yPercent: 100,
+                    opacity: 0
+                },
                 { 
                     yPercent: 0,
-                    ease: "none"
-                },
-                index * 0.5 // Stagger the animations
+                    opacity: 1,
+                    ease: "power2.inOut"
+                }
             );
         });
 
         // Handle resize
         window.addEventListener("resize", () => {
-            spacer.style.height = `${(stackSections.length + 1) * 100}vh`;
             ScrollTrigger.refresh();
             console.log("Resize handled - ScrollTriggers refreshed");
         });
