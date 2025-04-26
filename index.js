@@ -194,24 +194,45 @@ document.addEventListener("DOMContentLoaded", function() {
                 zIndex: 2 + index
             });
 
-            // Simple approach: each section takes exactly 1 viewport height of scrolling to reveal
-            ScrollTrigger.create({
-                trigger: spacer,
-                start: index === 0 ? "top top" : `top+=${index * 100}vh top`, 
-                end: `top+=${(index + 1) * 100}vh top`,
-                animation: gsap.fromTo(section, 
-                    { yPercent: 100 },
-                    { yPercent: 0, ease: "none" }
-                ),
-                scrub: true,
-                invalidateOnRefresh: true,
-                markers: true,
-                id: `section-${index + 1}`,
-                onEnter: () => console.log(`Section ${index + 1} entering`),
-                onLeave: () => console.log(`Section ${index + 1} leaving`),
-                onEnterBack: () => console.log(`Section ${index + 1} entering back`),
-                onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
-            });
+            // Special handling for first section to ensure it appears immediately
+            if (index === 0) {
+                ScrollTrigger.create({
+                    trigger: document.body,
+                    start: "top top+=1", // Start after just 1px of scrolling
+                    end: "top+=100vh top",
+                    animation: gsap.fromTo(section, 
+                        { yPercent: 100 },
+                        { yPercent: 0, ease: "none", immediateRender: false }
+                    ),
+                    scrub: 0.5, // Lower scrub value for faster response
+                    invalidateOnRefresh: true,
+                    markers: true,
+                    id: `section-${index + 1}`,
+                    onEnter: () => console.log(`Section ${index + 1} entering`),
+                    onLeave: () => console.log(`Section ${index + 1} leaving`),
+                    onEnterBack: () => console.log(`Section ${index + 1} entering back`),
+                    onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
+                });
+            } else {
+                // Original implementation for subsequent sections
+                ScrollTrigger.create({
+                    trigger: spacer,
+                    start: `top+=${index * 100}vh top`, 
+                    end: `top+=${(index + 1) * 100}vh top`,
+                    animation: gsap.fromTo(section, 
+                        { yPercent: 100 },
+                        { yPercent: 0, ease: "none" }
+                    ),
+                    scrub: true,
+                    invalidateOnRefresh: true,
+                    markers: true,
+                    id: `section-${index + 1}`,
+                    onEnter: () => console.log(`Section ${index + 1} entering`),
+                    onLeave: () => console.log(`Section ${index + 1} leaving`),
+                    onEnterBack: () => console.log(`Section ${index + 1} entering back`),
+                    onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
+                });
+            }
         });
 
         // Handle resize
