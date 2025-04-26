@@ -141,83 +141,84 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Error in animation setup:", error);
     }
 
-    // Set up scroll animations with mask effect
+    // Set up scroll animations with mask effect for multiple sections
     try {
-        console.log("Setting up scroll animations");
+        console.log("Setting up scroll animations for multiple sections");
 
-        // Get the hero and stack elements
+        // Get all the necessary elements
         const heroArea = document.querySelector(".hero-area");
-        const stackSection = document.querySelector(".stack-section");
+        const stackSections = document.querySelectorAll(".stack-section");
         const mainWrapper = document.querySelector(".main-wrapper");
-        const body = document.body;
         
-        if (!heroArea || !stackSection) {
-            console.error("Hero area or stack section not found");
+        if (!heroArea || !stackSections.length) {
+            console.error("Hero area or stack sections not found");
             return;
         }
         
-        // Create a spacer div to push content down and prevent the gap
+        // Create a spacer div with height based on number of sections
         const spacer = document.createElement('div');
         spacer.className = 'scroll-spacer';
-        spacer.style.height = '100vh';
+        // Add extra viewport height for each section plus hero
+        spacer.style.height = `${(stackSections.length + 1) * 100}vh`;
         spacer.style.width = '100%';
         spacer.style.position = 'relative';
         spacer.style.zIndex = '1';
         spacer.style.visibility = 'hidden';
         document.body.appendChild(spacer);
         
-        // Ensure proper positioning for the stack section to create mask effect
-        gsap.set(stackSection, {
-            position: "absolute",
-            top: "0",
-            left: "0",
-            width: "100%",
-            height: "100vh",
-            yPercent: 100,  // Start below the viewport (invisible on page load)
-            zIndex: 2  // Higher than hero area
-        });
-        
-        // Set hero area styling for proper masking
-        gsap.set(heroArea, {
-            position: "relative", 
-            zIndex: 1,
-            height: "100vh" // Ensure hero fills viewport
-        });
-        
-        // Pin the hero section and create the mask effect
-        const scrollTrigger = ScrollTrigger.create({
+        // Pin the hero section
+        ScrollTrigger.create({
             trigger: heroArea,
             start: "top top",
-            end: "+=100%", // Animation lasts for one full viewport height of scrolling
+            end: () => `+=${spacer.offsetHeight}`, // Pin for the entire scroll duration
             pin: true,
-            pinSpacing: true, // This creates space in the document for the pinned element
-            anticipatePin: 1, // Helps prevent jitter
+            pinSpacing: true,
+            anticipatePin: 1,
             onEnter: () => console.log("Hero area pinned"),
-            markers: false // Set to true for debugging
+            markers: false
         });
-        
-        // Create the sliding animation for the stack section
-        gsap.to(stackSection, {
-            yPercent: 0,
-            ease: "none",
-            scrollTrigger: {
-                trigger: heroArea,
-                start: "top top",
-                end: "+=100%", // Match the pin duration
-                scrub: true,
-                markers: false, // Set to true for debugging
-                id: "stack-reveal"
-            }
+
+        // Set up each stack section
+        stackSections.forEach((section, index) => {
+            // Calculate z-index to ensure proper stacking
+            const zIndex = 2 + index; // Start at 2 since hero is 1
+            
+            // Set initial positioning for each section
+            gsap.set(section, {
+                position: "fixed",
+                top: "0",
+                left: "0",
+                width: "100%",
+                height: "100vh",
+                yPercent: 100, // Start below viewport
+                zIndex: zIndex
+            });
+
+            // Create the sliding animation for each section
+            gsap.to(section, {
+                yPercent: 0,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: spacer, // Use spacer as trigger
+                    start: () => `top+=${(index + 1) * 100}vh top`, // Offset start for each section
+                    end: () => `top+=${(index + 2) * 100}vh top`, // Animation ends one viewport height later
+                    scrub: true,
+                    markers: false,
+                    id: `stack-reveal-${index}`,
+                    onEnter: () => console.log(`Section ${index + 1} animation started`),
+                    onLeave: () => console.log(`Section ${index + 1} animation completed`)
+                }
+            });
         });
         
         // Handle browser resize
-        window.addEventListener("resize", function() {
-            // Force ScrollTrigger to recalculate positions and dimensions
-            ScrollTrigger.refresh(true); 
+        window.addEventListener("resize", () => {
+            ScrollTrigger.refresh(true);
             console.log("ScrollTrigger refreshed on resize");
         });
         
     } catch (error) {
         console.error("Error in scroll setup:", error);
+        console.log("Stack sections found:", document.querySelectorAll(".stack-section").length);
     }
 }); 
