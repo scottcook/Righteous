@@ -155,14 +155,6 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // Create spacer first
-        const spacerHeight = (stackSections.length + 1) * window.innerHeight;
-        const spacer = document.createElement('div');
-        spacer.style.height = `${spacerHeight}px`;
-        spacer.style.position = 'relative';
-        spacer.style.pointerEvents = 'none';
-        mainWrapper.appendChild(spacer); // Append to mainWrapper instead of body
-
         // Pin the hero section
         ScrollTrigger.create({
             trigger: heroArea,
@@ -171,6 +163,14 @@ document.addEventListener("DOMContentLoaded", function() {
             pin: true,
             pinSpacing: false
         });
+
+        // Create spacer for proper scrolling
+        const spacer = document.createElement('div');
+        spacer.style.height = `${(stackSections.length + 1) * 100}vh`;
+        spacer.style.position = 'relative';
+        spacer.style.pointerEvents = 'none';
+        spacer.style.visibility = 'hidden';
+        mainWrapper.appendChild(spacer);
 
         // Set up each stack section
         stackSections.forEach((section, index) => {
@@ -190,11 +190,11 @@ document.addEventListener("DOMContentLoaded", function() {
             // Create scroll-linked animation
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: spacer, // Use spacer as trigger
-                    start: () => `top+=${(index + 1) * 100}vh top`, // Offset by section index
-                    end: () => `top+=${(index + 2) * 100}vh top`, // One viewport height animation duration
+                    trigger: section,
+                    start: "top bottom", // Start when section enters viewport
+                    end: "top top", // End when section reaches top
                     scrub: 1,
-                    markers: true, // Enable markers temporarily for debugging
+                    markers: true, // Temporary markers for debugging
                     onEnter: () => console.log(`Section ${index + 1} entering`),
                     onLeave: () => console.log(`Section ${index + 1} leaving`),
                     onEnterBack: () => console.log(`Section ${index + 1} entering back`),
@@ -208,22 +208,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 { yPercent: 100 },
                 { 
                     yPercent: 0,
-                    ease: "none",
-                    immediateRender: false // Prevent initial render flash
+                    ease: "none"
                 }
             );
-
-            // Log section setup completion
-            console.log(`Stack section ${index + 1} setup complete with z-index: ${index + 2}`);
         });
 
         // Handle resize
         window.addEventListener("resize", () => {
-            // Update spacer height
-            spacer.style.height = `${(stackSections.length + 1) * window.innerHeight}px`;
-            // Refresh all ScrollTriggers
+            spacer.style.height = `${(stackSections.length + 1) * 100}vh`;
             ScrollTrigger.refresh();
-            console.log("Resize handled - spacer height updated and ScrollTriggers refreshed");
+            console.log("Resize handled - ScrollTriggers refreshed");
         });
         
     } catch (error) {
