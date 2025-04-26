@@ -169,78 +169,66 @@ document.addEventListener("DOMContentLoaded", function() {
             start: "top top"
         });
 
-        // Create spacer for proper scrolling
-        // Total height = number of sections * 100vh
-        const totalHeight = (stackSections.length) * 100;
+        // Create spacer for proper scrolling - each section 100vh
         const spacer = document.createElement('div');
         spacer.className = "scroll-spacer";
-        spacer.style.height = `${totalHeight}vh`;
+        spacer.style.height = `${stackSections.length * 100}vh`;
         mainWrapper.appendChild(spacer);
-        
-        console.log(`Created spacer with height ${totalHeight}vh for ${stackSections.length} sections`);
 
-        // Set up each stack section with a simplified approach
+        // Create a master timeline for all sections
+        const masterTimeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: spacer,
+                start: "top top",
+                end: `bottom bottom`,
+                scrub: 0.5,
+                markers: true,
+                id: "master-timeline",
+                onUpdate: self => {
+                    console.log(`Progress: ${self.progress.toFixed(2)}`);
+                }
+            }
+        });
+
+        // Set initial state for all sections
         stackSections.forEach((section, index) => {
-            console.log(`Setting up stack section ${index + 1}`);
-            
-            // Initial setup for each section
             gsap.set(section, {
                 position: "fixed",
                 width: "100%",
                 height: "100vh",
                 top: 0,
                 left: 0,
-                yPercent: 100,
+                yPercent: 100, // Start below the viewport
                 zIndex: 2 + index
             });
+        });
 
-            // Special handling for first section to ensure it appears immediately
-            if (index === 0) {
-                ScrollTrigger.create({
-                    trigger: document.body,
-                    start: "top top+=1", // Start after just 1px of scrolling
-                    end: "top+=100vh top",
-                    animation: gsap.fromTo(section, 
-                        { yPercent: 100 },
-                        { yPercent: 0, ease: "none", immediateRender: false }
-                    ),
-                    scrub: 0.5, // Lower scrub value for faster response
-                    invalidateOnRefresh: true,
-                    markers: true,
-                    id: `section-${index + 1}`,
-                    onEnter: () => console.log(`Section ${index + 1} entering`),
-                    onLeave: () => console.log(`Section ${index + 1} leaving`),
-                    onEnterBack: () => console.log(`Section ${index + 1} entering back`),
-                    onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
-                });
-            } else {
-                // Original implementation for subsequent sections
-                ScrollTrigger.create({
-                    trigger: spacer,
-                    start: `top+=${index * 100}vh top`, 
-                    end: `top+=${(index + 1) * 100}vh top`,
-                    animation: gsap.fromTo(section, 
-                        { yPercent: 100 },
-                        { yPercent: 0, ease: "none" }
-                    ),
-                    scrub: true,
-                    invalidateOnRefresh: true,
-                    markers: true,
-                    id: `section-${index + 1}`,
-                    onEnter: () => console.log(`Section ${index + 1} entering`),
-                    onLeave: () => console.log(`Section ${index + 1} leaving`),
-                    onEnterBack: () => console.log(`Section ${index + 1} entering back`),
-                    onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
-                });
-            }
+        // Add each section to the master timeline with precise timing
+        // The total scroll distance is divided into equal segments for each section
+        const sectionCount = stackSections.length;
+        const progressStep = 1 / sectionCount;
+        
+        stackSections.forEach((section, index) => {
+            console.log(`Adding section ${index + 1} to timeline at position ${index * progressStep}`);
+            
+            // Each section animates from 100% (off screen) to 0% (fully visible)
+            masterTimeline.fromTo(
+                section, 
+                { yPercent: 100 }, 
+                { 
+                    yPercent: 0, 
+                    ease: "none", 
+                    duration: progressStep, // Each section takes an equal portion of the timeline
+                    immediateRender: false  // Don't render until scrolled into view
+                }, 
+                index * progressStep // Position in the timeline (0, 0.25, 0.5, 0.75 for 4 sections)
+            );
         });
 
         // Handle resize
         window.addEventListener("resize", () => {
-            const newHeight = stackSections.length * 100;
-            spacer.style.height = `${newHeight}vh`;
-            ScrollTrigger.refresh();
-            console.log("Resize handled - ScrollTriggers refreshed");
+            ScrollTrigger.update();
+            console.log("Resize handled - ScrollTriggers updated");
         });
         
     } catch (error) {
