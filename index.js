@@ -191,8 +191,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             // Calculate trigger points based on section index
-            // First section starts immediately, others maintain their spacing
-            const startPosition = index === 0 ? 0 : index * 100;
+            const startPosition = index === 0 ? -100 : (index - 1) * 100; // Start first section earlier
             const endPosition = startPosition + 100;
 
             // Create scroll-linked animation
@@ -204,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     yPercent: 0,
                     ease: "none"
                 }),
-                scrub: true,
+                scrub: 0.5, // Reduced for snappier response
                 invalidateOnRefresh: true,
                 markers: true, // Remove in production
                 onEnter: () => console.log(`Section ${index + 1} entering`),
