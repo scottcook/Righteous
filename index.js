@@ -169,10 +169,9 @@ document.addEventListener("DOMContentLoaded", function() {
             start: "top top"
         });
 
-        // Create spacer for proper scrolling
-        const totalHeight = (stackSections.length + 1) * window.innerHeight;
+        // Create spacer for proper scrolling - one viewport height per section
         const spacer = document.createElement('div');
-        spacer.style.height = `${totalHeight}px`;
+        spacer.style.height = `${stackSections.length * 100}vh`;
         mainWrapper.appendChild(spacer);
 
         // Set up each stack section
@@ -190,33 +189,46 @@ document.addEventListener("DOMContentLoaded", function() {
                 zIndex: 2 + index
             });
 
-            // Calculate trigger points based on section index
-            const startPosition = index === 0 ? -100 : (index - 1) * 100; // Start first section earlier
-            const endPosition = startPosition + 100;
-
-            // Create scroll-linked animation
-            ScrollTrigger.create({
-                trigger: spacer,
-                start: `top+=${startPosition}vh top`,
-                end: `top+=${endPosition}vh top`,
-                animation: gsap.to(section, {
-                    yPercent: 0,
-                    ease: "none"
-                }),
-                scrub: 0.5, // Reduced for snappier response
-                invalidateOnRefresh: true,
-                markers: true, // Remove in production
-                onEnter: () => console.log(`Section ${index + 1} entering`),
-                onLeave: () => console.log(`Section ${index + 1} leaving`),
-                onEnterBack: () => console.log(`Section ${index + 1} entering back`),
-                onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
-            });
+            // Create scroll-linked animation with different logic for first section
+            if (index === 0) {
+                // First section starts immediately and completes at 100vh
+                ScrollTrigger.create({
+                    trigger: spacer,
+                    start: "top top",
+                    end: "top+=100vh top",
+                    animation: gsap.to(section, {
+                        yPercent: 0,
+                        ease: "none"
+                    }),
+                    scrub: 0.5,
+                    invalidateOnRefresh: true,
+                    markers: true,
+                    onEnter: () => console.log("First section entering"),
+                    onLeave: () => console.log("First section leaving")
+                });
+            } else {
+                // Other sections maintain their spacing
+                ScrollTrigger.create({
+                    trigger: spacer,
+                    start: `top+=${(index * 100)}vh top`,
+                    end: `top+=${((index + 1) * 100)}vh top`,
+                    animation: gsap.to(section, {
+                        yPercent: 0,
+                        ease: "none"
+                    }),
+                    scrub: 0.5,
+                    invalidateOnRefresh: true,
+                    markers: true,
+                    onEnter: () => console.log(`Section ${index + 1} entering`),
+                    onLeave: () => console.log(`Section ${index + 1} leaving`)
+                });
+            }
         });
 
         // Handle resize
         window.addEventListener("resize", () => {
-            const newHeight = (stackSections.length + 1) * window.innerHeight;
-            spacer.style.height = `${newHeight}px`;
+            const newHeight = stackSections.length * 100;
+            spacer.style.height = `${newHeight}vh`;
             ScrollTrigger.refresh();
             console.log("Resize handled - ScrollTriggers refreshed");
         });
