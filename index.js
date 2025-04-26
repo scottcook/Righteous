@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
             scrollTrigger: {
                 trigger: spacer,
                 // Start animation with almost no scrolling required
-                start: "top 50%", 
+                start: "top 80%", 
                 end: `bottom bottom`,
                 scrub: 0.3,
                 markers: true,
