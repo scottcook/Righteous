@@ -155,19 +155,19 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        // Set initial styles for main wrapper
+        gsap.set(mainWrapper, {
+            height: "auto",
+            overflow: "hidden"
+        });
+
         // Pin the hero section
         ScrollTrigger.create({
             trigger: heroArea,
-            start: "top top",
-            end: "bottom top",
             pin: true,
-            pinSpacing: false
+            pinSpacing: false,
+            start: "top top"
         });
-
-        // Create spacer for proper scrolling
-        const spacer = document.createElement('div');
-        spacer.style.height = `${stackSections.length * 100}vh`;
-        mainWrapper.appendChild(spacer);
 
         // Set up each stack section
         stackSections.forEach((section, index) => {
@@ -176,46 +176,39 @@ document.addEventListener("DOMContentLoaded", function() {
             // Initial setup for each section
             gsap.set(section, {
                 position: "fixed",
-                top: 0,
-                left: 0,
                 width: "100%",
                 height: "100vh",
+                top: 0,
+                left: 0,
                 yPercent: 100,
-                zIndex: 10 + index // Ensure proper stacking
+                zIndex: 2 + index
             });
 
             // Create scroll-linked animation
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: spacer,
-                    start: () => `top+=${index * 100}vh top`, // Start when previous section hits top
-                    end: () => `top+=${(index + 1) * 100}vh top`,
-                    scrub: 1,
-                    markers: true,
-                    onEnter: () => console.log(`Section ${index + 1} entering`),
-                    onLeave: () => console.log(`Section ${index + 1} leaving`),
-                    onEnterBack: () => console.log(`Section ${index + 1} entering back`),
-                    onLeaveBack: () => console.log(`Section ${index + 1} leaving back`),
-                    invalidateOnRefresh: true
-                }
-            });
-
-            // Add animation to timeline
-            tl.fromTo(section, 
-                { 
-                    yPercent: 100,
-                    opacity: 0
-                },
-                { 
+            ScrollTrigger.create({
+                trigger: section,
+                start: "top-=100% top",
+                end: "+=100%",
+                animation: gsap.to(section, {
                     yPercent: 0,
-                    opacity: 1,
-                    ease: "power2.inOut"
-                }
-            );
+                    ease: "none"
+                }),
+                scrub: true,
+                invalidateOnRefresh: true,
+                markers: true // Remove in production
+            });
         });
+
+        // Create spacer for proper scrolling
+        const totalHeight = (stackSections.length + 1) * window.innerHeight;
+        const spacer = document.createElement('div');
+        spacer.style.height = `${totalHeight}px`;
+        mainWrapper.appendChild(spacer);
 
         // Handle resize
         window.addEventListener("resize", () => {
+            const newHeight = (stackSections.length + 1) * window.innerHeight;
+            spacer.style.height = `${newHeight}px`;
             ScrollTrigger.refresh();
             console.log("Resize handled - ScrollTriggers refreshed");
         });
