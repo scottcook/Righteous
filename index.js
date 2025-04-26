@@ -155,6 +155,14 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        // Create spacer first
+        const spacerHeight = (stackSections.length + 1) * window.innerHeight;
+        const spacer = document.createElement('div');
+        spacer.style.height = `${spacerHeight}px`;
+        spacer.style.position = 'relative';
+        spacer.style.pointerEvents = 'none';
+        mainWrapper.appendChild(spacer); // Append to mainWrapper instead of body
+
         // Pin the hero section
         ScrollTrigger.create({
             trigger: heroArea,
@@ -166,6 +174,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Set up each stack section
         stackSections.forEach((section, index) => {
+            console.log(`Setting up stack section ${index + 1}`);
+            
             // Initial setup for each section
             gsap.set(section, {
                 position: "fixed",
@@ -180,36 +190,32 @@ document.addEventListener("DOMContentLoaded", function() {
             // Create scroll-linked animation
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: section,
-                    start: "top bottom", // Animation starts when section's top hits viewport bottom
-                    end: "top top", // Ends when section's top reaches viewport top
+                    trigger: spacer, // Use spacer as trigger
+                    start: () => `top+=${(index + 1) * 100}vh top`, // Offset by section index
+                    end: () => `top+=${(index + 2) * 100}vh top`, // One viewport height animation duration
                     scrub: 1,
-                    markers: false,
+                    markers: true, // Enable markers temporarily for debugging
                     onEnter: () => console.log(`Section ${index + 1} entering`),
                     onLeave: () => console.log(`Section ${index + 1} leaving`),
                     onEnterBack: () => console.log(`Section ${index + 1} entering back`),
                     onLeaveBack: () => console.log(`Section ${index + 1} leaving back`),
-                    invalidateOnRefresh: true // Recalculate on resize
+                    invalidateOnRefresh: true
                 }
             });
 
             // Add animation to timeline
             tl.fromTo(section, 
-                { yPercent: 100 }, // Start position (below viewport)
+                { yPercent: 100 },
                 { 
-                    yPercent: 0, // End position (fully visible)
-                    ease: "none"
+                    yPercent: 0,
+                    ease: "none",
+                    immediateRender: false // Prevent initial render flash
                 }
             );
-        });
 
-        // Create spacer for proper scrolling
-        const spacerHeight = (stackSections.length + 1) * window.innerHeight;
-        const spacer = document.createElement('div');
-        spacer.style.height = `${spacerHeight}px`;
-        spacer.style.position = 'relative';
-        spacer.style.pointerEvents = 'none';
-        document.body.appendChild(spacer);
+            // Log section setup completion
+            console.log(`Stack section ${index + 1} setup complete with z-index: ${index + 2}`);
+        });
 
         // Handle resize
         window.addEventListener("resize", () => {
@@ -217,6 +223,7 @@ document.addEventListener("DOMContentLoaded", function() {
             spacer.style.height = `${(stackSections.length + 1) * window.innerHeight}px`;
             // Refresh all ScrollTriggers
             ScrollTrigger.refresh();
+            console.log("Resize handled - spacer height updated and ScrollTriggers refreshed");
         });
         
     } catch (error) {
