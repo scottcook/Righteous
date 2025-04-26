@@ -191,16 +191,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Create scroll-linked animation with different logic for first section
             if (index === 0) {
-                // First section starts immediately and completes at 100vh
+                // First section starts before scroll begins
                 ScrollTrigger.create({
                     trigger: spacer,
-                    start: "top top",
-                    end: "top+=100vh top",
+                    start: "top bottom", // Start when spacer's top hits viewport bottom
+                    end: "top center", // End when spacer's top hits viewport center
                     animation: gsap.to(section, {
                         yPercent: 0,
                         ease: "none"
                     }),
-                    scrub: 0.5,
+                    scrub: true,
                     invalidateOnRefresh: true,
                     markers: true,
                     onEnter: () => console.log("First section entering"),
@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         yPercent: 0,
                         ease: "none"
                     }),
-                    scrub: 0.5,
+                    scrub: true,
                     invalidateOnRefresh: true,
                     markers: true,
                     onEnter: () => console.log(`Section ${index + 1} entering`),
