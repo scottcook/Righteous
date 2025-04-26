@@ -191,11 +191,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Create scroll-linked animation with different logic for first section
             if (index === 0) {
-                // First section starts at top and ends at bottom of viewport
+                // First section starts unmask immediately upon scroll
                 ScrollTrigger.create({
-                    trigger: heroArea,
+                    trigger: document.body, // Use document.body as trigger for earliest detection
                     start: "top top", // Start at the very top
-                    end: "bottom bottom", // End at the bottom of viewport
+                    endTrigger: spacer, // Use the spacer as the end trigger
+                    end: "top+=100vh top", // End after scrolling 100vh (one viewport height)
                     animation: gsap.fromTo(section, 
                         {
                             yPercent: 100,
@@ -204,10 +205,10 @@ document.addEventListener("DOMContentLoaded", function() {
                         {
                             yPercent: 0,
                             opacity: 1,
-                            ease: "none"
+                            ease: "power1.out" // Slight easing for smoother start
                         }
                     ),
-                    scrub: true,
+                    scrub: 0.2, // Minimal scrub value for immediate response
                     invalidateOnRefresh: true,
                     markers: true,
                     onEnter: () => console.log("First section entering"),
