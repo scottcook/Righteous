@@ -169,12 +169,17 @@ document.addEventListener("DOMContentLoaded", function() {
             start: "top top"
         });
 
-        // Create spacer for proper scrolling - one viewport height per section
+        // Create spacer for proper scrolling
+        // Total height = number of sections * 100vh
+        const totalHeight = (stackSections.length) * 100;
         const spacer = document.createElement('div');
-        spacer.style.height = `${stackSections.length * 100}vh`;
+        spacer.className = "scroll-spacer";
+        spacer.style.height = `${totalHeight}vh`;
         mainWrapper.appendChild(spacer);
+        
+        console.log(`Created spacer with height ${totalHeight}vh for ${stackSections.length} sections`);
 
-        // Set up each stack section
+        // Set up each stack section with a simplified approach
         stackSections.forEach((section, index) => {
             console.log(`Setting up stack section ${index + 1}`);
             
@@ -189,36 +194,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 zIndex: 2 + index
             });
 
-            // Use a consistent animation approach for all sections
-            // Calculate the scroll progress ranges for each section
-            const startPosition = index * 100; // vh units
-            const endPosition = startPosition + 100; // One viewport height of scrolling per section
-            
-            // Create the scroll trigger for this section
-            const trigger = index === 0 ? document.body : spacer;
-            const startValue = index === 0 ? "top top" : `top+=${startPosition}vh top`;
-            const endValue = index === 0 ? "top+=100vh top" : `top+=${endPosition}vh top`;
-            
+            // Simple approach: each section takes exactly 1 viewport height of scrolling to reveal
             ScrollTrigger.create({
-                trigger: trigger,
-                start: startValue,
-                end: endValue,
-                animation: gsap.fromTo(section,
-                    {
-                        yPercent: 100,
-                        opacity: 1
-                    },
-                    {
-                        yPercent: 0,
-                        opacity: 1,
-                        ease: "power1.inOut" // Smoother easing for both directions
-                    }
+                trigger: spacer,
+                start: index === 0 ? "top top" : `top+=${index * 100}vh top`, 
+                end: `top+=${(index + 1) * 100}vh top`,
+                animation: gsap.fromTo(section, 
+                    { yPercent: 100 },
+                    { yPercent: 0, ease: "none" }
                 ),
-                scrub: 2, // Much higher scrub value for slower, smoother animations
+                scrub: true,
                 invalidateOnRefresh: true,
                 markers: true,
+                id: `section-${index + 1}`,
                 onEnter: () => console.log(`Section ${index + 1} entering`),
-                onLeave: () => console.log(`Section ${index + 1} leaving`)
+                onLeave: () => console.log(`Section ${index + 1} leaving`),
+                onEnterBack: () => console.log(`Section ${index + 1} entering back`),
+                onLeaveBack: () => console.log(`Section ${index + 1} leaving back`)
             });
         });
 
