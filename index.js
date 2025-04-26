@@ -228,10 +228,10 @@ document.addEventListener("DOMContentLoaded", function() {
                         {
                             yPercent: 0,
                             opacity: 1,
-                            ease: "none"
+                            ease: "power1.out" // Match first section easing
                         }
                     ),
-                    scrub: true,
+                    scrub: 0.2, // Match first section scrub value
                     invalidateOnRefresh: true,
                     markers: true,
                     onEnter: () => console.log(`Section ${index + 1} entering`),
