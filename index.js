@@ -190,8 +190,8 @@ document.addEventListener("DOMContentLoaded", function() {
             // Create scroll-linked animation
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: index === 0 ? heroArea : stackSections[index - 1], // First section triggers on hero, others on previous section
-                    start: index === 0 ? "bottom center" : "top top", // First section starts when hero leaves center, others when previous hits top
+                    trigger: heroArea,
+                    start: "top top",
                     end: "+=100%",
                     scrub: 1,
                     markers: true,
@@ -203,13 +203,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
 
-            // Add animation to timeline
+            // Add animation to timeline with offset based on index
             tl.fromTo(section, 
                 { yPercent: 100 },
                 { 
                     yPercent: 0,
                     ease: "none"
-                }
+                },
+                index * 0.5 // Stagger the animations
             );
         });
 
