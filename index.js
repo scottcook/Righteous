@@ -191,11 +191,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Create scroll-linked animation with different logic for first section
             if (index === 0) {
-                // First section starts before scroll begins
+                // First section starts from bottom of viewport
                 ScrollTrigger.create({
-                    trigger: spacer,
-                    start: "top bottom", // Start when spacer's top hits viewport bottom
-                    end: "top center", // End when spacer's top hits viewport center
+                    trigger: heroArea, // Use hero area as trigger
+                    start: "bottom bottom", // Start when hero's bottom hits viewport bottom
+                    end: "bottom top", // End when hero's bottom hits viewport top
                     animation: gsap.to(section, {
                         yPercent: 0,
                         ease: "none"
