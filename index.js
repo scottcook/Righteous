@@ -194,10 +194,15 @@ document.addEventListener("DOMContentLoaded", function() {
             const startPosition = index * 100; // vh units
             const endPosition = startPosition + 100; // One viewport height of scrolling per section
             
+            // Create the scroll trigger for this section
+            const trigger = index === 0 ? document.body : spacer;
+            const startValue = index === 0 ? "top top" : `top+=${startPosition}vh top`;
+            const endValue = index === 0 ? "top+=100vh top" : `top+=${endPosition}vh top`;
+            
             ScrollTrigger.create({
-                trigger: spacer,
-                start: `top+=${startPosition}vh top`,
-                end: `top+=${endPosition}vh top`,
+                trigger: trigger,
+                start: startValue,
+                end: endValue,
                 animation: gsap.fromTo(section,
                     {
                         yPercent: 100,
@@ -206,10 +211,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     {
                         yPercent: 0,
                         opacity: 1,
-                        ease: "none" // Linear animation for consistent scroll speed
+                        ease: "power1.inOut" // Smoother easing for both directions
                     }
                 ),
-                scrub: 1, // Higher scrub value for smoother animation
+                scrub: 2, // Much higher scrub value for slower, smoother animations
                 invalidateOnRefresh: true,
                 markers: true,
                 onEnter: () => console.log(`Section ${index + 1} entering`),
