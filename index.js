@@ -189,55 +189,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 zIndex: 2 + index
             });
 
-            // Create scroll-linked animation with different logic for first section
-            if (index === 0) {
-                // First section starts unmask immediately upon scroll
-                ScrollTrigger.create({
-                    trigger: document.body, // Use document.body as trigger for earliest detection
-                    start: "top top", // Start at the very top
-                    endTrigger: spacer, // Use the spacer as the end trigger
-                    end: "top+=100vh top", // End after scrolling 100vh (one viewport height)
-                    animation: gsap.fromTo(section, 
-                        {
-                            yPercent: 100,
-                            opacity: 1
-                        },
-                        {
-                            yPercent: 0,
-                            opacity: 1,
-                            ease: "power1.out" // Slight easing for smoother start
-                        }
-                    ),
-                    scrub: 0.2, // Minimal scrub value for immediate response
-                    invalidateOnRefresh: true,
-                    markers: true,
-                    onEnter: () => console.log("First section entering"),
-                    onLeave: () => console.log("First section leaving")
-                });
-            } else {
-                // Other sections maintain their spacing
-                ScrollTrigger.create({
-                    trigger: spacer,
-                    start: `top+=${(index * 100)}vh top`,
-                    end: `top+=${(index * 100 + 100)}vh top`,
-                    animation: gsap.fromTo(section,
-                        {
-                            yPercent: 100,
-                            opacity: 1
-                        },
-                        {
-                            yPercent: 0,
-                            opacity: 1,
-                            ease: "power1.out" // Match first section easing
-                        }
-                    ),
-                    scrub: 0.2, // Match first section scrub value
-                    invalidateOnRefresh: true,
-                    markers: true,
-                    onEnter: () => console.log(`Section ${index + 1} entering`),
-                    onLeave: () => console.log(`Section ${index + 1} leaving`)
-                });
-            }
+            // Use a consistent animation approach for all sections
+            // Calculate the scroll progress ranges for each section
+            const startPosition = index * 100; // vh units
+            const endPosition = startPosition + 100; // One viewport height of scrolling per section
+            
+            ScrollTrigger.create({
+                trigger: spacer,
+                start: `top+=${startPosition}vh top`,
+                end: `top+=${endPosition}vh top`,
+                animation: gsap.fromTo(section,
+                    {
+                        yPercent: 100,
+                        opacity: 1
+                    },
+                    {
+                        yPercent: 0,
+                        opacity: 1,
+                        ease: "none" // Linear animation for consistent scroll speed
+                    }
+                ),
+                scrub: 1, // Higher scrub value for smoother animation
+                invalidateOnRefresh: true,
+                markers: true,
+                onEnter: () => console.log(`Section ${index + 1} entering`),
+                onLeave: () => console.log(`Section ${index + 1} leaving`)
+            });
         });
 
         // Handle resize
