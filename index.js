@@ -194,8 +194,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 // First section starts from bottom of viewport
                 ScrollTrigger.create({
                     trigger: heroArea, // Use hero area as trigger
-                    start: "bottom bottom", // Start when hero's bottom hits viewport bottom
-                    end: "bottom top", // End when hero's bottom hits viewport top
+                    start: "top top", // Start when hero's top hits viewport top
+                    endTrigger: spacer,
+                    end: "top top", // End when spacer's top hits viewport top
                     animation: gsap.to(section, {
                         yPercent: 0,
                         ease: "none"
@@ -210,8 +211,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Other sections maintain their spacing
                 ScrollTrigger.create({
                     trigger: spacer,
-                    start: `top+=${(index * 100)}vh top`,
-                    end: `top+=${((index + 1) * 100)}vh top`,
+                    start: `top+=${(index - 1) * 100}vh top`,
+                    end: `top+=${index * 100}vh top`,
                     animation: gsap.to(section, {
                         yPercent: 0,
                         ease: "none"
