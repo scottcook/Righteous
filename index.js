@@ -196,13 +196,16 @@ document.addEventListener("DOMContentLoaded", function() {
         stackSections.forEach((section, index) => {
             gsap.set(section, {
                 position: "fixed",
-                width: "100vw", // Use viewport width instead of percentage
+                width: "100vw",
                 height: "100vh",
                 top: 0,
                 left: 0,
                 yPercent: 100, // Start below the viewport
+                xPercent: 25,  // Offset to the left by 25% of viewport
+                rotationZ: 0,  // No angle at start
+                opacity: 1,
                 zIndex: 2 + index,
-                rotationZ: 20 // Start each section at a 20 degree angle
+                transformOrigin: "top right"
             });
         });
 
@@ -212,26 +215,55 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         // Add each section to the master timeline with precise timing
-        // The total scroll distance is divided into equal segments for each section
         const sectionCount = stackSections.length;
         const progressStep = 1 / sectionCount;
-        
+
         stackSections.forEach((section, index) => {
-            console.log(`Adding section ${index + 1} to timeline at position ${index * progressStep}`);
-            
-            // Animate from yPercent: 100, rotationZ: 20 to yPercent: 0, rotationZ: 0 with smooth ease
+            // Animate current section in
             masterTimeline.fromTo(
-                section, 
-                { yPercent: 100, rotationZ: 20 }, 
-                { 
-                    yPercent: 0, 
-                    rotationZ: 0,
-                    ease: "power4.out", // Smooth, strong ease
-                    duration: progressStep, // Each section takes an equal portion of the timeline
-                    immediateRender: false  // Don't render until scrolled into view
-                }, 
-                index * progressStep // Position in the timeline (0, 0.25, 0.5, 0.75 for 4 sections)
+                section,
+                { yPercent: 100, xPercent: 25, rotationZ: 0, opacity: 1 },
+                {
+                    yPercent: 0,
+                    xPercent: 0,
+                    rotationZ: -6, // Subtle angle as it comes in
+                    opacity: 1,
+                    ease: "power4.out",
+                    duration: progressStep,
+                    immediateRender: false
+                },
+                index * progressStep
             );
+
+            // Animate previous sections up/left as new one comes in
+            if (index > 0) {
+                masterTimeline.to(
+                    stackSections[index - 1],
+                    {
+                        xPercent: -10,
+                        yPercent: -10,
+                        opacity: 0.7,
+                        ease: "power2.out",
+                        duration: progressStep * 0.8,
+                        immediateRender: false
+                    },
+                    index * progressStep
+                );
+            }
+        });
+
+        // Create a master timeline for all sections with updated ScrollTrigger
+        masterTimeline.scrollTrigger && masterTimeline.scrollTrigger.kill();
+        masterTimeline.scrollTrigger = ScrollTrigger.create({
+            trigger: spacer,
+            start: "top bottom", // Next section appears as soon as user scrolls
+            end: `bottom top`,
+            scrub: 0.7, // Fluid, not too fast
+            markers: true,
+            id: "master-timeline",
+            onUpdate: self => {
+                console.log(`Progress: ${self.progress.toFixed(2)}`);
+            }
         });
 
         // Handle resize with debounce for better performance
