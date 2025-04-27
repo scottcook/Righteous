@@ -201,7 +201,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 top: 0,
                 left: 0,
                 yPercent: 100, // Start below the viewport
-                zIndex: 2 + index
+                zIndex: 2 + index,
+                rotationZ: 20 // Start each section at a 20 degree angle
             });
         });
 
@@ -218,13 +219,14 @@ document.addEventListener("DOMContentLoaded", function() {
         stackSections.forEach((section, index) => {
             console.log(`Adding section ${index + 1} to timeline at position ${index * progressStep}`);
             
-            // Each section animates from 100% (off screen) to 0% (fully visible)
+            // Animate from yPercent: 100, rotationZ: 20 to yPercent: 0, rotationZ: 0 with smooth ease
             masterTimeline.fromTo(
                 section, 
-                { yPercent: 100 }, 
+                { yPercent: 100, rotationZ: 20 }, 
                 { 
                     yPercent: 0, 
-                    ease: "none", 
+                    rotationZ: 0,
+                    ease: "power4.out", // Smooth, strong ease
                     duration: progressStep, // Each section takes an equal portion of the timeline
                     immediateRender: false  // Don't render until scrolled into view
                 }, 
