@@ -201,7 +201,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 top: 0,
                 left: 0,
                 yPercent: 100, // Start below the viewport
-                zIndex: 2 + index
+                zIndex: 2 + index,
+                rotationZ: 20 // Start each section at a 20 degree angle
             });
         });
 
@@ -219,18 +220,23 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(`Adding section ${index + 1} to timeline at position ${index * progressStep}`);
             
             // Each section animates from 100% (off screen) to 0% (fully visible)
+            // and from 20deg to 0deg rotationZ for a dynamic entry effect
             masterTimeline.fromTo(
                 section, 
-                { yPercent: 100 }, 
+                { yPercent: 100, rotationZ: 20 }, 
                 { 
                     yPercent: 0, 
-                    ease: "none", 
+                    rotationZ: 0,
+                    ease: "expo.out", // Exaggerated ease for inertia
                     duration: progressStep, // Each section takes an equal portion of the timeline
                     immediateRender: false  // Don't render until scrolled into view
                 }, 
                 index * progressStep // Position in the timeline (0, 0.25, 0.5, 0.75 for 4 sections)
             );
         });
+
+        // Update ScrollTrigger scrub for more inertia/lag effect
+        masterTimeline.scrollTrigger && (masterTimeline.scrollTrigger.scrub = 1.2); // More inertia
 
         // Handle resize with debounce for better performance
         let resizeTimeout;
