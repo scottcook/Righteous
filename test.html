@@ -4,41 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Righteous Animation Test</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
-        }
-        .main-logo {
-            color: white;
-            font-size: 48px;
-            font-family: Arial, sans-serif;
-            position: absolute;
-            z-index: 2;
-        }
-        .bg-video {
-            position: absolute;
-            width: 90vw;
-            height: 45vw;
-            background: #333; /* Placeholder for video */
-            z-index: 1;
-        }
-    </style>
     <!-- GSAP from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
     <!-- SplitText locally -->
     <script src="lib/gsap-premium/minified/SplitText.min.js"></script>
+    <!-- ScrollTrigger plugin -->
+    <script src="lib/gsap-premium/minified/ScrollTrigger.min.js"></script>
+    <!-- ScrollToPlugin -->
+    <script src="lib/gsap-premium/minified/ScrollToPlugin.min.js"></script>
     <!-- Your animation code - served by MCP in production, local for testing -->
     <script src="http://localhost:5500/index.js"></script>
 </head>
 <body>
-    <!-- Match your Webflow structure -->
-    <div class="main-logo">RIGHTEOUS</div>
-    <div class="bg-video"></div>
+    <!-- Navigation as direct child of body -->
+    <div class="nav-bar-main">
+        <div class="logo-lockup">
+            <a href="#" class="logo-link">
+                <div class="top-logo" title="Return to home">Righteous</div>
+            </a>
+        </div>
+        <a id="about" class="top-navlink" href="#">ABOUT</a>
+        <a id="gear" class="top-navlink" href="#">GEAR</a>
+        <a id="contact" class="top-navlink" href="#">CONTACT</a>
+    </div>
+    
+    <!-- Main wrapper as direct child of body -->
+    <div class="main-wrapper">
+        <div class="hero-area">
+            <div class="main-logo-container">
+                <div class="main-logo">Righteous</div>
+                <div class="logo-underline"></div>
+            </div>
+            <div class="bg-video"></div>
+        </div>
+        <!-- Stack sections from your structure -->
+        <div class="stack-section" id="about-section">
+            <div class="text-block-2">About Section Content</div>
+        </div>
+        <div class="stack-section" id="gear-section">
+            <div class="text-block-2">Gear Section Content</div>
+        </div>
+        <div class="stack-section" id="contact-section">
+            <div class="text-block-2">Contact Section Content</div>
+        </div>
+    </div>
 </body>
 </html> 
