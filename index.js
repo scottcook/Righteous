@@ -660,7 +660,13 @@ document.addEventListener("DOMContentLoaded", function() {
             gsap.set(slideUpElements, { opacity: 0, y: 80, rotationX: 6 }); // Increased y offset, added X rotation
             gsap.set(slideLeftElements, { opacity: 0, x: -80, rotationZ: -4 }); // Increased x offset, added Z rotation
             gsap.set(slideRightElements, { opacity: 0, x: 80, rotationZ: 4 }); // Increased x offset, added Z rotation
-            gsap.set(scaleElements, { opacity: 0, scale: 0.7, rotationY: 8 }); // Smaller scale, added Y rotation
+            gsap.set(scaleElements, { 
+                opacity: 0, 
+                scale: 0.7, 
+                rotationY: 8,
+                rotationZ: 10,
+                transformOrigin: "center center" 
+            }); // Enhanced initial state with multiple rotation axes
             gsap.set(rotateElements, { opacity: 0, rotation: -8 }); // Increased initial rotation
             
             // Completely reimagined FADE IN ANIMATIONS - now sliding from lower left with exaggerated easing
@@ -721,7 +727,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 masterTimeline.to(scaleElements, {
                     opacity: 1,
                     scale: 1,
-                    rotationY: 0, // Return to normal rotation
+                    rotationY: -8, // Negative Y rotation
+                    rotationZ: -12, // Adding Z rotation for more visible effect
+                    transformOrigin: "center center",
                     duration: progressStep * 0.45,
                     stagger: staggerDelay,
                     ease: "back.out(1.7)", // Increased elastic effect
@@ -893,7 +901,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 // Pause all animations immediately
                 ScrollTrigger.getAll().forEach(trigger => {
-                    trigger.pause();
+                    // Check if the trigger has a pause method before calling it
+                    if (trigger && typeof trigger.pause === 'function') {
+                        trigger.pause();
+                    }
                 });
             }
             
@@ -969,7 +980,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Add click event for logo link - outside the ScrollToPlugin check
     document.addEventListener('click', function(e) {
-        let logoLink = e.target.closest('');
+        let logoLink = e.target.closest('.logo-link');
         
         if (logoLink) {
             e.preventDefault();
