@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Righteous - Local Development</title>
+    <!-- Add GSAP core first -->
+    <script src="/lib/gsap-premium/src/gsap-core.js"></script>
+    <style>
+        /* Basic styles to match Webflow structure */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .nav-bar-main {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            background: #fff;
+        }
+        
+        .logo-lockup {
+            display: flex;
+            align-items: center;
+        }
+        
+        .top-logo {
+            font-size: 24px;
+            margin-right: 20px;
+        }
+        
+        .top-navlink {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .main-wrapper {
+            padding-top: 100px;
+        }
+        
+        .hero-area {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-logo-container {
+            text-align: center;
+        }
+        
+        .main-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-underline {
+            height: 2px;
+            background: #000;
+            width: 100%;
+            transform: scaleX(0);
+        }
+        
+        .stack-section {
+            padding: 100px 20px;
+            text-align: center;
+        }
+        
+        .skelehand {
+            width: 200px;
+            height: 200px;
+            background: #ccc;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar-main">
+        <div class="logo-lockup">
+            <div class="top-logo">Righteous</div>
+            <div class="logo-underline"></div>
+        </div>
+        <a href="#" class="top-navlink">Home</a>
+        <a href="#" class="top-navlink">About</a>
+        <a href="#" class="top-navlink">Contact</a>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="hero-area">
+            <div class="main-logo-container">
+                <div class="main-logo">Righteous</div>
+                <div class="logo-underline"></div>
+            </div>
+        </div>
+        
+        <div class="stack-section">
+            <h2>Stack Section</h2>
+            <div class="skelehand"></div>
+        </div>
+    </div>
+
+    <!-- Bundle will be injected automatically by webpack -->
+</body>
+</html> 
