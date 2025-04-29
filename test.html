@@ -4,16 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Righteous Animation Test</title>
-    <!-- GSAP from CDN -->
+    <!-- GSAP Core first -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
-    <!-- SplitText locally -->
-    <script src="lib/gsap-premium/minified/SplitText.min.js"></script>
-    <!-- ScrollTrigger plugin -->
+    <!-- Then load all plugins -->
     <script src="lib/gsap-premium/minified/ScrollTrigger.min.js"></script>
-    <!-- ScrollToPlugin -->
     <script src="lib/gsap-premium/minified/ScrollToPlugin.min.js"></script>
-    <!-- Your animation code - served by MCP in production, local for testing -->
+    <script src="lib/gsap-premium/minified/SplitText.min.js"></script>
+    <!-- Added console log to verify plugin loading -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log("Plugin Check:");
+            console.log("- ScrollTrigger:", typeof ScrollTrigger !== 'undefined' ? "Loaded" : "Not loaded");
+            console.log("- ScrollToPlugin:", gsap.plugins && gsap.plugins.ScrollToPlugin ? "Loaded" : "Not loaded");
+            console.log("- SplitText:", typeof SplitText !== 'undefined' ? "Loaded" : "Not loaded");
+        });
+    </script>
+    <!-- Your animation code - loaded after all plugins -->
     <script src="http://localhost:5500/index.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .nav-bar-main {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .logo-lockup {
+            margin-right: auto;
+        }
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .top-logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .top-navlink {
+            margin-left: 30px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .main-wrapper {
+            position: relative;
+        }
+        .hero-area {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-color: #333;
+            color: white;
+        }
+        .main-logo-container {
+            text-align: center;
+        }
+        .main-logo {
+            font-size: 64px;
+            font-weight: bold;
+        }
+        .logo-underline {
+
+            background-color: currentColor;
+
+        }
+        .stack-section {
+            min-height: 100vh;
+            padding: 80px 20px;
+            background-color: #f5f5f5;
+        }
+        .text-block-2 {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation as direct child of body -->
@@ -37,15 +113,13 @@
             </div>
             <div class="bg-video"></div>
         </div>
-        <!-- Stack sections from your structure -->
-        <div class="stack-section" id="about-section">
-            <div class="text-block-2">About Section Content</div>
-        </div>
-        <div class="stack-section" id="gear-section">
-            <div class="text-block-2">Gear Section Content</div>
-        </div>
-        <div class="stack-section" id="contact-section">
-            <div class="text-block-2">Contact Section Content</div>
+        <!-- Single stack section -->
+        <div class="stack-section">
+            <div class="text-block-2">
+                <h2>Welcome to Righteous</h2>
+                <p>This is the main content section of the page. The animations have been simplified to work with a single stack section, making the transitions smoother and more focused.</p>
+                <p>The section will fade in and slide up as you scroll down the page, creating an elegant and professional appearance that matches your Webflow design.</p>
+            </div>
         </div>
     </div>
 </body>
