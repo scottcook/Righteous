@@ -7,6 +7,44 @@
 gsap.registerPlugin(ScrollTrigger);
 console.log("GSAP and ScrollTrigger registered");
 
+// Scroll lock helper functions
+function disableScroll() {
+    // Get the current scroll position
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    // Store current scroll position
+    document.body.dataset.scrollTop = scrollTop;
+    document.body.dataset.scrollLeft = scrollLeft;
+    
+    // Lock scroll position
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollTop}px`;
+    document.body.style.left = `-${scrollLeft}px`;
+    document.body.style.width = '100%';
+    
+    console.log("Scrolling disabled during animation");
+}
+
+function enableScroll() {
+    // Get the stored scroll position
+    const scrollTop = parseInt(document.body.dataset.scrollTop || '0');
+    const scrollLeft = parseInt(document.body.dataset.scrollLeft || '0');
+    
+    // Restore normal scroll behavior
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.width = '';
+    
+    // Restore scroll position
+    window.scrollTo(scrollLeft, scrollTop);
+    
+    console.log("Scrolling enabled after animation complete");
+}
+
 // Save original URL without hash to prevent scroll position restoration
 const originalURL = window.location.href.split('#')[0];
 
@@ -72,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Full hierarchical selectors (updated for new structure)
     const mainLogoSelector = ".main-wrapper .hero-area .main-logo-container .main-logo";
     const topLogoSelector = ".nav-bar-main .logo-lockup .top-logo";
-    const textBlockSelector = ".stack-section .text-block-2";
     const navLinksSelector = ".nav-bar-main .top-navlink";
     
     // Create main timeline
@@ -81,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Check if elements exist first
     const mainLogoElement = document.querySelector(mainLogoSelector);
     const topLogoElement = document.querySelector(topLogoSelector);
-    const textBlockElement = document.querySelector(textBlockSelector);
     
     if (!mainLogoElement) {
         console.error("Main logo element not found:", mainLogoSelector);
@@ -94,15 +130,9 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         console.log("Top logo found:", topLogoElement);
     }
-    
-    if (!textBlockElement) {
-        console.error("Text block element not found:", textBlockSelector);
-    } else {
-        console.log("Text block found:", textBlockElement);
-    }
 
     // Don't run animations if elements aren't found
-    if (!mainLogoElement || !topLogoElement || !textBlockElement) {
+    if (!mainLogoElement || !topLogoElement) {
         console.error("Critical elements missing - not running animations");
         return;
     }
@@ -119,12 +149,10 @@ document.addEventListener("DOMContentLoaded", function() {
         // Initialize SplitText with more split types for more dramatic effect
         const mainLogoSplit = new SplitText(mainLogoSelector, {type: "chars,words,lines"});
         const topLogoSplit = new SplitText(topLogoSelector, {type: "chars,words,lines"});
-        const citiesTextSplit = new SplitText(textBlockSelector, {type: "chars,words,lines"});
         
         console.log("SplitText initialized successfully with:");
         console.log("- Main logo chars:", mainLogoSplit.chars.length);
         console.log("- Top logo chars:", topLogoSplit.chars.length);
-        console.log("- Cities text chars:", citiesTextSplit.chars.length);
 
         // Set initial styles for better split text effect
         gsap.set(mainLogoSplit.chars, { 
@@ -138,20 +166,28 @@ document.addEventListener("DOMContentLoaded", function() {
             y: 50 
         });
         
-        gsap.set(citiesTextSplit.chars, { 
-            opacity: 0,
-            y: 30 
-        });
-        
         gsap.set(navLinksSelector, {
             opacity: 0,
             y: 20
+        });
+        
+        // Set the logo underline to always be visible but with lower opacity
+        gsap.set(".logo-underline", {
+            opacity: 0.6,
+            scaleX: 0,
+            height: 0.7,
+            zIndex: 2000,
+            transformOrigin: "left center",
+     
         });
         
         console.log("Initial animation states set");
 
         // Animation Sequence for intro elements
         console.log("Starting animation sequence");
+        // Disable scrolling during initial animations
+        disableScroll();
+
         mainTl
             // Animate main logo text characters
             .to(mainLogoSplit.chars, {
@@ -164,39 +200,40 @@ document.addEventListener("DOMContentLoaded", function() {
                 onStart: () => console.log("Main logo animation started")
             })
 
-            // Animate top logo
+            // Animate logo underline immediately
+            .to(".logo-underline", {
+                scaleX: 1,
+                duration: 0.5,
+                ease: "power2.out",
+                onStart: () => console.log("Logo underline animation started")
+            }, "-=1.0")
+
+            // Animate top logo almost immediately - start as soon as main logo begins
             .to(topLogoSplit.chars, {
                 opacity: 1,
                 y: 0,
-                stagger: 0.03,
-                duration: 0.7,
+                stagger: 0.02, // Reduced stagger time
+                duration: 0.5, // Reduced duration
                 ease: "power2.out",
                 onStart: () => console.log("Top logo animation started")
-            }, "-=0.3")
+            }, "-=1.15") // Start almost immediately after main logo starts
 
-            // Animate cities text
-            .to(citiesTextSplit.chars, {
-                opacity: 1,
-                y: 0,
-                stagger: 0.02,
-                duration: 0.5,
-                ease: "power2.out",
-                onStart: () => console.log("Cities text animation started")
-            }, "-=0.3")
-
-            // Fade in navigation elements
+            // Fade in navigation elements immediately after top logo starts
             .to(navLinksSelector, {
                 opacity: 1,
                 y: 0,
-                duration: 0.8,
-                stagger: 0.2,
+                duration: 0.6, // Shorter duration
+                stagger: 0.1, // Reduced stagger for faster appearance
                 ease: "power2.out",
                 onStart: () => console.log("Nav links animation started"),
                 onComplete: () => {
                     console.log("Nav links animation completed");
                     // The logo animation is now handled directly in the ScrollTrigger onUpdate callback
+                    
+                    // Enable scrolling after nav links animation completes
+                    enableScroll();
                 }
-            }, "-=0.4");
+            }, "-=0.45"); // Start quickly after top logo animation starts
 
     } catch (error) {
         console.error("Error in animation setup:", error);
@@ -335,8 +372,18 @@ document.addEventListener("DOMContentLoaded", function() {
             position: "fixed",
             top: 0,
             width: "100%", 
-            zIndex: 999 // Very high z-index
+            zIndex: 1000
         });
+        
+        // Ensure logo-underline stays on top of stack sections
+        const logoUnderline = document.querySelector(".logo-underline");
+        if (logoUnderline) {
+            // Set the logo-underline in a higher stacking context
+            gsap.set(logoUnderline, {
+                position: "relative",
+                zIndex: 2000
+            });
+        }
 
         // Set initial styles for main wrapper
         gsap.set(mainWrapper, {
@@ -353,11 +400,11 @@ document.addEventListener("DOMContentLoaded", function() {
             markers: false
         });
 
-        // Create spacer for proper scrolling - each section 100vh
+        // Create new spacer for proper scrolling
         const spacer = document.createElement('div');
         spacer.className = "scroll-spacer";
-        // Reduce the height to require less scrolling (from 100vh per section to 70vh per section)
-        spacer.style.height = `${stackSections.length * 70}vh`;
+        // Since we only have one active stack-section, use a fixed height instead of multiplying by length
+        spacer.style.height = "120vh";
         mainWrapper.appendChild(spacer);
 
         // Create a master timeline for all sections
@@ -366,7 +413,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 trigger: spacer,
                 start: "top 98%",
                 end: `bottom bottom`,
-                scrub: 1.5,
+                scrub: 2.1,
                 markers: false,
                 id: "master-timeline",
                 onUpdate: self => {
@@ -379,7 +426,52 @@ document.addEventListener("DOMContentLoaded", function() {
                         visibility: "visible"
                     });
                     
-                    // Direct logo animation on scroll - synced with stack section movement
+                    // Get progress value for animations
+                    const progress = self.progress;
+                    
+                    // Add color change for top logo and navigation based on scroll position
+                    const topLogo = document.querySelector(".top-logo");
+                    const navLinks = document.querySelectorAll(".top-navlink");
+                    const logoUnderline = document.querySelector(".logo-underline");
+                    
+                    // Check if we're in the hero area (progress near 0) or in a stack section
+                    if (progress < 0.05) {
+                        // In hero area - tween to white
+                        gsap.to([topLogo, navLinks], {
+                            color: "white",
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: true
+                        });
+                        
+                        // Logo underline to white with reduced opacity
+                        gsap.to(logoUnderline, {
+                            backgroundColor: "white",
+                            opacity: 0.3,
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: true
+                        });
+                    } else {
+                        // In a stack section - tween to black
+                        gsap.to([topLogo, navLinks], {
+                            color: "#0B0B0B",
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: true
+                        });
+                        
+                        // Logo underline to black with reduced opacity
+                        gsap.to(logoUnderline, {
+                            backgroundColor: "#0B0B0B",
+                            opacity: 0.3,
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: true
+                        });
+                    }
+                    
+                    // Direct logo animation on scroll
                     const mainLogo = document.querySelector(".main-logo");
                     
                     if (mainLogo) {
@@ -472,6 +564,17 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
 
+        // Ensure logo underline remains visible during scroll but with correct opacity
+        ScrollTrigger.create({
+            trigger: "body",
+            start: "top top",
+            end: "bottom bottom",
+            onUpdate: function(self) {
+                // Keep logo underline visible at all times but with reduced opacity
+                gsap.set(".logo-underline", { opacity: 0.3 });
+            }
+        });
+
         // Also set hero area to viewport width
         gsap.set(heroArea, {
             width: "100vw"
@@ -483,23 +586,27 @@ document.addEventListener("DOMContentLoaded", function() {
         const progressStep = 1 / sectionCount;
         
         stackSections.forEach((section, index) => {
-            const timelinePosition = index === 0 ? 0 : index * progressStep - progressStep * 0.2;
+            // MAJOR CHANGE: Adjust how sections are positioned in the timeline
+            // Ensure each section is almost completely visible before the next appears
+            // Previously used formula: index === 0 ? 0 : index * progressStep - progressStep * 0.2
+            // New formula: Places sections further apart in the timeline
+            const timelinePosition = index * progressStep;
 
-            // Animate opacity to 1 quickly at the start of the section's scroll
+            // Animate opacity to 1 very quickly at the start of the section's scroll
             masterTimeline.to(section, {
                 opacity: 1,
-                duration: progressStep * 0.15, // reach full opacity in the first 15% of the scroll
-                ease: "sine.out",
+                duration: progressStep * 0.1, // Even quicker fade-in (previously 0.15)
+                ease: "power1.out", // Simpler ease
                 immediateRender: false
             }, timelinePosition);
 
-            // Animate in the section (left, yPercent, rotationZ)
+            // Animate in the section (left, yPercent, rotationZ) MUCH FASTER
             masterTimeline.to(section, {
                 left: 0,
                 yPercent: 0,
                 rotationZ: 0,
-                duration: progressStep,
-                ease: "power2.out",
+                duration: progressStep * 0.3, // Very quick transition (previously progressStep * 1.5)
+                ease: "power3.out", // Strong ease out for quick entrance
                 immediateRender: false
             }, timelinePosition);
 
@@ -507,14 +614,17 @@ document.addEventListener("DOMContentLoaded", function() {
             if (index > 0) {
                 const prevSection = stackSections[index - 1];
                 
-                // For all sections, we'll only change filter/brightness without y-movement
+                // IMPORTANT: Only start transitioning the previous section after it's been fully visible
+                // Use a delayed position to make sure previous section stays fully visible longer
+                const prevExitPosition = timelinePosition - (progressStep * 0.1); // Only start exit near the end
+                
                 masterTimeline.to(prevSection, {
                     yPercent: 0, // Keep all sections in place instead of moving up
                     filter: "brightness(0.7)",
-                    duration: progressStep,
-                    ease: "none",
+                    duration: progressStep * 0.2, // Quick brightness change
+                    ease: "power1.in",
                     immediateRender: false
-                }, timelinePosition);
+                }, prevExitPosition);
             }
             
             // Create animations for child elements within each section
@@ -531,116 +641,104 @@ document.addEventListener("DOMContentLoaded", function() {
             const scaleElements = section.querySelectorAll('.section-scale');
             const rotateElements = section.querySelectorAll('.section-rotate');
             
-            // Define the delay between each element in the same group
-            const staggerDelay = 0.1;
+            // Define the delay between each element in the same group - increased for more visible stagger
+            const staggerDelay = 0.22;
             
-            // Calculate when the section is fully visible (25% into its segment)
-            const sectionVisiblePosition = timelinePosition + (progressStep * 0.25);
+            // CHANGE: Start animations much earlier - as the section starts coming into view
+            // Changed from: timelinePosition + (progressStep * 0.25)
+            // To: timelinePosition + (progressStep * 0.05)
+            const sectionVisiblePosition = timelinePosition + (progressStep * 0.04);
             
-            // Initial state for all animated elements (set before any animation starts)
-            gsap.set(fadeElements, { opacity: 0 });
-            gsap.set(slideUpElements, { opacity: 0, y: 50 });
-            gsap.set(slideLeftElements, { opacity: 0, x: -50 });
-            gsap.set(slideRightElements, { opacity: 0, x: 50 });
-            gsap.set(scaleElements, { opacity: 0, scale: 0.8 });
-            gsap.set(rotateElements, { opacity: 0, rotation: -5 });
+            // Initial state for all animated elements - enhanced with rotation and offsets
+            gsap.set(fadeElements, { 
+                opacity: 0, 
+                x: -100, 
+                y: 80, 
+                rotationZ: 10, 
+                transformOrigin: "left bottom" 
+            }); // Changed to slide from lower left with rotation
+            gsap.set(slideUpElements, { opacity: 0, y: 80, rotationX: 6 }); // Increased y offset, added X rotation
+            gsap.set(slideLeftElements, { opacity: 0, x: -80, rotationZ: -4 }); // Increased x offset, added Z rotation
+            gsap.set(slideRightElements, { opacity: 0, x: 80, rotationZ: 4 }); // Increased x offset, added Z rotation
+            gsap.set(scaleElements, { opacity: 0, scale: 0.7, rotationY: 8 }); // Smaller scale, added Y rotation
+            gsap.set(rotateElements, { opacity: 0, rotation: -8 }); // Increased initial rotation
             
-            // FADE IN ANIMATIONS
+            // Completely reimagined FADE IN ANIMATIONS - now sliding from lower left with exaggerated easing
             if (fadeElements.length) {
                 masterTimeline.to(fadeElements, {
                     opacity: 1,
-                    duration: progressStep * 0.4,
-                    stagger: staggerDelay,
-                    ease: "power2.out",
+                    x: 0, 
+                    y: 0,
+                    rotationZ: 0,
+                    duration: progressStep * 0.6, // Longer duration for more dramatic effect
+                    stagger: staggerDelay * 1.5, // Increased stagger
+                    ease: "expo.out(1, 0.7)", // Exaggerated elastic easing for bouncy inertia effect
                     immediateRender: false
                 }, sectionVisiblePosition);
             }
             
-            // SLIDE UP ANIMATIONS
+            // Enhanced SLIDE UP ANIMATIONS with perspective and rotation
             if (slideUpElements.length) {
                 masterTimeline.to(slideUpElements, {
                     opacity: 1,
                     y: 0,
-                    duration: progressStep * 0.4,
+                    rotationX: 0, // Return to normal rotation
+                    duration: progressStep * 0.45, // Slightly longer for more dramatic effect
+                    stagger: staggerDelay,
+                    ease: "back.out(1.4)", // Increased back effect for more bounce
+                    immediateRender: false
+                }, sectionVisiblePosition);
+            }
+            
+            // Enhanced SLIDE LEFT TO RIGHT ANIMATIONS with rotation
+            if (slideLeftElements.length) {
+                masterTimeline.to(slideLeftElements, {
+                    opacity: 1,
+                    x: 0,
+                    rotationZ: 0, // Return to normal rotation
+                    duration: progressStep * 0.45,
                     stagger: staggerDelay,
                     ease: "back.out(1.2)",
                     immediateRender: false
                 }, sectionVisiblePosition);
             }
             
-            // SLIDE LEFT TO RIGHT ANIMATIONS
-            if (slideLeftElements.length) {
-                masterTimeline.to(slideLeftElements, {
-                    opacity: 1,
-                    x: 0,
-                    duration: progressStep * 0.4,
-                    stagger: staggerDelay,
-                    ease: "power2.out",
-                    immediateRender: false
-                }, sectionVisiblePosition);
-            }
-            
-            // SLIDE RIGHT TO LEFT ANIMATIONS
+            // Enhanced SLIDE RIGHT TO LEFT ANIMATIONS with rotation
             if (slideRightElements.length) {
                 masterTimeline.to(slideRightElements, {
                     opacity: 1,
                     x: 0,
-                    duration: progressStep * 0.4,
+                    rotationZ: 0, // Return to normal rotation
+                    duration: progressStep * 0.45,
                     stagger: staggerDelay,
-                    ease: "power2.out",
+                    ease: "back.out(1.2)",
                     immediateRender: false
                 }, sectionVisiblePosition);
             }
             
-            // SCALE ANIMATIONS
+            // Enhanced SCALE ANIMATIONS with rotation
             if (scaleElements.length) {
                 masterTimeline.to(scaleElements, {
                     opacity: 1,
                     scale: 1,
-                    duration: progressStep * 0.4,
+                    rotationY: 0, // Return to normal rotation
+                    duration: progressStep * 0.45,
                     stagger: staggerDelay,
-                    ease: "back.out(1.4)",
+                    ease: "back.out(1.7)", // Increased elastic effect
                     immediateRender: false
                 }, sectionVisiblePosition);
             }
             
-            // ROTATE ANIMATIONS
+            // Enhanced ROTATE ANIMATIONS with more dramatic initial rotation
             if (rotateElements.length) {
                 masterTimeline.to(rotateElements, {
                     opacity: 1,
                     rotation: 0,
-                    duration: progressStep * 0.4,
+                    duration: progressStep * 0.45,
                     stagger: staggerDelay,
-                    ease: "power2.out",
+                    ease: "back.out(1.5)", // Added back effect for more spring
                     immediateRender: false
                 }, sectionVisiblePosition);
-            }
-            
-            // If not the last section, animate all elements out when leaving the section
-            if (sectionIndex < stackSections.length - 1) {
-                // Calculate when the section should start exiting (75% through its segment)
-                const sectionExitPosition = timelinePosition + (progressStep * 0.75);
-                
-                // Group all animated elements for exit animation
-                const allAnimatedElements = [
-                    ...fadeElements, 
-                    ...slideUpElements, 
-                    ...slideLeftElements,
-                    ...slideRightElements,
-                    ...scaleElements,
-                    ...rotateElements
-                ];
-                
-                if (allAnimatedElements.length) {
-                    // Animate out - fade out with slight movement
-                    masterTimeline.to(allAnimatedElements, {
-                        opacity: 0,
-                        y: -20,
-                        duration: progressStep * 0.3,
-                        ease: "power1.in",
-                        immediateRender: false
-                    }, sectionExitPosition);
-                }
             }
         }
         
@@ -672,37 +770,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Skeleton hand animation - flickering effect
         try {
-            console.log("Setting up skeleton hand animation");
+            console.log("Checking for skeleton hand element");
             
             const skelehand = document.querySelector('.skelehand');
             const mainLogo = document.querySelector('.main-logo');
             
             if (skelehand && mainLogo) {
+                console.log("Setting up skeleton hand animation");
                 // Position the skelehand relative to the main logo
-                // Specifically above the 'e' and 'o' characters
                 const logoRect = mainLogo.getBoundingClientRect();
                 
-                // Position the skeleton hand as shown in the screenshot - on the right side of the TV
-                // Maintain the existing absolute positioning from Webflow, just add animation properties
+                // Add animation code for skeleton hand
                 gsap.set(skelehand, {
                     zIndex: 910, // Above the main logo (which is 900)
                     opacity: 0.9
-                    // Don't override the position values already set in Webflow
                 });
                 
                 // Create a flicker effect 
                 const flickerTl = gsap.timeline({
                     repeat: -1, // Repeat infinitely
-                    repeatDelay: gsap.utils.random(5, 12) // Much longer delay between appearances
+                    repeatDelay: gsap.utils.random(5, 12)
                 });
                 
-                // Using random values for the flicker animation for more organic feel
                 flickerTl
-                    // Start invisible
-                    .set(skelehand, {
-                        opacity: 0
-                    })
-                    // Quick flicker sequence with complete disappearance
+                    .set(skelehand, { opacity: 0 })
                     .to(skelehand, {
                         opacity: gsap.utils.random(0.7, 0.9),
                         duration: 0.08,
@@ -768,10 +859,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 console.log("Skeleton hand animation setup complete");
             } else {
-                console.error("Skeleton hand or main logo element not found", {
-                    skelehand: !!skelehand,
-                    mainLogo: !!mainLogo
-                });
+                console.log("Skeleton hand element not found - skipping animation");
             }
         } catch (error) {
             console.error("Error setting up skeleton hand animation:", error);
@@ -783,240 +871,92 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Handle resize with debounce for better performance
         let resizeTimeout;
+        let isResizing = false; // Flag to track active resize
+        
         window.addEventListener("resize", () => {
             if (resizeTimeout) clearTimeout(resizeTimeout);
+            
+            // Set resizing flag to prevent ScrollTrigger conflicts
+            if (!isResizing) {
+                isResizing = true;
+                
+                // Store current scroll progress and position
+                const currentProgress = masterTimelineRef ? masterTimelineRef.progress() : 0;
+                const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // CRITICAL: Pause the timeline to prevent flickers during resize
+                if (masterTimelineRef) {
+                    masterTimelineRef.pause();
+                }
 
-            // Store current scroll progress before resetting
-            const currentProgress = masterTimelineRef ? masterTimelineRef.progress() : 0;
-            
-            // Store current scroll position
-            const scrollPos = window.scrollY || window.pageYOffset;
-            
-            // Get existing elements before resetting
-            const stackSections = document.querySelectorAll('.stack-section');
-            const heroArea = document.querySelector('.hero-area');
-            const mainWrapper = document.querySelector('.main-wrapper');
-            const navBar = document.querySelector('.nav-bar-main');
-            
-            // Pause animations while resizing to avoid glitches
-            if (masterTimelineRef) {
-                masterTimelineRef.pause();
-            }
-            
-            // Kill all ScrollTrigger instances to rebuild them
-            if (typeof ScrollTrigger !== 'undefined') {
+                console.log(`Resize started: Progress ${currentProgress.toFixed(2)}`);
+                
+                // Pause all animations immediately
                 ScrollTrigger.getAll().forEach(trigger => {
-                    trigger.kill(true);
+                    trigger.pause();
                 });
             }
             
-            // Kill any animations on elements
-            gsap.killTweensOf([heroArea, ...stackSections, mainWrapper]);
-            
-            // Remove existing spacer if it exists (will be recreated)
-            const oldSpacer = document.querySelector('.scroll-spacer');
-            if (oldSpacer && oldSpacer.parentNode) {
-                oldSpacer.parentNode.removeChild(oldSpacer);
-            }
-            
-            // Only do the complete refresh/rebuild after a short debounce
+            // Only execute the resize logic after a short debounce
             resizeTimeout = setTimeout(() => {
                 try {
-                    // Set common properties for all elements
-                    gsap.set([heroArea, ...stackSections], {
-                        width: "100vw",
-                        height: "100vh"
-                    });
+                    console.log("Resize handling complete, restoring animation state");
                     
-                    if (mainWrapper) {
-                        gsap.set(mainWrapper, {
-                            width: "100vw",
-                            height: "auto",
-                            overflow: "hidden"
+                    // Get current progress and position again in case they changed
+                    const currentProgress = masterTimelineRef ? masterTimelineRef.progress() : 0;
+                    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    // Simplify resize handling - allow ScrollTrigger's built-in resize handling to work
+                    // without adding additional complexity
+                    
+                    // Simply refresh ScrollTrigger
+                    ScrollTrigger.refresh();
+                    
+                    // After refresh, restore timeline progress
+                    setTimeout(() => {
+                        // First ensure the scroll position is maintained
+                        window.scrollTo(0, scrollPosition);
+                        
+                        // Re-enable and resume all ScrollTrigger instances
+                        ScrollTrigger.getAll().forEach(trigger => {
+                            trigger.enable();
+                            trigger.refresh();
                         });
-                    }
-                    
-                    // Reset hero area
-                    gsap.set(heroArea, {
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        width: "100vw",
-                        autoAlpha: 1,
-                        zIndex: 1
-                    });
-                    
-                    // Pin the hero section
-                    ScrollTrigger.create({
-                        trigger: heroArea,
-                        pin: true,
-                        pinSpacing: false,
-                        start: "top top",
-                        markers: false
-                    });
-                    
-                    // Create new spacer for proper scrolling
-                    const spacer = document.createElement('div');
-                    spacer.className = "scroll-spacer";
-                    // Reduce the height to require less scrolling (from 100vh per section to 70vh per section)
-                    spacer.style.height = `${stackSections.length * 70}vh`;
-                    mainWrapper.appendChild(spacer);
-                    
-                    // Create a master timeline for all sections
-                    const masterTimeline = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: spacer,
-                            start: "top 98%",
-                            end: `bottom bottom`,
-                            scrub: 1.5,
-                            markers: false,
-                            id: "master-timeline",
-                            onUpdate: self => {
-                                // Ensure nav stays visible during scroll
-                                gsap.set(navBar, { 
-                                    opacity: 1, 
-                                    y: 0,
-                                    autoAlpha: 1,
-                                    visibility: "visible"
-                                });
-                                
-                                // Direct logo animation on scroll
-                                const mainLogo = document.querySelector(".main-logo");
-                                
-                                if (mainLogo) {
-                                    const progress = self.progress;
-                                    
-                                    if (progress <= 0.05) {
-                                        gsap.killTweensOf(mainLogo);
-                                        gsap.set(mainLogo, {
-                                            clearProps: "all"
-                                        });
-                                    } 
-                                    else if (progress > 0.05 && progress < 0.95) {
-                                        if (mainLogo.style.position !== "fixed") {
-                                            const logoRect = mainLogo.getBoundingClientRect();
-                                            
-                                            gsap.set(mainLogo, {
-                                                position: "fixed",
-                                                top: logoRect.top + "px",
-                                                left: "50%", 
-                                                xPercent: -50,
-                                                zIndex: 900
-                                            });
-                                            
-                                            gsap.to(mainLogo, {
-                                                top: "-340px",
-                                                rotateZ: -5,
-                                                duration: 1.2,
-                                                ease: "expo.out",
-                                                overwrite: true,
-                                                immediateRender: true
-                                            });
-                                        }
-                                    } 
-                                    else if (progress >= 0.95) {
-                                        if (mainLogo.style.position === "fixed") {
-                                            gsap.killTweensOf(mainLogo);
-                                            
-                                            gsap.to(mainLogo, {
-                                                top: "auto",
-                                                rotateZ: 0,
-                                                duration: 0.6,
-                                                ease: "power2.inOut",
-                                                onComplete: function() {
-                                                    gsap.set(mainLogo, {
-                                                        clearProps: "all"
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                    
-                    // Set initial state for all sections
-                    stackSections.forEach((section, index) => {
-                        gsap.set(section, {
-                            position: "fixed",
-                            width: "100vw",
-                            height: "100vh",
-                            top: 0,
-                            left: "-16vw",
-                            yPercent: 100,
-                            zIndex: 2 + index,
-                            rotationZ: 12,
-                            opacity: 0,
-                            filter: "brightness(1)"
-                        });
-                    });
-                    
-                    // Add each section to the master timeline
-                    const sectionCount = stackSections.length;
-                    const progressStep = 1 / sectionCount;
-                    
-                    stackSections.forEach((section, index) => {
-                        const timelinePosition = index === 0 ? 0 : index * progressStep - progressStep * 0.2;
                         
-                        // Animate opacity to 1 quickly at the start of the section's scroll
-                        masterTimeline.to(section, {
-                            opacity: 1,
-                            duration: progressStep * 0.15,
-                            ease: "sine.out",
-                            immediateRender: false
-                        }, timelinePosition);
-                        
-                        // Animate in the section (left, yPercent, rotationZ)
-                        masterTimeline.to(section, {
-                            left: 0,
-                            yPercent: 0,
-                            rotationZ: 0,
-                            duration: progressStep,
-                            ease: "power2.out",
-                            immediateRender: false
-                        }, timelinePosition);
-                        
-                        // Animate previous section out (yPercent, brightness)
-                        if (index > 0) {
-                            const prevSection = stackSections[index - 1];
-                            
-                            // For all sections, we'll only change filter/brightness without y-movement
-                            masterTimeline.to(prevSection, {
-                                yPercent: 0,
-                                filter: "brightness(0.7)",
-                                duration: progressStep,
-                                ease: "none",
-                                immediateRender: false
-                            }, timelinePosition);
+                        // Then restore the timeline progress if needed
+                        if (masterTimelineRef && currentProgress > 0) {
+                            masterTimelineRef.progress(currentProgress);
+                            masterTimelineRef.resume();
+                            console.log("Progress restored:", currentProgress);
                         }
                         
-                        // Recreate child element animations
-                        animateSectionChildren(section, index, timelinePosition, progressStep);
-                    });
+                        // Reset resizing flag
+                        isResizing = false;
+                    }, 100);
                     
-                    // Assign to shared reference
-                    masterTimelineRef = masterTimeline;
-                    window.masterTimelineRef = masterTimelineRef;
-                    
-                    // Try to restore progress
-                    if (currentProgress > 0) {
-                        // Set the timeline to the previous progress position
-                        masterTimeline.progress(currentProgress);
-                        
-                        // Also restore the scroll position
-                        window.scrollTo(0, scrollPos);
-                    }
-                    
-                    // Final refresh
-                    ScrollTrigger.refresh(true);
-                    console.log("Full animation rebuild complete after resize");
                 } catch (error) {
-                    console.error("Error during resize rebuild:", error);
+                    // Reset the flag even in case of errors
+                    isResizing = false;
+                    console.error("Error during resize handling:", error);
+                    
+                    // Try to recover as best as possible
+                    ScrollTrigger.refresh();
+                    if (masterTimelineRef) {
+                        masterTimelineRef.resume();
+                    }
                 }
-            }, 100);
+            }, 250); // Debounce delay
         });
         
+        // Create a resize check in the ScrollTrigger onUpdate callback
+        const originalOnUpdate = masterTimeline.scrollTrigger.onUpdate;
+        masterTimeline.scrollTrigger.onUpdate = self => {
+            // Skip updates during active resize to prevent glitches
+            if (!isResizing) {
+                originalOnUpdate(self);
+            }
+        };
+
     } catch (error) {
         console.error("Error in scroll setup:", error);
         console.log("Stack sections found:", document.querySelectorAll(".stack-section").length);
