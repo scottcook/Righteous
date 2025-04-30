@@ -3,9 +3,14 @@
  * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
  */
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-console.log("GSAP and ScrollTrigger registered");
+// Wait for GSAP and plugins to be available
+if (typeof gsap === 'undefined') {
+    console.error("GSAP not loaded!");
+} else {
+    // Register GSAP plugins
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+    console.log("GSAP and ScrollTrigger registered");
+}
 
 // Scroll lock helper functions
 function disableScroll() {
@@ -188,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Set initial state for skelehand element
         gsap.set(skelehandSelector, {
             opacity: 0,
-            y: 200, // Start from below the screen
+            y: 200,
             transformOrigin: "center bottom"
         });
         
@@ -245,38 +250,41 @@ document.addEventListener("DOMContentLoaded", () => {
             opacity: 1,
             y: 0,
             duration: 1.8,
-            ease: "elastic.out(0.5, 0.3)", // Exaggerated bouncy easing
+            ease: "elastic.out(0.5, 0.3)",
             onStart: () => console.log("Skelehand animation started")
         }, "-=0.2");
 
-        // Create animation for stack section without using ScrollTrigger directly
-        const sectionAnimation = gsap.to(stackSection, {
-            opacity: 1,
-            y: 0,
+        // Use ScrollTrigger for stack section animation
+        gsap.from(stackSection, {
+            scrollTrigger: {
+                trigger: stackSection,
+                start: "top 75%",
+                toggleActions: "play none none none",
+                markers: true, // Helpful for debugging, remove in production
+                onEnter: () => console.log("Stack section animation triggered")
+            },
+            opacity: 0,
+            y: 50,
             duration: 1,
-            ease: "power2.out",
-            paused: true
+            ease: "power2.out"
         });
-        
-        // Simple scroll handler for the stack section
-        const scrollHandler = () => {
-            const rect = stackSection.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-            
-            // If section is in view
-            if (rect.top < viewportHeight * 0.75 && rect.bottom > 0) {
-                sectionAnimation.play();
-            }
-        };
-        
-        // Add scroll listener with passive flag for better performance
-        window.addEventListener('scroll', scrollHandler, { passive: true });
-        
-        // Check initial position
-        setTimeout(scrollHandler, 100);
 
         // Check for ScrollToPlugin
-        if (gsap.plugins && gsap.plugins.ScrollToPlugin) {
+        if (!gsap.plugins || !gsap.plugins.scrollTo) {
+            console.warn("GSAP ScrollToPlugin not loaded. Nav-to-section functionality will not work.");
+            
+            // Fallback navigation with standard scrolling
+            document.querySelectorAll(navLinksSelector).forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetSection = stackSection;
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        } else {
             console.log("ScrollToPlugin successfully loaded");
             
             // Handle navigation clicks
@@ -294,20 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             },
                             ease: "power2.inOut"
                         });
-                    }
-                });
-            });
-        } else {
-            console.warn("GSAP ScrollToPlugin not loaded. Nav-to-section functionality will not work.");
-            
-            // Fallback navigation with standard scrolling
-            document.querySelectorAll(navLinksSelector).forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetSection = stackSection;
-                    
-                    if (targetSection) {
-                        targetSection.scrollIntoView({ behavior: 'smooth' });
                     }
                 });
             });
