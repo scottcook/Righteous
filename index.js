@@ -1,6 +1,6 @@
 /**
  * This file should be loaded from:
- * https://cdn.jsdelivr.net/gh/scottcook/Righteous@407a88d/index.js
+ * https://cdn.jsdelivr.net/gh/scottcook/Righteous@6af4add/index.js
  */
 
 console.log('Script loaded - Starting initialization');
@@ -45,6 +45,48 @@ function initializeGSAP() {
         console.log("Registered plugins:", gsap.plugins ? Object.keys(gsap.plugins) : 'No plugins found');
     } catch (error) {
         console.error("Error registering GSAP plugins:", error);
+        return;
+    }
+
+    // Full hierarchical selectors
+    const selectors = {
+        mainLogo: ".main-wrapper .hero-area .main-logo-container .main-logo",
+        topLogo: ".nav-bar-main .logo-lockup .top-logo",
+        navLinks: ".nav-bar-main .top-navlink",
+        stackSection: ".stack-section",
+        skelehand: ".skelehand",
+        logoUnderline: ".logo-underline"
+    };
+
+    // Check each selector
+    console.log('Checking for elements in the page:');
+    Object.entries(selectors).forEach(([name, selector]) => {
+        const element = document.querySelector(selector);
+        if (element) {
+            console.log(`✓ Found ${name}:`, selector);
+        } else {
+            console.error(`✗ Missing ${name}:`, selector);
+            // Log parent elements to help debug
+            const parts = selector.split(' ');
+            let currentSelector = '';
+            parts.forEach(part => {
+                currentSelector += (currentSelector ? ' ' : '') + part;
+                const el = document.querySelector(currentSelector);
+                console.log(`  ${currentSelector}: ${el ? 'exists' : 'not found'}`);
+            });
+        }
+    });
+
+    // Create main timeline
+    const mainTl = gsap.timeline();
+
+    // Check if elements exist first
+    const mainLogoElement = document.querySelector(selectors.mainLogo);
+    const topLogoElement = document.querySelector(selectors.topLogo);
+    const stackSection = document.querySelector(selectors.stackSection);
+    
+    if (!mainLogoElement || !topLogoElement || !stackSection) {
+        console.error("Required elements not found. Animation initialization stopped.");
         return;
     }
 
