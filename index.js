@@ -1,19 +1,11 @@
 /**
  * This file should be loaded from:
- * https://cdn.jsdelivr.net/gh/scottcook/Righteous@338e1c2/index.js
+ * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
  */
 
-console.log('Script loaded - Starting initialization');
-
-// Define selectors at the top level
-const selectors = {
-    mainLogo: ".main-wrapper .hero-area .main-logo-container .main-logo",
-    topLogo: ".nav-bar-main .logo-lockup .top-logo",
-    navLinks: ".nav-bar-main .top-navlink",
-    stackSection: ".stack-section",
-    skelehand: ".skelehand",
-    logoUnderline: ".logo-underline"
-};
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+console.log("GSAP and ScrollTrigger registered");
 
 // Scroll lock helper functions
 function disableScroll() {
@@ -53,132 +45,161 @@ function enableScroll() {
     console.log("Scrolling enabled after animation complete");
 }
 
-// Initialize GSAP and handle animations
-function initializeGSAP() {
-    console.log('initializeGSAP called');
+// Use a different variable name to avoid redeclaration
+const baseURL = window.location.href.split('#')[0];
+
+// Clear URL hash on page refresh/unload to prevent automatic scrolling to sections
+window.addEventListener("beforeunload", () => {
+    // Replace current URL with a clean one (no hash)
+    window.history.replaceState({}, document.title, baseURL);
+});
+
+// Handle page refresh/load to reset scroll position
+window.addEventListener("load", () => {
+    // Force reset all scroll positions
+    resetScrollPosition();
     
-    // Check if GSAP is loaded
-    if (typeof gsap === 'undefined') {
-        console.error('GSAP not loaded! Please ensure GSAP is loaded before this script.');
-        console.log('Window object keys:', Object.keys(window));
-        return;
+    // Check and fix URL if it contains a hash
+    if (window.location.hash) {
+        // Remove the hash without causing page jump
+        window.history.replaceState({}, document.title, baseURL);
+        console.log("Removed hash from URL to prevent auto-scrolling");
     }
-    console.log('GSAP found:', gsap.version);
+});
 
-    // Check for required plugins
-    const requiredPlugins = {
-        ScrollTrigger: typeof ScrollTrigger !== 'undefined',
-        ScrollToPlugin: typeof ScrollToPlugin !== 'undefined',
-        SplitText: typeof SplitText !== 'undefined'
-    };
-
-    console.log('Plugin status:', requiredPlugins);
-
-    // Log missing plugins
-    const missingPlugins = Object.entries(requiredPlugins)
-        .filter(([, loaded]) => !loaded)
-        .map(([name]) => name);
-
-    if (missingPlugins.length > 0) {
-        console.error(`Missing required GSAP plugins: ${missingPlugins.join(', ')}`);
-        console.error('Please ensure all required plugins are loaded before this script.');
-        console.log('Available GSAP plugins:', gsap.plugins ? Object.keys(gsap.plugins) : 'No plugins found');
-        return;
-    }
-
-    try {
-        // Register GSAP plugins
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-        console.log("GSAP plugins registered successfully");
-        console.log("Registered plugins:", gsap.plugins ? Object.keys(gsap.plugins) : 'No plugins found');
-    } catch (error) {
-        console.error("Error registering GSAP plugins:", error);
-        return;
-    }
-
-    try {
-        console.log("Starting animation setup");
+// Reset scroll position with repeated attempts to ensure it works
+function resetScrollPosition() {
+    // Immediately scroll to top
+    window.scrollTo(0, 0);
+    
+    // Also use the more compatible version
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    
+    // Disable smooth scrolling temporarily
+    const htmlElement = document.documentElement;
+    const originalScrollBehavior = htmlElement.style.scrollBehavior;
+    htmlElement.style.scrollBehavior = 'auto';
+    
+    // Force scroll to work even if other scripts interfere
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
         
-        // Check if elements exist first
-        Object.entries(selectors).forEach(([name, selector]) => {
-            const element = document.querySelector(selector);
-            if (element) {
-                console.log(`✓ Found ${name}:`, selector);
-            } else {
-                console.error(`✗ Missing ${name}:`, selector);
+        // Restore original scroll behavior
+        htmlElement.style.scrollBehavior = originalScrollBehavior;
+        
+        // Safer way to refresh ScrollTrigger
+        if (typeof ScrollTrigger !== 'undefined') {
+            try {
+                ScrollTrigger.refresh();
+            } catch (e) {
+                console.warn("ScrollTrigger refresh error:", e);
             }
-        });
+        }
+    }, 10);
+}
 
-        // Initialize SplitText
-        console.log("Creating SplitText instances");
-        const mainLogoSplit = new SplitText(selectors.mainLogo, {type: "chars,words,lines"});
-        const topLogoSplit = new SplitText(selectors.topLogo, {type: "chars,words,lines"});
+// Wait for DOM content and web fonts to load
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM Content Loaded");
+    
+    // Full hierarchical selectors
+    const mainLogoSelector = ".main-wrapper .hero-area .main-logo-container .main-logo";
+    const topLogoSelector = ".nav-bar-main .logo-lockup .top-logo";
+    const navLinksSelector = ".nav-bar-main .top-navlink";
+    const stackSectionSelector = ".stack-section";
+    const skelehandSelector = ".skelehand";
+    const logoUnderlineSelector = ".logo-underline";
+    
+    // Create main timeline
+    const mainTl = gsap.timeline();
+
+    // Check if elements exist first
+    const mainLogoElement = document.querySelector(mainLogoSelector);
+    const topLogoElement = document.querySelector(topLogoSelector);
+    const stackSection = document.querySelector(stackSectionSelector);
+    
+    if (!mainLogoElement) {
+        console.error("Main logo element not found:", mainLogoSelector);
+        return;
+    }
+    console.log("Main logo found:", mainLogoElement);
+    
+    if (!topLogoElement) {
+        console.error("Top logo element not found:", topLogoSelector);
+        return;
+    }
+    console.log("Top logo found:", topLogoElement);
+
+    if (!stackSection) {
+        console.error("Stack section not found:", stackSectionSelector);
+        return;
+    }
+    console.log("Stack sections found:", document.querySelectorAll(stackSectionSelector).length);
+
+    try {
+        console.log("Initializing SplitText");
         
-        console.log("SplitText created successfully:");
+        // Make sure SplitText is available
+        if (typeof SplitText === 'undefined') {
+            console.error("SplitText plugin not loaded!");
+            return;
+        }
+        
+        // Initialize SplitText
+        const mainLogoSplit = new SplitText(mainLogoSelector, {type: "chars,words,lines"});
+        const topLogoSplit = new SplitText(topLogoSelector, {type: "chars,words,lines"});
+        
+        console.log("SplitText initialized successfully with:");
         console.log("- Main logo chars:", mainLogoSplit.chars.length);
         console.log("- Top logo chars:", topLogoSplit.chars.length);
 
-        // Set initial states with logging
-        console.log("Setting initial states");
-        
+        // Set initial styles
         gsap.set(mainLogoSplit.chars, { 
             opacity: 0,
             y: 80,
-            rotateX: -90,
-            immediateRender: true
+            rotateX: -90
         });
         
         gsap.set(topLogoSplit.chars, { 
             opacity: 0,
-            y: 50,
-            immediateRender: true
+            y: 50 
         });
         
-        gsap.set(selectors.navLinks, {
+        gsap.set(navLinksSelector, {
             opacity: 0,
-            y: 20,
-            immediateRender: true
+            y: 20
         });
         
-        gsap.set(selectors.logoUnderline, {
+        gsap.set(logoUnderlineSelector, {
             opacity: 0.6,
-            scaleX: 0,
-            transformOrigin: "left center",
-            immediateRender: true
+            zIndex: 2000,
+            transformOrigin: "left center"
         });
 
-        gsap.set(selectors.stackSection, {
+        // Set initial state for stack section
+        gsap.set(stackSection, {
             opacity: 0,
-            y: 50,
-            immediateRender: true
+            y: 50
         });
         
-        gsap.set(selectors.skelehand, {
+        // Set initial state for skelehand element
+        gsap.set(skelehandSelector, {
             opacity: 0,
-            y: 200,
-            transformOrigin: "center bottom",
-            immediateRender: true
+            y: 200, // Start from below the screen
+            transformOrigin: "center bottom"
         });
         
-        console.log("Initial states set");
+        console.log("Initial animation states set");
 
         // Disable scrolling during initial animations
         disableScroll();
-        console.log("Scroll disabled for animations");
 
-        // Create and configure main timeline
-        console.log("Creating main timeline");
-        const mainTl = gsap.timeline({
-            onStart: () => console.log("Main timeline started"),
-            onComplete: () => console.log("Main timeline completed"),
-            defaults: {
-                ease: "power2.out"
-            }
-        });
-
-        // Build the animation sequence
-        console.log("Building animation sequence");
+        // Main animation sequence
         mainTl
+            // Animate main logo text characters
             .to(mainLogoSplit.chars, {
                 opacity: 1,
                 y: 0,
@@ -186,151 +207,116 @@ function initializeGSAP() {
                 stagger: 0.05,
                 duration: 1.2,
                 ease: "back.out(2)",
-                onStart: () => console.log("Main logo animation started"),
-                onComplete: () => console.log("Main logo animation completed")
+                onStart: () => console.log("Main logo animation started")
             })
-            .to(selectors.logoUnderline, {
+            // Animate logo underline
+            .to(logoUnderlineSelector, {
                 scaleX: 1,
                 duration: 0.8,
-                onStart: () => console.log("Logo underline animation started"),
-                onComplete: () => console.log("Logo underline animation completed")
+                ease: "power2.out",
+                onStart: () => console.log("Logo underline animation started")
             }, "-=0.5")
+            // Animate top logo characters
             .to(topLogoSplit.chars, {
                 opacity: 1,
                 y: 0,
                 stagger: 0.02,
                 duration: 0.8,
                 ease: "back.out(1.7)",
-                onStart: () => console.log("Top logo animation started"),
-                onComplete: () => console.log("Top logo animation completed")
+                onStart: () => console.log("Top logo animation started")
             }, "-=0.3")
-            .to(selectors.navLinks, {
+            // Animate navigation links
+            .to(navLinksSelector, {
                 opacity: 1,
                 y: 0,
                 stagger: 0.1,
                 duration: 0.6,
+                ease: "power2.out",
                 onStart: () => console.log("Nav links animation started"),
                 onComplete: () => {
-                    console.log("Nav links animation completed");
                     enableScroll();
-                    console.log("Scroll enabled");
+                    console.log("Nav links animation completed");
+                    console.log("Initial animation sequence complete");
                 }
-            }, "-=0.4")
-            .to(selectors.skelehand, {
-                opacity: 1,
-                y: 0,
-                duration: 1.8,
-                ease: "elastic.out(0.5, 0.3)",
-                onStart: () => console.log("Skelehand animation started"),
-                onComplete: () => console.log("Skelehand animation completed")
-            }, "-=0.2");
+            }, "-=0.4");
 
-        // Set up ScrollTrigger for stack section
-        console.log("Setting up ScrollTrigger");
-        
-        // Verify stack section element exists before creating ScrollTrigger
-        const stackSection = document.querySelector(selectors.stackSection);
-        if (!stackSection) {
-            console.error("Stack section element not found for ScrollTrigger");
-            return;
-        }
-        console.log("Stack section element found:", stackSection);
+        // Animate the skelehand element with exaggerated easing
+        mainTl.to(skelehandSelector, {
+            opacity: 1,
+            y: 0,
+            duration: 1.8,
+            ease: "elastic.out(0.5, 0.3)", // Exaggerated bouncy easing
+            onStart: () => console.log("Skelehand animation started")
+        }, "-=0.2");
 
-        // Create a wrapper div for the animation
-        console.log("Creating animation wrapper");
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'position: relative; width: 100%; height: 100%; will-change: transform;';
-        
-        // Move all children into the wrapper
-        while (stackSection.firstChild) {
-            wrapper.appendChild(stackSection.firstChild);
-        }
-        stackSection.appendChild(wrapper);
-        
-        // Reset any Webflow transforms on the section
-        stackSection.style.transform = 'none';
-        stackSection.style.opacity = '1';
-        stackSection.style.willChange = 'transform';
-        
-        // Set initial state of wrapper
-        gsap.set(wrapper, {
-            y: '100vh', // Start from below the viewport
-            opacity: 0,
-            scale: 0.8,
-            force3D: true
+        // Create animation for stack section without using ScrollTrigger directly
+        const sectionAnimation = gsap.to(stackSection, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power2.out",
+            paused: true
         });
-
-        // Create the scroll animation
-        ScrollTrigger.create({
-            trigger: stackSection,
-            start: "top bottom", // Start when the top of the section hits the bottom of the viewport
-            end: "top center", // End when the top of the section hits the center of the viewport
-            scrub: 1,
-            markers: true,
-            onEnter: () => console.log("Stack section entering view"),
-            onLeave: () => console.log("Stack section leaving view"),
-            onEnterBack: () => console.log("Stack section entering back"),
-            onLeaveBack: () => console.log("Stack section leaving back"),
-            onUpdate: (self) => console.log("Scroll progress:", self.progress.toFixed(2)),
-            animation: gsap.timeline()
-                .to(wrapper, {
-                    y: 0,
-                    opacity: 1,
-                    scale: 1,
-                    duration: 1,
-                    ease: "power2.out"
-                })
-        });
-
-        // Add a parallax effect to enhance the movement
-        gsap.to(wrapper, {
-            yPercent: -30,
-            ease: "none",
-            scrollTrigger: {
-                trigger: stackSection,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-                markers: false
+        
+        // Simple scroll handler for the stack section
+        const scrollHandler = () => {
+            const rect = stackSection.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            
+            // If section is in view
+            if (rect.top < viewportHeight * 0.75 && rect.bottom > 0) {
+                sectionAnimation.play();
             }
-        });
+        };
+        
+        // Add scroll listener with passive flag for better performance
+        window.addEventListener('scroll', scrollHandler, { passive: true });
+        
+        // Check initial position
+        setTimeout(scrollHandler, 100);
 
-        // Force a refresh of ScrollTrigger
-        ScrollTrigger.refresh();
-
-        // Log active ScrollTriggers
-        const triggers = ScrollTrigger.getAll();
-        console.log("Active ScrollTriggers:", triggers);
-        triggers.forEach(trigger => {
-            console.log("ScrollTrigger details:", {
-                id: trigger.vars.id,
-                trigger: trigger.trigger,
-                start: trigger.vars.start,
-                end: trigger.vars.end,
-                scrub: trigger.vars.scrub
+        // Check for ScrollToPlugin
+        if (gsap.plugins && gsap.plugins.ScrollToPlugin) {
+            console.log("ScrollToPlugin successfully loaded");
+            
+            // Handle navigation clicks
+            document.querySelectorAll(navLinksSelector).forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetSection = stackSection;
+                    
+                    if (targetSection) {
+                        gsap.to(window, {
+                            duration: 1,
+                            scrollTo: {
+                                y: targetSection,
+                                offsetY: 50
+                            },
+                            ease: "power2.inOut"
+                        });
+                    }
+                });
             });
-        });
+        } else {
+            console.warn("GSAP ScrollToPlugin not loaded. Nav-to-section functionality will not work.");
+            
+            // Fallback navigation with standard scrolling
+            document.querySelectorAll(navLinksSelector).forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetSection = stackSection;
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        }
 
         console.log("Animation setup complete");
 
     } catch (error) {
         console.error("Error in animation setup:", error);
-        console.error("Error stack:", error.stack);
         enableScroll(); // Ensure scrolling is enabled even if there's an error
     }
-}
-
-// Log the current readyState
-console.log('Current document.readyState:', document.readyState);
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    console.log('Document still loading, adding DOMContentLoaded listener');
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOMContentLoaded fired');
-        initializeGSAP();
-    });
-} else {
-    console.log('Document already loaded, initializing immediately');
-    initializeGSAP();
-} 
+}); 
