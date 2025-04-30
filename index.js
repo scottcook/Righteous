@@ -1,9 +1,9 @@
 /**
  * This file should be loaded from:
- * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
+ * https://cdn.jsdelivr.net/gh/scottcook/Righteous@49e0f89/index.js
  */
 
-// Wait for GSAP and plugins to be available
+// Initialize GSAP and handle animations
 function initializeGSAP() {
     // Check if GSAP is loaded
     if (typeof gsap === 'undefined') {
