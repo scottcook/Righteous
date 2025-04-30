@@ -236,47 +236,46 @@ function initializeGSAP() {
         }
         console.log("Stack section element found:", stackSection);
 
-        // Set initial state for stack section
-        gsap.set(stackSection, {
-            opacity: 0,
-            y: 50,
-            clearProps: "transform", // Clear existing transform properties
-            immediateRender: true
+        // Remove any existing transforms from Webflow
+        stackSection.style.transform = 'none';
+        stackSection.style.opacity = '0';
+
+        // Create the timeline for the stack section
+        const stackTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: stackSection,
+                start: "top bottom", // start when top of section hits bottom of viewport
+                end: "top center", // end when top of section hits center of viewport
+                scrub: 1, // smooth scrubbing
+                markers: true,
+                onEnter: () => console.log("Stack section entering - scrub starting"),
+                onLeave: () => console.log("Stack section leaving - scrub complete"),
+                onEnterBack: () => console.log("Stack section entering back - scrub reversing"),
+                onLeaveBack: () => console.log("Stack section leaving back - scrub reverse complete"),
+                onUpdate: (self) => {
+                    console.log("ScrollTrigger progress:", self.progress.toFixed(2));
+                },
+                invalidateOnRefresh: true, // recalculate on page refresh
+                fastScrollEnd: true, // better behavior for fast scrolling
+            }
         });
 
-        // Create ScrollTrigger with scrub animation
-        ScrollTrigger.create({
-            trigger: stackSection,
-            start: "top 80%", // Trigger earlier
-            end: "top center",
-            onEnter: () => {
-                console.log("Stack section entered viewport - animating");
-                gsap.to(stackSection, {
+        // Add animations to the timeline
+        stackTl
+            .fromTo(stackSection, 
+                {
+                    opacity: 0,
+                    y: 100,
+                    force3D: true, // force 3D transforms
+                    immediateRender: true
+                },
+                {
                     opacity: 1,
                     y: 0,
-                    duration: 0.8,
-                    ease: "power2.out",
-                    overwrite: true, // Ensure no animation conflicts
-                    clearProps: "transform", // Clear transforms after animation
-                    onComplete: () => console.log("Stack section animation completed")
-                });
-            },
-            onEnterBack: () => console.log("Stack section entered viewport (scrolling up)"),
-            onLeave: () => console.log("Stack section left viewport"),
-            onLeaveBack: () => {
-                console.log("Stack section left viewport (scrolling up)");
-                gsap.to(stackSection, {
-                    opacity: 0,
-                    y: 50,
-                    duration: 0.8,
-                    ease: "power2.in",
-                    overwrite: true
-                });
-            },
-            markers: true,
-            id: "stack-section-trigger",
-            toggleActions: "play reverse play reverse" // Play on enter, reverse on leave
-        });
+                    duration: 1,
+                    ease: "none" // linear ease for scrubbing
+                }
+            );
 
         // Force a refresh of ScrollTrigger
         ScrollTrigger.refresh();
@@ -290,7 +289,7 @@ function initializeGSAP() {
                 trigger: trigger.trigger,
                 start: trigger.vars.start,
                 end: trigger.vars.end,
-                toggleActions: trigger.vars.toggleActions
+                scrub: trigger.vars.scrub
             });
         });
 
