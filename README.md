@@ -36,6 +36,8 @@ npm run watch
 4. Open `index.html` with Live Server (or similar) to preview animations
 
 > ✅ Tip: Your build outputs to `dist/bundle.js`, which is injected into Webflow or your local page.
+> ⚠️ Make sure Live Server is running **before** opening your Webflow site to test the animations locally.
+> 🧪 Add `?dev=1` to your Webflow site URL to load your local `bundle.js` instead of the production CDN version for live development.
 
 ## 🧱 Project Structure
 
