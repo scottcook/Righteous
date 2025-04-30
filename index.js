@@ -227,12 +227,22 @@ function initializeGSAP() {
 
         // Set up ScrollTrigger for stack section
         console.log("Setting up ScrollTrigger");
+        
+        // Verify stack section element exists before creating ScrollTrigger
+        const stackSection = document.querySelector(selectors.stackSection);
+        if (!stackSection) {
+            console.error("Stack section element not found for ScrollTrigger");
+            return;
+        }
+        console.log("Stack section element found:", stackSection);
+
         ScrollTrigger.create({
-            trigger: selectors.stackSection,
-            start: "top bottom",
+            trigger: stackSection,
+            start: "top center", // Changed to make it trigger earlier
+            end: "bottom center",
             onEnter: () => {
                 console.log("Stack section entered viewport");
-                gsap.to(selectors.stackSection, {
+                gsap.to(stackSection, {
                     opacity: 1,
                     y: 0,
                     duration: 1,
@@ -240,12 +250,27 @@ function initializeGSAP() {
                     onComplete: () => console.log("Stack section animation completed")
                 });
             },
-            markers: true,
-            id: "stack-section-trigger"
+            onEnterBack: () => console.log("Stack section entered viewport (scrolling up)"),
+            onLeave: () => console.log("Stack section left viewport"),
+            onLeaveBack: () => console.log("Stack section left viewport (scrolling up)"),
+            markers: true, // Keep markers for debugging
+            id: "stack-section-trigger",
+            toggleActions: "play none none reverse" // Play on enter, reverse on leave
         });
 
-        // Log active ScrollTriggers
-        console.log("Active ScrollTriggers:", ScrollTrigger.getAll());
+        // Log ScrollTrigger instance details
+        const triggers = ScrollTrigger.getAll();
+        console.log("Active ScrollTriggers:", triggers);
+        triggers.forEach(trigger => {
+            console.log("ScrollTrigger details:", {
+                id: trigger.vars.id,
+                trigger: trigger.trigger,
+                start: trigger.vars.start,
+                end: trigger.vars.end,
+                toggleActions: trigger.vars.toggleActions
+            });
+        });
+
         console.log("Animation setup complete");
 
     } catch (error) {
