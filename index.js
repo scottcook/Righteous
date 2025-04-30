@@ -239,7 +239,7 @@ function initializeGSAP() {
         // Create a wrapper div for the animation
         console.log("Creating animation wrapper");
         const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'position: relative; width: 100%; height: 100%;';
+        wrapper.style.cssText = 'position: relative; width: 100%; height: 100%; will-change: transform;';
         
         // Move all children into the wrapper
         while (stackSection.firstChild) {
@@ -250,32 +250,49 @@ function initializeGSAP() {
         // Reset any Webflow transforms on the section
         stackSection.style.transform = 'none';
         stackSection.style.opacity = '1';
+        stackSection.style.willChange = 'transform';
         
         // Set initial state of wrapper
         gsap.set(wrapper, {
-            y: 100,
+            y: '100vh', // Start from below the viewport
             opacity: 0,
+            scale: 0.8,
             force3D: true
         });
 
         // Create the scroll animation
         ScrollTrigger.create({
             trigger: stackSection,
-            start: "top 80%",
-            end: "top 30%",
-            scrub: 0.5,
+            start: "top bottom", // Start when the top of the section hits the bottom of the viewport
+            end: "top center", // End when the top of the section hits the center of the viewport
+            scrub: 1,
             markers: true,
             onEnter: () => console.log("Stack section entering view"),
             onLeave: () => console.log("Stack section leaving view"),
             onEnterBack: () => console.log("Stack section entering back"),
             onLeaveBack: () => console.log("Stack section leaving back"),
             onUpdate: (self) => console.log("Scroll progress:", self.progress.toFixed(2)),
-            animation: gsap.to(wrapper, {
-                y: 0,
-                opacity: 1,
-                duration: 1,
-                ease: "none"
-            })
+            animation: gsap.timeline()
+                .to(wrapper, {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1,
+                    ease: "power2.out"
+                })
+        });
+
+        // Add a parallax effect to enhance the movement
+        gsap.to(wrapper, {
+            yPercent: -30,
+            ease: "none",
+            scrollTrigger: {
+                trigger: stackSection,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true,
+                markers: false
+            }
         });
 
         // Force a refresh of ScrollTrigger
