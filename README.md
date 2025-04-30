@@ -1,90 +1,91 @@
-# Righteous Webflow Project
+# Righteous Webflow Scroll Animation Project
 
-This repository contains the custom code for the Righteous Webflow project, including GSAP animations and custom functionality.
+This repository contains the custom Webflow-enhanced scroll experience powered by GSAP, ScrollTrigger, and ScrollSmoother. It provides full-screen pinned sections, smooth scrolling, scroll snapping, and modular animation logic per section.
 
-## Setup
+## 🔧 Setup
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/scottcook/Righteous.git
 cd Righteous
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory with your Webflow credentials:
-```
-WEBFLOW_SITE_ID=your_site_id
-```
-
-## Development
+## 🚀 Development
 
 1. Start the development server:
+
 ```bash
 npm run dev
 ```
 
-2. Make changes to files in the `src` directory
-3. The development server will automatically reload with your changes
+2. Or use watch-only mode:
 
-## Code Style
+```bash
+npm run watch
+```
 
-- We use ESLint for code linting
-- Prettier for code formatting
-- Run `npm run format` before committing changes
+3. Make changes to files in the `src/` directory
 
-## Deployment
+4. Open `index.html` with Live Server (or similar) to preview animations
 
-1. Build the production bundle:
+> ✅ Tip: Your build outputs to `dist/bundle.js`, which is injected into Webflow or your local page.
+
+## 🧱 Project Structure
+
+- `src/`
+    - `index.js` — Entry point, initializes all scroll sections
+    - `global.js` — Global scroll smoothing, pinning, and snapping setup
+    - `section-*.js` — One module per scroll section, each exporting a `init[Section]Scroll()` function
+
+## 🎨 Styling
+
+- Smooth scrolling uses GSAP's `ScrollSmoother` plugin
+- Masthead is positioned outside the smoother content, and a dynamic buffer ensures proper scroll length
+- Additional visual effects can be layered via timelines in each section file
+
+## 🧹 Code Quality
+
+- Lint your code:
+
+```bash
+npm run lint
+```
+
+- Format your code:
+
+```bash
+npm run format
+```
+
+## 📦 Build for Production
+
 ```bash
 npm run build
 ```
 
-2. Deploy to Webflow:
-```bash
-npm run deploy
-```
+This outputs an optimized `dist/bundle.js` ready for injection into Webflow or CDN.
 
-## Branching Strategy
+## 🛠️ Tech Used
 
-- `main` - Production branch, deploys to live site
-- `staging` - Staging branch for testing
-- Feature branches should be created from `staging` with the format: `feature/description`
+- [GSAP 3](https://gsap.com)
+- ScrollTrigger
+- ScrollSmoother
+- Webpack 5
+- Babel + Prettier + ESLint
 
-## Collaboration Guidelines
+## 🔄 Notes
 
-1. Always create a new branch for features/fixes
-2. Submit pull requests to `staging` branch
-3. Pull requests require one review before merging
-4. Keep commits atomic and write clear commit messages
-5. Update documentation when making significant changes
+- Scroll animations use `scrub` to stay in sync with ScrollSmoother
+- A dynamic scroll buffer is added to account for pinned masthead height
+- All resize events trigger ScrollTrigger refresh + buffer recalculation
 
-## Webflow Integration
+## 👋 Questions?
 
-The project uses jsDelivr CDN for serving the bundled JavaScript file. The production URL format is:
-```
-https://cdn.jsdelivr.net/gh/scottcook/Righteous@[version]/dist/bundle.js
-```
-
-## GSAP Animations
-
-All GSAP animations are centralized in `src/index.js`. When adding new animations:
-1. Use the existing timeline management system
-2. Follow the established naming conventions
-3. Add appropriate console logging
-4. Test performance impact
-
-## Troubleshooting
-
-If you encounter issues:
-1. Check the console for errors
-2. Verify Webflow site ID is correct
-3. Ensure GSAP plugins are properly registered
-4. Check branch is up to date with staging
-
-## Contact
-
-For questions or issues, please contact the project maintainers or create an issue in the repository. 
+For issues or help, open an issue or contact Scott Cook.
