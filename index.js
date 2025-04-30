@@ -3,6 +3,22 @@
  * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
  */
 
+// Explicitly register GSAP plugins to ensure they're available
+try {
+    if (typeof gsap !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, SplitText);
+        console.log("GSAP plugins explicitly registered:", 
+            typeof ScrollTrigger !== 'undefined' ? "✓ ScrollTrigger" : "✗ ScrollTrigger",
+            typeof ScrollToPlugin !== 'undefined' ? "✓ ScrollToPlugin" : "✗ ScrollToPlugin",
+            typeof SplitText !== 'undefined' ? "✓ SplitText" : "✗ SplitText"
+        );
+    } else {
+        console.error("GSAP not loaded before this script!");
+    }
+} catch (e) {
+    console.error("Error registering GSAP plugins:", e);
+}
+
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 console.log("GSAP and ScrollTrigger registered");
