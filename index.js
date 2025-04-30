@@ -303,6 +303,51 @@ document.addEventListener("DOMContentLoaded", () => {
         // Check initial position
         setTimeout(scrollHandler, 100);
 
+        // REPLACEMENT CODE - Add a proper ScrollTrigger animation for the stack section
+        console.log("Setting up ScrollTrigger animation for the stack section");
+        
+        // First, make sure stack section is positioned below viewport initially
+        gsap.set(stackSection, {
+            opacity: 0,
+            y: 100, // Start 100px below its final position
+            force3D: true // Hardware acceleration for smoother animation
+        });
+        
+        // Create ScrollTrigger animation
+        ScrollTrigger.create({
+            trigger: stackSection,
+            start: "top 85%", // Start when the top of section is 85% down the viewport
+            end: "top 50%",
+            markers: true, // Shows marker for debugging - remove in production
+            onEnter: () => {
+                console.log("⬆️ Stack section entering viewport - animating in");
+                gsap.to(stackSection, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: "power2.out"
+                });
+            },
+            onEnterBack: () => {
+                console.log("⬇️ Stack section entering viewport from above");
+            },
+            onLeave: () => {
+                console.log("⬆️ Stack section leaving viewport upward");
+            },
+            onLeaveBack: () => {
+                console.log("⬇️ Stack section leaving viewport - animating out");
+                gsap.to(stackSection, {
+                    opacity: 0,
+                    y: 100,
+                    duration: 0.8,
+                    ease: "power2.in"
+                });
+            }
+        });
+        
+        // Remove earlier code's scroll listener as we're now using ScrollTrigger
+        window.removeEventListener('scroll', scrollHandler);
+
         // No longer checking for ScrollToPlugin - using vanilla JS navigation
         console.log("Setting up navigation without ScrollToPlugin");
         
