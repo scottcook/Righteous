@@ -7,9 +7,19 @@
 if (typeof gsap === 'undefined') {
     console.error("GSAP not loaded!");
 } else {
-    // Register GSAP plugins
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-    console.log("GSAP and ScrollTrigger registered");
+    try {
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.registerPlugin(ScrollToPlugin);
+        console.log("GSAP and plugins registered successfully");
+        
+        // Verify ScrollTrigger registration
+        if (ScrollTrigger) {
+            console.log("ScrollTrigger is available");
+        }
+    } catch (error) {
+        console.error("Error registering plugins:", error);
+    }
 }
 
 // Scroll lock helper functions
@@ -255,19 +265,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }, "-=0.2");
 
         // Use ScrollTrigger for stack section animation
-        gsap.from(stackSection, {
-            scrollTrigger: {
-                trigger: stackSection,
-                start: "top 75%",
-                toggleActions: "play none none none",
-                markers: true, // Helpful for debugging, remove in production
-                onEnter: () => console.log("Stack section animation triggered")
+        ScrollTrigger.create({
+            trigger: stackSection,
+            start: "top 75%",
+            onEnter: () => {
+                console.log("Stack section entered viewport");
+                gsap.to(stackSection, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                });
             },
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            ease: "power2.out"
+            markers: true,
+            id: "stack-section-trigger"
         });
+
+        // Log all active ScrollTriggers for debugging
+        console.log("Active ScrollTriggers:", ScrollTrigger.getAll());
 
         // Check for ScrollToPlugin
         if (!gsap.plugins || !gsap.plugins.scrollTo) {
