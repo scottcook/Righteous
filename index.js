@@ -1,15 +1,21 @@
 /**
  * This file should be loaded from:
- * https://cdn.jsdelivr.net/gh/scottcook/Righteous@49e0f89/index.js
+ * https://cdn.jsdelivr.net/gh/scottcook/Righteous@407a88d/index.js
  */
+
+console.log('Script loaded - Starting initialization');
 
 // Initialize GSAP and handle animations
 function initializeGSAP() {
+    console.log('initializeGSAP called');
+    
     // Check if GSAP is loaded
     if (typeof gsap === 'undefined') {
         console.error('GSAP not loaded! Please ensure GSAP is loaded before this script.');
+        console.log('Window object keys:', Object.keys(window));
         return;
     }
+    console.log('GSAP found:', gsap.version);
 
     // Check for required plugins
     const requiredPlugins = {
@@ -17,6 +23,8 @@ function initializeGSAP() {
         ScrollToPlugin: typeof ScrollToPlugin !== 'undefined',
         SplitText: typeof SplitText !== 'undefined'
     };
+
+    console.log('Plugin status:', requiredPlugins);
 
     // Log missing plugins
     const missingPlugins = Object.entries(requiredPlugins)
@@ -26,13 +34,15 @@ function initializeGSAP() {
     if (missingPlugins.length > 0) {
         console.error(`Missing required GSAP plugins: ${missingPlugins.join(', ')}`);
         console.error('Please ensure all required plugins are loaded before this script.');
+        console.log('Available GSAP plugins:', gsap.plugins ? Object.keys(gsap.plugins) : 'No plugins found');
         return;
     }
 
     try {
         // Register GSAP plugins
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-        console.log("GSAP and plugins registered successfully");
+        console.log("GSAP plugins registered successfully");
+        console.log("Registered plugins:", gsap.plugins ? Object.keys(gsap.plugins) : 'No plugins found');
     } catch (error) {
         console.error("Error registering GSAP plugins:", error);
         return;
@@ -341,9 +351,17 @@ function initializeGSAP() {
     });
 }
 
+// Log the current readyState
+console.log('Current document.readyState:', document.readyState);
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeGSAP);
+    console.log('Document still loading, adding DOMContentLoaded listener');
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded fired');
+        initializeGSAP();
+    });
 } else {
+    console.log('Document already loaded, initializing immediately');
     initializeGSAP();
 } 
