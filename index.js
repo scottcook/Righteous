@@ -1,9 +1,57 @@
 /**
  * This file should be loaded from:
- * https://cdn.jsdelivr.net/gh/scottcook/Righteous@6af4add/index.js
+ * https://cdn.jsdelivr.net/gh/scottcook/Righteous@338e1c2/index.js
  */
 
 console.log('Script loaded - Starting initialization');
+
+// Define selectors at the top level
+const selectors = {
+    mainLogo: ".main-wrapper .hero-area .main-logo-container .main-logo",
+    topLogo: ".nav-bar-main .logo-lockup .top-logo",
+    navLinks: ".nav-bar-main .top-navlink",
+    stackSection: ".stack-section",
+    skelehand: ".skelehand",
+    logoUnderline: ".logo-underline"
+};
+
+// Scroll lock helper functions
+function disableScroll() {
+    // Get the current scroll position
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    // Store current scroll position
+    document.body.dataset.scrollTop = scrollTop.toString();
+    document.body.dataset.scrollLeft = scrollLeft.toString();
+    
+    // Lock scroll position
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollTop}px`;
+    document.body.style.left = `-${scrollLeft}px`;
+    document.body.style.width = '100%';
+    
+    console.log("Scrolling disabled during animation");
+}
+
+function enableScroll() {
+    // Get the stored scroll position
+    const scrollTop = parseInt(document.body.dataset.scrollTop || '0', 10);
+    const scrollLeft = parseInt(document.body.dataset.scrollLeft || '0', 10);
+    
+    // Restore normal scroll behavior
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.width = '';
+    
+    // Restore scroll position
+    window.scrollTo(scrollLeft, scrollTop);
+    
+    console.log("Scrolling enabled after animation complete");
+}
 
 // Initialize GSAP and handle animations
 function initializeGSAP() {
@@ -39,8 +87,28 @@ function initializeGSAP() {
     }
 
     try {
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+        console.log("GSAP plugins registered successfully");
+        console.log("Registered plugins:", gsap.plugins ? Object.keys(gsap.plugins) : 'No plugins found');
+    } catch (error) {
+        console.error("Error registering GSAP plugins:", error);
+        return;
+    }
+
+    try {
         console.log("Starting animation setup");
         
+        // Check if elements exist first
+        Object.entries(selectors).forEach(([name, selector]) => {
+            const element = document.querySelector(selector);
+            if (element) {
+                console.log(`✓ Found ${name}:`, selector);
+            } else {
+                console.error(`✗ Missing ${name}:`, selector);
+            }
+        });
+
         // Initialize SplitText
         console.log("Creating SplitText instances");
         const mainLogoSplit = new SplitText(selectors.mainLogo, {type: "chars,words,lines"});
