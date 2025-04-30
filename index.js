@@ -236,27 +236,50 @@ function initializeGSAP() {
         }
         console.log("Stack section element found:", stackSection);
 
+        // Set initial state for stack section
+        gsap.set(stackSection, {
+            opacity: 0,
+            y: 50,
+            clearProps: "transform", // Clear existing transform properties
+            immediateRender: true
+        });
+
+        // Create ScrollTrigger with scrub animation
         ScrollTrigger.create({
             trigger: stackSection,
-            start: "top center", // Changed to make it trigger earlier
-            end: "bottom center",
+            start: "top 80%", // Trigger earlier
+            end: "top center",
             onEnter: () => {
-                console.log("Stack section entered viewport");
+                console.log("Stack section entered viewport - animating");
                 gsap.to(stackSection, {
                     opacity: 1,
                     y: 0,
-                    duration: 1,
+                    duration: 0.8,
                     ease: "power2.out",
+                    overwrite: true, // Ensure no animation conflicts
+                    clearProps: "transform", // Clear transforms after animation
                     onComplete: () => console.log("Stack section animation completed")
                 });
             },
             onEnterBack: () => console.log("Stack section entered viewport (scrolling up)"),
             onLeave: () => console.log("Stack section left viewport"),
-            onLeaveBack: () => console.log("Stack section left viewport (scrolling up)"),
-            markers: true, // Keep markers for debugging
+            onLeaveBack: () => {
+                console.log("Stack section left viewport (scrolling up)");
+                gsap.to(stackSection, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8,
+                    ease: "power2.in",
+                    overwrite: true
+                });
+            },
+            markers: true,
             id: "stack-section-trigger",
-            toggleActions: "play none none reverse" // Play on enter, reverse on leave
+            toggleActions: "play reverse play reverse" // Play on enter, reverse on leave
         });
+
+        // Force a refresh of ScrollTrigger
+        ScrollTrigger.refresh();
 
         // Log ScrollTrigger instance details
         const triggers = ScrollTrigger.getAll();
