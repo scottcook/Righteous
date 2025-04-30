@@ -5,9 +5,10 @@ import ScrollSmoother from 'gsap/ScrollSmoother';
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 export function initGlobalScroll() {
-    console.log('Global scroll setup starting');
+    console.log('[Righteous] Global scroll setup starting');
 
-    ScrollSmoother.create({
+    // ─── 1. Initialize ScrollSmoother ───────────────────────────────────────────────
+    const smoother = ScrollSmoother.create({
         wrapper: '#smooth-wrapper',
         content: '#smooth-content',
         smooth: 1.2,
@@ -17,6 +18,7 @@ export function initGlobalScroll() {
     const content = document.querySelector('#smooth-content');
     let buffer;
 
+    // ─── 2. Utility: Add scroll buffer matching masthead height ─────────────────────
     function updateScrollBuffer() {
         const masthead = document.querySelector('.section-masthead');
         if (!masthead || !content) return;
@@ -31,6 +33,7 @@ export function initGlobalScroll() {
 
     updateScrollBuffer();
 
+    // ─── 3. Create pinned ScrollTriggers for each section ───────────────────────────
     const panels = ['.section-masthead', '.section-about', '.section-work', '.section-clients', '.section-contact'];
 
     panels.forEach((selector) => {
@@ -48,6 +51,7 @@ export function initGlobalScroll() {
         });
     });
 
+    // ─── 4. Enable snap-to-section behavior ─────────────────────────────────────────
     ScrollTrigger.create({
         snap: {
             snapTo: 1 / (panels.length - 1),
@@ -57,8 +61,26 @@ export function initGlobalScroll() {
         }
     });
 
+    // ─── 5. Scroll reset and refresh on resize ──────────────────────────────────────
     window.addEventListener('resize', () => {
+        console.log('[Righteous] Resized — updating buffer and refreshing triggers');
         updateScrollBuffer();
         ScrollTrigger.refresh();
+        smoother.scrollTo(0, false);
+    });
+
+    // ─── 6. Reset scroll on load and back/forward navigation (Chrome/BFCACHE) ───────
+    window.history.scrollRestoration = 'manual';
+
+    window.addEventListener('load', () => {
+        console.log('[Righteous] Forcing scroll to top on load');
+        smoother.scrollTo(0, false);
+    });
+
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted || performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
+            console.log('[Righteous] Forcing scroll to top on pageshow');
+            smoother.scrollTo(0, false);
+        }
     });
 }

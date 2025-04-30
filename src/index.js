@@ -1,3 +1,5 @@
+window.history.scrollRestoration = 'manual';
+
 // Then import your scroll logic:
 import {initGlobalScroll} from './global.js';
 import {initMastheadScroll} from './section-masthead.js';
