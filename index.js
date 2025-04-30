@@ -3,15 +3,30 @@
  * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
  */
 
+// Improved plugin detection and registration
+console.log("Starting plugin detection...");
+console.log("GSAP version:", typeof gsap !== 'undefined' ? gsap.version : 'not loaded');
+console.log("ScrollTrigger global:", typeof ScrollTrigger !== 'undefined' ? "available" : "not available");
+console.log("ScrollToPlugin global:", typeof ScrollToPlugin !== 'undefined' ? "available" : "not available");
+console.log("SplitText global:", typeof SplitText !== 'undefined' ? "available" : "not available");
+
 // Explicitly register GSAP plugins to ensure they're available
 try {
     if (typeof gsap !== 'undefined') {
+        // Check if core GSAP plugins object exists
+        if (!gsap.plugins) {
+            console.warn("GSAP plugins object doesn't exist yet");
+        }
+        
+        // Register plugins
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, SplitText);
-        console.log("GSAP plugins explicitly registered:", 
-            typeof ScrollTrigger !== 'undefined' ? "✓ ScrollTrigger" : "✗ ScrollTrigger",
-            typeof ScrollToPlugin !== 'undefined' ? "✓ ScrollToPlugin" : "✗ ScrollToPlugin",
-            typeof SplitText !== 'undefined' ? "✓ SplitText" : "✗ SplitText"
-        );
+        console.log("Plugins registered successfully");
+        
+        // Check gsap.plugins after registration
+        if (gsap.plugins) {
+            console.log("Available plugins after registration:", Object.keys(gsap.plugins));
+            console.log("ScrollToPlugin in plugins:", gsap.plugins.scrollTo ? "✓" : "✗");
+        }
     } else {
         console.error("GSAP not loaded before this script!");
     }
@@ -291,9 +306,12 @@ document.addEventListener("DOMContentLoaded", () => {
         // Check initial position
         setTimeout(scrollHandler, 100);
 
-        // Check for ScrollToPlugin
-        if (gsap.plugins && gsap.plugins.ScrollToPlugin) {
-            console.log("ScrollToPlugin successfully loaded");
+        // Check for ScrollToPlugin in multiple ways
+        if (
+            (gsap.plugins && (gsap.plugins.scrollTo || gsap.plugins.ScrollToPlugin)) || 
+            typeof ScrollToPlugin !== 'undefined'
+        ) {
+            console.log("ScrollToPlugin successfully detected");
             
             // Handle navigation clicks
             document.querySelectorAll(navLinksSelector).forEach(link => {
@@ -302,19 +320,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     const targetSection = stackSection;
                     
                     if (targetSection) {
-                        gsap.to(window, {
-                            duration: 1,
-                            scrollTo: {
-                                y: targetSection,
-                                offsetY: 50
-                            },
-                            ease: "power2.inOut"
-                        });
+                        try {
+                            gsap.to(window, {
+                                duration: 1,
+                                scrollTo: {
+                                    y: targetSection,
+                                    offsetY: 50
+                                },
+                                ease: "power2.inOut"
+                            });
+                        } catch (error) {
+                            console.error("Error using scrollTo:", error);
+                            // Fallback
+                            targetSection.scrollIntoView({ behavior: 'smooth' });
+                        }
                     }
                 });
             });
         } else {
-            console.warn("GSAP ScrollToPlugin not loaded. Nav-to-section functionality will not work.");
+            console.warn("GSAP ScrollToPlugin not detected. Nav-to-section functionality will use fallback.");
             
             // Fallback navigation with standard scrolling
             document.querySelectorAll(navLinksSelector).forEach(link => {
