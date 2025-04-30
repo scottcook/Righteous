@@ -318,9 +318,9 @@ document.addEventListener("DOMContentLoaded", () => {
             trigger: stackSection,
             start: "top 85%", // Start when the top of section is 85% down the viewport
             end: "top 50%",
-            markers: true, // Shows marker for debugging - remove in production
+            markers: true, // Shows markers for debugging
             onEnter: () => {
-                console.log("⬆️ Stack section entering viewport - animating in");
+                // Animate in when scrolling down
                 gsap.to(stackSection, {
                     opacity: 1,
                     y: 0,
@@ -328,14 +328,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     ease: "power2.out"
                 });
             },
-            onEnterBack: () => {
-                console.log("⬇️ Stack section entering viewport from above");
-            },
-            onLeave: () => {
-                console.log("⬆️ Stack section leaving viewport upward");
-            },
             onLeaveBack: () => {
-                console.log("⬇️ Stack section leaving viewport - animating out");
+                // Animate out when scrolling back up
                 gsap.to(stackSection, {
                     opacity: 0,
                     y: 100,
