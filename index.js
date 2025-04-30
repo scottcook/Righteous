@@ -3,24 +3,9 @@
  * https://cdn.jsdelivr.net/gh/scottcook/Righteous@main/index.js
  */
 
-// Wait for GSAP and plugins to be available
-if (typeof gsap === 'undefined') {
-    console.error("GSAP not loaded!");
-} else {
-    try {
-        // Register GSAP plugins
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.registerPlugin(ScrollToPlugin);
-        console.log("GSAP and plugins registered successfully");
-        
-        // Verify ScrollTrigger registration
-        if (ScrollTrigger) {
-            console.log("ScrollTrigger is available");
-        }
-    } catch (error) {
-        console.error("Error registering plugins:", error);
-    }
-}
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+console.log("GSAP and ScrollTrigger registered");
 
 // Scroll lock helper functions
 function disableScroll() {
@@ -203,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Set initial state for skelehand element
         gsap.set(skelehandSelector, {
             opacity: 0,
-            y: 200,
+            y: 200, // Start from below the screen
             transformOrigin: "center bottom"
         });
         
@@ -260,14 +245,14 @@ document.addEventListener("DOMContentLoaded", () => {
             opacity: 1,
             y: 0,
             duration: 1.8,
-            ease: "elastic.out(0.5, 0.3)",
+            ease: "elastic.out(0.5, 0.3)", // Exaggerated bouncy easing
             onStart: () => console.log("Skelehand animation started")
         }, "-=0.2");
 
         // Use ScrollTrigger for stack section animation
         ScrollTrigger.create({
             trigger: stackSection,
-            start: "top 75%",
+            start: "top bottom",  // Only triggers when top of section hits bottom of viewport
             onEnter: () => {
                 console.log("Stack section entered viewport");
                 gsap.to(stackSection, {
@@ -285,21 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Active ScrollTriggers:", ScrollTrigger.getAll());
 
         // Check for ScrollToPlugin
-        if (!gsap.plugins || !gsap.plugins.scrollTo) {
-            console.warn("GSAP ScrollToPlugin not loaded. Nav-to-section functionality will not work.");
-            
-            // Fallback navigation with standard scrolling
-            document.querySelectorAll(navLinksSelector).forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetSection = stackSection;
-                    
-                    if (targetSection) {
-                        targetSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-            });
-        } else {
+        if (gsap.plugins && gsap.plugins.ScrollToPlugin) {
             console.log("ScrollToPlugin successfully loaded");
             
             // Handle navigation clicks
@@ -317,6 +288,20 @@ document.addEventListener("DOMContentLoaded", () => {
                             },
                             ease: "power2.inOut"
                         });
+                    }
+                });
+            });
+        } else {
+            console.warn("GSAP ScrollToPlugin not loaded. Nav-to-section functionality will not work.");
+            
+            // Fallback navigation with standard scrolling
+            document.querySelectorAll(navLinksSelector).forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetSection = stackSection;
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
                     }
                 });
             });
