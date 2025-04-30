@@ -7,26 +7,23 @@
 console.log("Starting plugin detection...");
 console.log("GSAP version:", typeof gsap !== 'undefined' ? gsap.version : 'not loaded');
 console.log("ScrollTrigger global:", typeof ScrollTrigger !== 'undefined' ? "available" : "not available");
-console.log("ScrollToPlugin global:", typeof ScrollToPlugin !== 'undefined' ? "available" : "not available");
 console.log("SplitText global:", typeof SplitText !== 'undefined' ? "available" : "not available");
 
-// Explicitly register GSAP plugins to ensure they're available
+// Explicitly register available plugins only
 try {
     if (typeof gsap !== 'undefined') {
-        // Check if core GSAP plugins object exists
-        if (!gsap.plugins) {
-            console.warn("GSAP plugins object doesn't exist yet");
+        // Only register the plugins we actually need and that are definitely available
+        if (typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+            console.log("ScrollTrigger registered successfully");
         }
         
-        // Register plugins
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, SplitText);
-        console.log("Plugins registered successfully");
-        
-        // Check gsap.plugins after registration
-        if (gsap.plugins) {
-            console.log("Available plugins after registration:", Object.keys(gsap.plugins));
-            console.log("ScrollToPlugin in plugins:", gsap.plugins.scrollTo ? "✓" : "✗");
+        if (typeof SplitText !== 'undefined') {
+            gsap.registerPlugin(SplitText);
+            console.log("SplitText registered successfully");
         }
+        
+        // No longer trying to use ScrollToPlugin - will use vanilla JS instead
     } else {
         console.error("GSAP not loaded before this script!");
     }
@@ -34,9 +31,9 @@ try {
     console.error("Error registering GSAP plugins:", e);
 }
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-console.log("GSAP and ScrollTrigger registered");
+// Register ScrollTrigger only - no longer using ScrollToPlugin
+gsap.registerPlugin(ScrollTrigger);
+console.log("GSAP core plugins registered");
 
 // Scroll lock helper functions
 function disableScroll() {
@@ -306,52 +303,34 @@ document.addEventListener("DOMContentLoaded", () => {
         // Check initial position
         setTimeout(scrollHandler, 100);
 
-        // Check for ScrollToPlugin in multiple ways
-        if (
-            (gsap.plugins && (gsap.plugins.scrollTo || gsap.plugins.ScrollToPlugin)) || 
-            typeof ScrollToPlugin !== 'undefined'
-        ) {
-            console.log("ScrollToPlugin successfully detected");
-            
-            // Handle navigation clicks
-            document.querySelectorAll(navLinksSelector).forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetSection = stackSection;
+        // No longer checking for ScrollToPlugin - using vanilla JS navigation
+        console.log("Setting up navigation without ScrollToPlugin");
+        
+        // Handle navigation clicks with pure JS
+        document.querySelectorAll(navLinksSelector).forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = stackSection;
+                
+                if (targetSection) {
+                    // Pure JS smooth scroll
+                    const scrollOptions = {
+                        behavior: 'smooth'
+                    };
                     
-                    if (targetSection) {
-                        try {
-                            gsap.to(window, {
-                                duration: 1,
-                                scrollTo: {
-                                    y: targetSection,
-                                    offsetY: 50
-                                },
-                                ease: "power2.inOut"
-                            });
-                        } catch (error) {
-                            console.error("Error using scrollTo:", error);
-                            // Fallback
-                            targetSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    }
-                });
-            });
-        } else {
-            console.warn("GSAP ScrollToPlugin not detected. Nav-to-section functionality will use fallback.");
-            
-            // Fallback navigation with standard scrolling
-            document.querySelectorAll(navLinksSelector).forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetSection = stackSection;
+                    // Calculate position with offset
+                    const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - 50;
                     
-                    if (targetSection) {
-                        targetSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
+                    // Scroll to the target position
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    console.log("Navigating to section using native smooth scroll");
+                }
             });
-        }
+        });
 
         console.log("Animation setup complete");
 
