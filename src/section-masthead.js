@@ -27,6 +27,5 @@ export function initMastheadScroll() {
 
     // This will be based on the duration above so till start at 0s and animate the last 2s.
     const split = new SplitText(masthead.querySelector('.heading'), {type: 'words, chars'});
-
     tl.to(split.chars, {stagger: 0.2, opacity: 0, scale: 5.0, duration: 2}, 0);
 }
