@@ -29,7 +29,7 @@ export function initMastheadScroll() {
         });
 
     // Create the entrance animation for the top logo
-    const logo = document.querySelector('.top-nav-bar .top-logo');
+    const logo = document.querySelector('.top-nav-bar .top-logo .nav-links');
     if (logo) {
         const logoSplit = new SplitText(logo, {type: 'chars'});
         
