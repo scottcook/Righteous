@@ -36,7 +36,10 @@ export function initGlobalScroll() {
     // ─── 3. Create pinned ScrollTriggers for each section ───────────────────────────
     const panels = ['.section-masthead', '.section-about', '.section-work', '.section-clients', '.section-contact'];
 
-    panels.forEach((selector) => {
+    // Track which panel is currently active for better transition control
+    let activePanel = 0;
+
+    panels.forEach((selector, index) => {
         const el = document.querySelector(selector);
         if (!el) return;
 
@@ -47,14 +50,46 @@ export function initGlobalScroll() {
             pinSpacing: false,
             scrub: 1,
             anticipatePin: 1,
-            markers: false
+            markers: false,
+            id: `panel-${index}`,
+            onEnter: () => {
+                activePanel = index;
+                console.log(`Entered panel ${index}: ${selector}`);
+            }
         });
     });
 
     // ─── 4. Enable snap-to-section behavior ─────────────────────────────────────────
     ScrollTrigger.create({
         snap: {
-            snapTo: 1 / (panels.length - 1),
+            snapTo: (progress, self) => {
+                // Create snap points at equal intervals based on number of panels
+                const snapPoints = [];
+                const increment = 1 / (panels.length - 1);
+                
+                for (let i = 0; i < panels.length; i++) {
+                    snapPoints.push(i * increment);
+                }
+                
+                // Find the closest snap point
+                let closest = snapPoints.reduce((prev, curr) => {
+                    return (Math.abs(curr - progress) < Math.abs(prev - progress) ? curr : prev);
+                });
+                
+                // If we're close to the About section (panel 1) and scrolling down from Masthead,
+                // ensure the About section animations complete before snapping to Work section
+                if (activePanel === 1 && progress > snapPoints[1] && progress < snapPoints[2]) {
+                    const aboutSection = document.querySelector('.section-about');
+                    const workSection = document.querySelector('.section-work');
+                    
+                    // If work section isn't ready yet, keep user on about section
+                    if (workSection && !workSection.hasAttribute('data-animation-enabled')) {
+                        return snapPoints[1]; // Stay on about section
+                    }
+                }
+                
+                return closest;
+            },
             duration: 0.8,
             ease: 'power2.inOut',
             delay: 0.1

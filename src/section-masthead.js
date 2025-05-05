@@ -83,7 +83,7 @@ export function initMastheadScroll() {
     });
 
     // Animate the section itself: tilt right as next section scrolls in
-    tl.to(masthead, {opacity: 0.5, y: '-=15%', rotate: 20, scale: 1.15, ease: 'none'});
+    tl.to(masthead, {opacity: 0.5, y: '-=15%', rotate: 10, scale: 1.15, ease: 'none'});
 
     // This will be based on the duration above so till start at 0s and animate the last 2s.
     const split = new SplitText(masthead.querySelector('.heading'), {type: 'words, chars'});

@@ -7,6 +7,8 @@ export function initWorkScroll() {
     const section = document.querySelector('.section-work');
     if (!section) return;
 
+    console.log('Initializing scroll animation for .section-work');
+
     const tl = gsap.timeline({
         defaults: {duration: 5}, // ensure timeline length is normalized
         scrollTrigger: {
