@@ -67,6 +67,9 @@ export function initMastheadScroll() {
             });
     }
 
+    // Ensure masthead starts at y:0 and rotation:0
+    gsap.set(masthead, {y: 0, rotate: 0});
+
     // Original scroll animation code
     const tl = gsap.timeline({
         defaults: {duration: 5}, // ensure timeline length is normalized
@@ -79,10 +82,20 @@ export function initMastheadScroll() {
         }
     });
 
-    // Animate the section itself
-    tl.to(masthead, {opacity: 0.5, y: '-=25%', ease: 'none'});
+    // Animate the section itself: tilt right as next section scrolls in
+    tl.to(masthead, {opacity: 0.5, y: '-=15%', rotate: 20, scale: 1.15, ease: 'none'});
 
     // This will be based on the duration above so till start at 0s and animate the last 2s.
     const split = new SplitText(masthead.querySelector('.heading'), {type: 'words, chars'});
     tl.to(split.chars, {stagger: 0.2, opacity: 0, scale: 5.0, duration: 2}, 0);
+
+    // Ensure masthead rotates back to 0º when revealed again
+    ScrollTrigger.create({
+        trigger: masthead,
+        start: 'top bottom',
+        end: 'bottom top',
+        onEnter: () => gsap.to(masthead, {rotate: 0, duration: 0.5, scale: 1, ease: 'power2.out'}),
+        onEnterBack: () => gsap.to(masthead, {rotate: 0, duration: 0.5, scale: 1, ease: 'power2.out'}),
+        markers: false
+    });
 }
