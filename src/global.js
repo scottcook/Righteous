@@ -60,68 +60,64 @@ export function initGlobalScroll() {
     });
 
     // ─── 4. Enable snap-to-section behavior ─────────────────────────────────────────
-    ScrollTrigger.create({
-        snap: {
-            snapTo: (progress, self) => {
-                // Create snap points at equal intervals based on number of panels
-                const snapPoints = [];
-                const increment = 1 / (panels.length - 1);
-                
-                for (let i = 0; i < panels.length; i++) {
-                    snapPoints.push(i * increment);
-                }
-                
-                // Find the closest snap point
-                let closest = snapPoints.reduce((prev, curr) => {
-                    return (Math.abs(curr - progress) < Math.abs(prev - progress) ? curr : prev);
-                });
-                
-                // If we're close to the About section (panel 1) and scrolling down from Masthead,
-                // ensure the About section animations complete before snapping to Work section
-                if (activePanel === 1 && progress > snapPoints[1] && progress < snapPoints[2]) {
-                    const aboutSection = document.querySelector('.section-about');
-                    const workSection = document.querySelector('.section-work');
-                    
-                    // If work section isn't ready yet, keep user on about section
-                    if (workSection && !workSection.hasAttribute('data-animation-enabled')) {
-                        return snapPoints[1]; // Stay on about section
-                    }
-                }
-                
-                return closest;
-            },
-            duration: 0.8,
-            ease: 'power2.inOut',
-            delay: 0.1
-        }
-    });
+    // ScrollTrigger.create({
+    //     snap: {
+    //         snapTo: (progress, self) => {
+    //             // Create snap points at equal intervals based on number of panels
+    //             const snapPoints = [];
+    //             const increment = 1 / (panels.length - 1);
+
+    //             for (let i = 0; i < panels.length; i++) {
+    //                 snapPoints.push(i * increment);
+    //             }
+
+    //             // Find the closest snap point
+    //             let closest = snapPoints.reduce((prev, curr) => {
+    //                 return (Math.abs(curr - progress) < Math.abs(prev - progress) ? curr : prev);
+    //             });
+
+    //             // If we're close to the About section (panel 1) and scrolling down from Masthead,
+    //             // ensure the About section animations complete before snapping to Work section
+    //             if (activePanel === 1 && progress > snapPoints[1] && progress < snapPoints[2]) {
+    //                 const aboutSection = document.querySelector('.section-about');
+    //                 const workSection = document.querySelector('.section-work');
+
+    //                 // If work section isn't ready yet, keep user on about section
+    //                 if (workSection && !workSection.hasAttribute('data-animation-enabled')) {
+    //                     return snapPoints[1]; // Stay on about section
+    //                 }
+    //             }
+
+    //             return closest;
+    //         },
+    //         duration: 0.8,
+    //         ease: 'power2.inOut',
+    //         delay: 0.1
+    //     }
+    // });
 
     // ─── 5. Navigation color transition based on section ────────────────────────────
     const topLogo = document.querySelector('.top-logo');
     const toplinks = document.querySelectorAll('.toplink');
     const navtexts = document.querySelectorAll('.navtext');
     const divider = document.querySelector('.divider');
-    
+
     if (topLogo || toplinks.length > 0 || navtexts.length > 0) {
         // Combine all navigation elements that need color transition
-        const navElements = [
-            topLogo, 
-            ...Array.from(toplinks), 
-            ...Array.from(navtexts)
-        ].filter(Boolean);  
-        
+        const navElements = [topLogo, ...Array.from(toplinks), ...Array.from(navtexts)].filter(Boolean);
+
         // Set initial color state explicitly
-        gsap.set(navElements, { color: '#ffffff' });
+        gsap.set(navElements, {color: '#ffffff'});
         if (divider) {
-            gsap.set(divider, { backgroundColor: '#ffffff' });
+            gsap.set(divider, {backgroundColor: '#ffffff'});
         }
-        
+
         // Single ScrollTrigger to handle both color transitions
         const navColorTrigger = ScrollTrigger.create({
             trigger: '#smooth-content', // Target the entire content wrapper instead of specific section
             start: 'top 95%', // Start almost immediately when content begins to enter viewport
-            end: 'top 60%',   // End transition sooner
-            scrub: 0.6,       // Slightly quicker response while still smooth
+            end: 'top 60%', // End transition sooner
+            scrub: 0.6, // Slightly quicker response while still smooth
             markers: false,
             onUpdate: (self) => {
                 // Smoothly transition between white and dark based on scroll progress
@@ -132,7 +128,7 @@ export function initGlobalScroll() {
                     ease: 'power1.inOut',
                     overwrite: 'auto'
                 });
-                
+
                 if (divider) {
                     gsap.to(divider, {
                         backgroundColor: progress > 0 ? '#1A1A1B' : '#ffffff',
@@ -143,7 +139,7 @@ export function initGlobalScroll() {
                 }
             }
         });
-        
+
         // Add a direct check for scrolling past masthead
         ScrollTrigger.create({
             trigger: '.section-masthead',
@@ -156,7 +152,7 @@ export function initGlobalScroll() {
                     duration: 0.3,
                     overwrite: true
                 });
-                
+
                 if (divider) {
                     gsap.to(divider, {
                         backgroundColor: '#1A1A1B',
@@ -172,7 +168,7 @@ export function initGlobalScroll() {
                     duration: 0.3,
                     overwrite: true
                 });
-                
+
                 if (divider) {
                     gsap.to(divider, {
                         backgroundColor: '#ffffff',
@@ -182,7 +178,7 @@ export function initGlobalScroll() {
                 }
             }
         });
-        
+
         // Refresh ScrollTrigger when window is resized
         window.addEventListener('resize', () => {
             setTimeout(() => {
