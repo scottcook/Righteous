@@ -3,19 +3,23 @@ window.history.scrollRestoration = 'manual';
 // Then import your scroll logic:
 import {initGlobalScroll} from './global.js';
 import {initMastheadScroll} from './section-masthead.js';
-import {initAboutScroll} from './section-about.js';
+import {initOfferingsScroll} from './section-offerings.js';
 import {initWorkScroll} from './section-work.js';
-import {initClientsScroll} from './section-clients.js';
-import {initContactScroll} from './section-contact.js';
+import {initAboutScroll} from './section-about.js';
+import {initAbout2Scroll} from './section-about-2.js';
+import {initHowWeWorkScroll} from './section-how-we-work.js';
+import {initGearScroll} from './section-gear.js';
 
 function init() {
     console.log('[Righteous] ✅ Running scroll inits');
     initGlobalScroll();
     initMastheadScroll();
-    initAboutScroll();
+    initOfferingsScroll();
     initWorkScroll();
-    initClientsScroll();
-    initContactScroll();
+    initAboutScroll();
+    initAbout2Scroll();
+    initHowWeWorkScroll();
+    initGearScroll();
 }
 
 if (document.readyState === 'loading') {

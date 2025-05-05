@@ -34,7 +34,7 @@ export function initGlobalScroll() {
     updateScrollBuffer();
 
     // ─── 3. Create pinned ScrollTriggers for each section ───────────────────────────
-    const panels = ['.section-masthead', '.section-about', '.section-work', '.section-clients', '.section-contact'];
+    const panels = ['.section-masthead', '.section-offerings', '.section-work', '.section-about', '.section-about-2', '.section-how-we-work', '.section-gear'];
 
     // Track which panel is currently active for better transition control
     let activePanel = 0;

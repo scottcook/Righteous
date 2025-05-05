@@ -6,11 +6,11 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function initContactScroll() {
-    const section = document.querySelector('.section-contact');
+export function initGearScroll() {
+    const section = document.querySelector('.section-gear');
     if (!section) return;
 
-    console.log('Initializing scroll animation for .section-contact');
+    console.log('Initializing scroll animation for .section-gear');
 
     const tl = gsap.timeline({
         defaults: {duration: 5}, // ensure timeline length is normalized

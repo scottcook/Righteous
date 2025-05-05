@@ -3,11 +3,11 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function initClientsScroll() {
-    const section = document.querySelector('.section-clients');
+export function initHowWeWorkScroll() {
+    const section = document.querySelector('.section-how-we-work');
     if (!section) return;
 
-    console.log('Initializing scroll animation for .section-clients');
+    console.log('Initializing scroll animation for .section-how-we-work');
 
     const tl = gsap.timeline({
         defaults: {duration: 5}, // ensure timeline length is normalized
