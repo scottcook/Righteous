@@ -100,6 +100,7 @@ export function initGlobalScroll() {
     const topLogo = document.querySelector('.top-logo');
     const toplinks = document.querySelectorAll('.toplink');
     const navtexts = document.querySelectorAll('.navtext');
+    const divider = document.querySelector('.divider');
     
     if (topLogo || toplinks.length > 0 || navtexts.length > 0) {
         // Combine all navigation elements that need color transition
@@ -107,10 +108,13 @@ export function initGlobalScroll() {
             topLogo, 
             ...Array.from(toplinks), 
             ...Array.from(navtexts)
-        ].filter(Boolean);
+        ].filter(Boolean);  
         
         // Set initial color state explicitly
         gsap.set(navElements, { color: '#ffffff' });
+        if (divider) {
+            gsap.set(divider, { backgroundColor: '#ffffff' });
+        }
         
         // Single ScrollTrigger to handle both color transitions
         const navColorTrigger = ScrollTrigger.create({
@@ -128,6 +132,15 @@ export function initGlobalScroll() {
                     ease: 'power1.inOut',
                     overwrite: 'auto'
                 });
+                
+                if (divider) {
+                    gsap.to(divider, {
+                        backgroundColor: progress > 0 ? '#1A1A1B' : '#ffffff',
+                        duration: 0.6,
+                        ease: 'power1.inOut',
+                        overwrite: 'auto'
+                    });
+                }
             }
         });
         
@@ -143,6 +156,14 @@ export function initGlobalScroll() {
                     duration: 0.3,
                     overwrite: true
                 });
+                
+                if (divider) {
+                    gsap.to(divider, {
+                        backgroundColor: '#1A1A1B',
+                        duration: 0.3,
+                        overwrite: true
+                    });
+                }
             },
             onEnterBack: () => {
                 // Force white color when returning to masthead
@@ -151,6 +172,14 @@ export function initGlobalScroll() {
                     duration: 0.3,
                     overwrite: true
                 });
+                
+                if (divider) {
+                    gsap.to(divider, {
+                        backgroundColor: '#ffffff',
+                        duration: 0.3,
+                        overwrite: true
+                    });
+                }
             }
         });
         

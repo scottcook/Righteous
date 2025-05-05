@@ -59,18 +59,19 @@ export function initAboutScroll() {
         gsap.set(team, {
             rotate: -14, 
             opacity: 0, 
-            xPercent: -80, // Start from the left side (outside viewport)
+            xPercent: -40, // Start from less far left side
             y: 40, 
-            scale: 0.5, 
+            scale: 0.75, // Increased from 0.5 to make scale animation less dramatic
             transformOrigin: '10% 80%'
         });
 
         // Create a scroll-based animation for the team div container
+        // Modify the trigger points to delay animation start
         ScrollTrigger.create({
             trigger: section,
-            start: 'top 60%', // Start a bit after the main section animation begins
-            end: 'top 20%',   // End before the main section animation completes
-            scrub: true,      // Direct 1:1 synchronization with scroll
+            start: 'top 40%', // Delay start point (was 60%)
+            end: 'top -10%',  // Extend end point for slower animation (was 20%)
+            scrub: 2,         // Slow down animation by increasing scrub value (was 1)
             markers: false,
             onUpdate: function(self) {
                 // Calculate the proportional values based on scroll progress
@@ -80,9 +81,9 @@ export function initAboutScroll() {
                 gsap.set(team, {
                     rotate: -14 + (14 * progress), // Rotate from -14 to 0
                     opacity: progress,
-                    xPercent: -80 + (50 * progress), // Move from left to final position
+                    xPercent: -40 + (10 * progress), // Move from -40 to -30 (original final position)
                     y: 40 - (40 * progress), // Move up from 40 to 0
-                    scale: 0.5 + (0.5 * progress), // Scale from 0.5 to 1
+                    scale: 0.75 + (0.25 * progress), // Scale from 0.75 to 1 (less dramatic)
                 });
             }
         });
@@ -93,14 +94,15 @@ export function initAboutScroll() {
             team.querySelector('.team2'),
             team.querySelector('.team3')
         ];
-        gsap.set(teamImages, {opacity: 0, x: -50, y: 60, scale: 0, rotate: -45});
+        gsap.set(teamImages, {opacity: 0, x: 0, y: 60, scale: 0.3, rotate: -45}); // Increased scale from 0 to 0.3
         
         // Create a scroll-synchronized animation for team images
+        // Adjust timing to match the delayed team container animation
         ScrollTrigger.create({
             trigger: section,
-            start: 'top 50%', // Start earlier for more scroll distance
-            end: 'top 0%',    // End at the top of the viewport
-            scrub: true,      // Direct 1:1 synchronization with scroll
+            start: 'top 30%', // Delay start (was 50%)
+            end: 'top -20%',  // Extend end for slower animation (was 0%)
+            scrub: 2,         // Slow down animation (was 1)
             markers: false,
             onUpdate: function(self) {
                 const progress = self.progress;
@@ -111,8 +113,9 @@ export function initAboutScroll() {
                     
                     // Calculate when this image should start and end animating
                     // Stagger the start points so they animate in sequence
-                    const startPoint = 0.2 + (i * 0.15); // Start points: 0.2, 0.35, 0.5
-                    const endPoint = startPoint + 0.3;   // End animations over 30% of scroll
+                    // Add more delay between images
+                    const startPoint = 0.25 + (i * 0.2); // Increased delays (was 0.2 + i * 0.15)
+                    const endPoint = startPoint + 0.35;   // Extend animation time (was 0.3)
                     
                     // Calculate this image's individual progress
                     let imgProgress = 0;
@@ -123,13 +126,13 @@ export function initAboutScroll() {
                     // Apply properties based on image progress
                     if (imgProgress > 0) {
                         // Starting values
-                        const startX = -50;
+                        const startX = 0; 
                         const startY = 60;
-                        const startScale = 0;
+                        const startScale = 0.3; // Increased from 0 to 0.3
                         const startRotate = -45;
                         
                         // Ending values
-                        const endX = 280;
+                        const endX = 280; // Reset to original value
                         const endY = 0;
                         const endScale = 1;
                         const endRotate = rotations[i];
@@ -164,9 +167,9 @@ export function initAboutScroll() {
                 teamImages.forEach((img, i) => {
                     gsap.to(img, {
                         opacity: 0,
-                        x: -50,
+                        x: 0,
                         y: 60,
-                        scale: 0,
+                        scale: 0.3, // Increased from 0 to 0.3
                         rotation: -45,
                         duration: 0.6,
                         ease: "expo.out",
@@ -178,9 +181,9 @@ export function initAboutScroll() {
                 gsap.to(team, {
                     rotate: -14, 
                     opacity: 0,
-                    xPercent: -80,
+                    xPercent: -40,
                     y: 40, 
-                    scale: 0.5,
+                    scale: 0.75, // Increased from 0.5 to 0.75
                     duration: 0.7,
                     ease: "expo.out"
                 });
@@ -214,6 +217,60 @@ export function initAboutScroll() {
                     y: 60 - (60 * progress), // Move up from 60 to 0
                     scale: 1.0
                 });
+            }
+        });
+    }
+    
+    // Add new animation for transition to next section
+    // This triggers an independent animation of elements inside section-about when section-work scrolls in
+    const nextSection = document.querySelector('.section-work');
+    if (nextSection) {
+        // Create a scroll trigger that watches for the next section
+        ScrollTrigger.create({
+            trigger: nextSection,
+            start: 'top 60%', // When section-work is 40% into the viewport
+            markers: false,
+            onEnter: function() {
+                
+                // Animate the team section upward
+                if (team) {
+                    gsap.to(team, {
+                        y: "-=125", // Increased movement (was 40px)
+                        duration: 1.4,
+                        ease: "power2.out"
+                    });
+                    
+                    // Also animate team images slightly
+                    teamImages.forEach((img, i) => {
+                        gsap.to(img, {
+                            y: "-=45", // Increased movement (was 25px)
+                            duration: 1.6,
+                            delay: 0.1 * i, // Stagger the animations
+                            ease: "power2.out"
+                        });
+                    });
+                }
+            },
+            onLeaveBack: function() {
+                // Reset when scrolling back up
+    
+                
+                if (team) {
+                    gsap.to(team, {
+                        y: "+=125", // Match the upward movement
+                        duration: 1.4,
+                        ease: "power2.out"
+                    });
+                    
+                    teamImages.forEach((img, i) => {
+                        gsap.to(img, {
+                            y: "+=45", // Match the upward movement
+                            duration: 1.6,
+                            delay: 0.1 * i,
+                            ease: "power2.out"
+                        });
+                    });
+                }
             }
         });
     }

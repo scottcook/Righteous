@@ -9,20 +9,47 @@ export function initWorkScroll() {
 
     console.log('Initializing scroll animation for .section-work');
 
-    const tl = gsap.timeline({
-        defaults: {duration: 5}, // ensure timeline length is normalized
-        scrollTrigger: {
-            trigger: section,
-            start: 'top bottom',
-            end: 'top top',
-            scrub: true,
-            markers: false
+    // Set initial state of the section - only scale is reduced
+    gsap.set(section, { scale: 0.9, y: '100vh' }); // Start positioned below the viewport
+
+    // Create the ScrollTrigger
+    const scrollTrigger = ScrollTrigger.create({
+        trigger: section,
+        start: 'top bottom', // Start when the top of section reaches bottom of viewport
+        end: 'top 30%',      // End when the top of section is 30% from top of viewport
+        scrub: 1,         
+        markers: false,
+        onUpdate: function(self) {
+            // Calculate how much section should move up
+            const yProgress = Math.max(0, 1 - self.progress * 2); // Move section up faster in first half
+            const yPosition = yProgress * 100; // Convert to vh units
+            
+            // Scale increases as section moves up
+            const scaleValue = 0.9 + (0.1 * self.progress);
+            
+            // Apply the animation based on progress
+            gsap.set(section, {
+                scale: scaleValue,
+                y: `${yPosition}vh`, // Move from 100vh to 0vh
+                opacity: 1           // Always full opacity
+            });
+            
+            // Apply heading animation when section becomes more visible (in upper half of viewport)
+            if (self.progress > 0.5) {
+                const headingProgress = (self.progress - 0.5) / 0.5; // Rescale for heading
+                const heading = section.querySelector('.heading');
+                if (heading) {
+                    gsap.set(heading, {
+                        opacity: headingProgress,
+                        scale: 5 - (4 * headingProgress)
+                    });
+                }
+            }
         }
     });
 
-    // Animate the section itself
-    tl.fromTo(section, {scale: 0.9}, {scale: 1, ease: 'none'});
-
-    // This will be based on the duration above so till start at 3s and animate the last 2s.
-    tl.from(section.querySelector('.heading'), {opacity: 0, scale: 5.0, duration: 2}, 3);
+    // Ensure we clean up if needed
+    return () => {
+        scrollTrigger.kill();
+    };
 }
