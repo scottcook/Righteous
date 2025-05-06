@@ -187,7 +187,7 @@ export function initGlobalScroll() {
         });
     }
 
-    // ─── 6. Scroll reset and refresh on resize ──────────────────────────────────────
+  /*   // ─── 6. Scroll reset and refresh on resize ──────────────────────────────────────
     window.addEventListener('resize', () => {
         console.log('[Righteous] Resized — updating buffer and refreshing triggers');
         updateScrollBuffer();
@@ -208,5 +208,5 @@ export function initGlobalScroll() {
             console.log('[Righteous] Forcing scroll to top on pageshow');
             smoother.scrollTo(0, false);
         }
-    });
+    }); */
 }

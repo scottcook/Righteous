@@ -19,7 +19,7 @@ export function initAboutScroll() {
     gsap.set(section, {
         scale: 0.85,
         rotate: startRotation,
-        xPercent: -75,
+        xPercent: -45,
         yPercent: startY,
         opacity: 1,
         transformOrigin: '60% 70%'
@@ -59,10 +59,9 @@ export function initAboutScroll() {
         gsap.set(team, {
             rotate: -14,
             opacity: 0,
-            xPercent: -40, // Start from less far left side
             y: 40,
             scale: 0.75, // Increased from 0.5 to make scale animation less dramatic
-            transformOrigin: '10% 80%'
+            transformOrigin: '50% 80%'
         });
 
         // Create a scroll-based animation for the team div container
@@ -81,7 +80,6 @@ export function initAboutScroll() {
                 gsap.set(team, {
                     rotate: -14 + 14 * progress, // Rotate from -14 to 0
                     opacity: progress,
-                    xPercent: -40 + 10 * progress, // Move from -40 to -30 (original final position)
                     y: 40 - 40 * progress, // Move up from 40 to 0
                     scale: 0.75 + 0.25 * progress // Scale from 0.75 to 1 (less dramatic)
                 });
@@ -90,7 +88,57 @@ export function initAboutScroll() {
 
         // Pre-set team images to be invisible
         const teamImages = [team.querySelector('.team1'), team.querySelector('.team2'), team.querySelector('.team3')];
-        gsap.set(teamImages, {opacity: 0, x: 0, y: 60, scale: 0.3, rotate: -45}); // Increased scale from 0 to 0.3
+        gsap.set(teamImages, {opacity: 0, x: 0, y: 60, scale: 0.5, rotate: -30}); // Reduced initial scale and rotation
+
+        // Store floating animations for control
+        const floatingAnimations = [];
+
+        // Add gentle floating animation to each team image with different parameters
+        function createFloatingAnimation() {
+            teamImages.forEach((img, i) => {
+                // Create floating animations for all images
+                // Use different durations, amplitudes and delays for each image
+                const duration = 2.5 + i * 0.4; // 2.5s, 2.9s, 3.3s
+                const yAmount = 7 + i * 1.5; // Vertical movement
+                const xAmount = 2 + i * 0.5; // Horizontal movement
+                
+                // Create floating timeline for this image
+                const floatTl = gsap.timeline({
+                    repeat: -1, 
+                    yoyo: true,
+                    paused: true
+                });
+                
+                // Add floating animation to timeline without rotation
+                floatTl.to(img, {
+                    y: "+=" + yAmount,
+                    x: "+=" + xAmount,
+                    duration: duration,
+                    ease: "sine.inOut"
+                });
+                
+                // Store the animation for later control
+                floatingAnimations[i] = floatTl;
+            });
+        }
+
+        // Create floating animations immediately
+        createFloatingAnimation();
+
+        // Add separate trigger to start floating animations when images are visible
+        ScrollTrigger.create({
+            trigger: team,
+            start: 'top 30%',
+            onEnter: function() {
+                // Start floating animations when images become visible
+                setTimeout(() => {
+                    floatingAnimations.forEach(anim => {
+                        if (anim) anim.play();
+                    });
+                }, 1500); // Delay to allow entrance animation to complete
+            },
+            once: true
+        });
 
         // Create a scroll-synchronized animation for team images
         // Adjust timing to match the delayed team container animation
@@ -105,7 +153,7 @@ export function initAboutScroll() {
 
                 // Define animation stages for each image
                 teamImages.forEach((img, i) => {
-                    const rotations = [-8, 4, 10]; // Final rotation values
+                    const rotations = [-4, 2, 6]; // Reduced final rotation values for less dramatic effect
 
                     // Calculate when this image should start and end animating
                     // Stagger the start points so they animate in sequence
@@ -124,20 +172,22 @@ export function initAboutScroll() {
                         // Starting values
                         const startX = 0;
                         const startY = 60;
-                        const startScale = 0.3; // Increased from 0 to 0.3
-                        const startRotate = -45;
+                        const startScale = 0.5; // Reduced from 0.3 for a subtler entrance
+                        const startRotate = -30; // Reduced from -45 for a subtler entrance
 
                         // Ending values
-                        const endX = 280; // Reset to original value
+                        const endX = 0; // Reset to 0 (no horizontal movement)
                         const endY = 0;
                         const endScale = 1;
                         const endRotate = rotations[i];
 
-                        // Calculate current values based on progress
+                        // Calculate current values based on progress with eased rotation
                         const currentX = startX + (endX - startX) * imgProgress;
                         const currentY = startY + (endY - startY) * imgProgress;
                         const currentScale = startScale + (endScale - startScale) * imgProgress;
-                        const currentRotate = startRotate + (endRotate - startRotate) * imgProgress;
+                        // Use a power ease for rotation to make it smoother at the end
+                        const rotationProgress = gsap.parseEase("power2.out")(imgProgress);
+                        const currentRotate = startRotate + (endRotate - startRotate) * rotationProgress;
                         const currentOpacity = Math.min(1, imgProgress * 1.5); // Fade in slightly faster
 
                         // Apply the values
@@ -148,6 +198,11 @@ export function initAboutScroll() {
                             rotation: currentRotate,
                             opacity: currentOpacity
                         });
+
+                        // Start floating animation when image is fully visible
+                        if (imgProgress >= 1 && floatingAnimations[i] && !floatingAnimations[i].isActive()) {
+                            floatingAnimations[i].play();
+                        }
                     }
                 });
             }
@@ -159,14 +214,19 @@ export function initAboutScroll() {
             start: 'top bottom',
             end: 'top top',
             onLeaveBack: () => {
+                // Pause floating animations
+                floatingAnimations.forEach(anim => {
+                    if (anim) anim.pause();
+                });
+                
                 // Reset when scrolling back to masthead
                 teamImages.forEach((img, i) => {
                     gsap.to(img, {
                         opacity: 0,
                         x: 0,
                         y: 60,
-                        scale: 0.3, // Increased from 0 to 0.3
-                        rotation: -45,
+                        scale: 0.5, // Reduced initial scale
+                        rotation: -30, // Reduced initial rotation
                         duration: 0.6,
                         ease: 'expo.out',
                         delay: i * 0.2
@@ -177,7 +237,6 @@ export function initAboutScroll() {
                 gsap.to(team, {
                     rotate: -14,
                     opacity: 0,
-                    xPercent: -40,
                     y: 40,
                     scale: 0.75, // Increased from 0.5 to 0.75
                     duration: 0.7,
@@ -194,24 +253,35 @@ export function initAboutScroll() {
     const heading = section.querySelector('.heading');
     if (heading) {
         // Set initial state
-        gsap.set(heading, {opacity: 0, y: 60, scale: 1.0});
+        gsap.set(heading, {opacity: 0, y: 100, scale: 0.9});
 
-        // Create a scroll-based animation for the heading
+        // Remove timeline approach and just use a single, better-timed animation
         ScrollTrigger.create({
             trigger: section,
-            start: 'top 30%', // Start later in the scroll sequence
-            end: 'top 5%', // End near the top of the viewport
-            scrub: 1,
+            start: 'top 65%', // Delay until section is well into the viewport
             markers: false,
-            onUpdate: function (self) {
-                // Calculate the proportional values based on scroll progress
-                const progress = self.progress;
-
-                // Apply the synchronized values
-                gsap.set(heading, {
-                    opacity: progress,
-                    y: 60 - 60 * progress, // Move up from 60 to 0
-                    scale: 1.0
+            onEnter: function() {
+                // Apply a one-time bounce animation
+                gsap.fromTo(heading, 
+                    {y: 100, opacity: 0, scale: 0.9},
+                    {
+                        y: 0, 
+                        opacity: 1, 
+                        scale: 1, 
+                        duration: 1.2, 
+                        delay: 0.3, // Small delay after trigger
+                        ease: "back.out(0.6)" // Single subtle bounce
+                    }
+                );
+            },
+            onLeaveBack: function() {
+                // Reverse animation when scrolling back up
+                gsap.to(heading, {
+                    y: 100,
+                    opacity: 0,
+                    scale: 0.9,
+                    duration: 0.6, // Faster reversal
+                    ease: "power2.in"
                 });
             }
         });
