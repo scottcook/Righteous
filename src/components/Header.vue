@@ -86,7 +86,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="pointer-events-none fixed top-0 z-30 grid h-auto w-full grid-cols-wrapper bg-brand-cream">
+    <div class="pointer-events-none fixed top-0 z-30 grid h-auto w-full grid-cols-wrapper">
         <a href="#maincontent" class="sr-only focus:not-sr-only">Skip to main content</a>
         <div class="col-main">
             <div class="w-full">

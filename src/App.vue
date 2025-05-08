@@ -1,16 +1,36 @@
 <script setup>
+import { onMounted } from 'vue';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+import ScrollSmoother from '@/utils/gsap-premium/src/ScrollSmoother';
+
 import Header from './components/Header.vue';
-// import Footer from './components/Footer.vue';
-// import VideoModal from './components/VideoModal.vue';
+
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+
+onMounted(() => {
+    if (!ScrollSmoother.get()) {
+        ScrollSmoother.create({
+            wrapper: '#smooth-wrapper',
+            content: '#smooth-content',
+            smooth: 1.2, // scroll speed (1 = natural)
+            effects: true, // enable data-speed parallax effects
+            normalizeScroll: true,
+            smoothTouch: 0.1,
+        });
+    }
+});
 </script>
 
 <template>
     <Header />
     <!-- <TalkButton /> -->
-    <main id="maincontent" class="">
-        <!-- Masthead -->
-        <section id="masthead">
-            <!-- <div class="grid w-full grid-cols-wrapper bg-brand-gray lg:bg-brand-orange">
+    <div id="smooth-wrapper">
+        <div id="smooth-content">
+            <main id="maincontent" class="">
+                <!-- Masthead -->
+                <section id="masthead" class="text-black h-screen flex items-center justify-center">
+                    <!-- <div class="grid w-full grid-cols-wrapper bg-brand-gray lg:bg-brand-orange">
                 <div class="relative col-full row-start-1 overflow-hidden h-full">
                     <img src="./assets/images/masthead.jpg" alt="Masthead Image" class="absolute w-full h-full object-cover object-center" />
                 </div>
@@ -22,10 +42,10 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </div> -->
-        </section>
-        <div class="content-wrapper">
-            <!-- Service -->
-            <!-- <section id="service" class="">
+                </section>
+                <div class="content-wrapper">
+                    <!-- Service -->
+                    <!-- <section id="service" class="">
                 <div class="grid w-full grid-cols-wrapper bg-brand-gray py-28 lg:py-32 xl:py-36">
                     <div class="col-main">
                         <div class="w-full max-w-prose lg:max-w-none mx-auto flex flex-col flex-wrap lg:flex-row items-center">
@@ -63,8 +83,8 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
-            <!-- Video -->
-            <!-- <section id="video" class="">
+                    <!-- Video -->
+                    <!-- <section id="video" class="">
                 <video-modal>
                     <template v-slot:button>
                         <div class="grid w-full grid-cols-wrapper bg-brand-gray h-[440px] md:h-[540px] lg:h-[640px] xl:h-[740px]">
@@ -90,8 +110,8 @@ import Header from './components/Header.vue';
                     </div>
                 </video-modal>
             </section> -->
-            <!-- Equipment -->
-            <!-- <section id="bergkamp-fp5" class="">
+                    <!-- Equipment -->
+                    <!-- <section id="bergkamp-fp5" class="">
                 <div class="grid w-full grid-cols-wrapper bg-[#efefef] py-28 lg:py-32 xl:py-36">
                     <div class="col-main">
                         <div class="max-w-prose lg:max-w-none mx-auto flex flex-col flex-wrap lg:flex-row w-full">
@@ -320,8 +340,8 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
-            <!-- Testimonial -->
-            <!-- <section id="testimonial" class="">
+                    <!-- Testimonial -->
+                    <!-- <section id="testimonial" class="">
                 <div class="grid w-full grid-cols-wrapper bg-[#D9D9D9] py-16 lg:py-20 xl:py-24">
                     <div class="col-main text-center lg:text-left">
                         <swiper
@@ -377,8 +397,8 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
-            <!-- Form -->
-            <!-- <section id="book-a-demo" class="relative">
+                    <!-- Form -->
+                    <!-- <section id="book-a-demo" class="relative">
                 <div class="grid w-full grid-cols-wrapper bg-brand-orange py-24 lg:py-36">
                     <div class="w-full relative col-main row-start-1">
                         <div class="w-full text-white">
@@ -414,8 +434,8 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
-            <!-- Benefits -->
-            <!-- <section id="benefits" class="">
+                    <!-- Benefits -->
+                    <!-- <section id="benefits" class="">
                 <div class="grid w-full grid-cols-wrapper bg-brand-gray py-16 lg:py-20 xl:py-24">
                     <div class="col-main">
                         <h2 class="mb-4 lg:mb-6 uppercase text-white max-w-prose text-center mx-auto lg:max-w-[1024px] text-[28px] lg:text-[36px] xl:text-[48px] font-myriad-pro leading-[1.15]">
@@ -450,8 +470,8 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
-            <!-- Campaign -->
-            <!-- <section id="campaign" class="">
+                    <!-- Campaign -->
+                    <!-- <section id="campaign" class="">
                 <div class="grid w-full grid-cols-wrapper lg:grid-cols-two-col bg-brand-gray h-[630px]">
                     <div class="relative col-full lg:col-full/left row-start-1 h-full">
                         <img src="./assets/images/campaign-1.jpg" alt="Campaign Image" class="absolute w-full h-full object-cover object-center" />
@@ -467,8 +487,8 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
-            <!-- Join The Movement -->
-            <!-- <section id="join-the-movement" class="">
+                    <!-- Join The Movement -->
+                    <!-- <section id="join-the-movement" class="">
                 <div class="grid w-full grid-cols-wrapper bg-brand-gray">
                     <div class="relative col-full row-start-1 overflow-hidden">
                         <img src="./assets/images/survey.jpg" alt="Survey Image" class="absolute w-full h-full object-cover object-bottom" />
@@ -532,8 +552,8 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
-            <!-- Programs -->
-            <!-- <section id="programs" class="">
+                    <!-- Programs -->
+                    <!-- <section id="programs" class="">
                 <div class="grid w-full grid-cols-wrapper bg-[#EFEFEF] py-16 lg:py-20 xl:py-24">
                     <div class="col-main">
                         <div class="w-full max-w-prose lg:max-w-none mx-auto flex flex-col flex-wrap lg:flex-row">
@@ -575,8 +595,10 @@ import Header from './components/Header.vue';
                     </div>
                 </div>
             </section> -->
+                </div>
+            </main>
         </div>
-    </main>
+    </div>
     <!-- <Footer /> -->
 </template>
 
