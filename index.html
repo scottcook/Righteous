@@ -1,43 +1,50 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+        <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Scroll Section Test</title>
-        <style>
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                overflow-x: hidden;
-                background-color: #000;
-            }
-            section {
-                width: 100vw;
-                height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 4rem;
-                font-weight: bold;
-                color: white;
-                background-color: #333;
-                border: 1px solid #ccc;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="smooth-wrapper">
-            <section id="masthead" class="section-masthead"><h1 class="heading">Masthead</h1></section>
-            <div id="smooth-content">
-                <section id="about" class="section-about"><h1 class="heading">About</h1></section>
-                <section id="work" class="section-work"><h1 class="heading">Work</h1></section>
-                <section id="clients" class="section-clients"><h1 class="heading">Clients</h1></section>
-                <section id="contact" class="section-contact"><h1 class="heading">Contact</h1></section>
-            </div>
-        </div>
+        <title>Righteous | Digital Agency</title>
 
-        <!-- Your Webpack bundle -->
-        <script src="./dist/bundle.js" defer></script>
+        <meta name="description" content="" />
+        <meta name="keywords" content="Righteous | Digital Agency" />
+        <meta name="author" content="Righteous | Digital Agency" />
+
+        <meta property="og:title" content="Righteous | Digital Agency" />
+        <meta property="og:description" content="" />
+        <meta property="og:image" content="https://www.example.com/social-media.png" />
+        <meta property="og:url" content="https://www.example.com/" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:site_name" content="Righteous | Digital Agency" />
+        <meta name="twitter:image:alt" content="Righteous | Digital Agency" />
+        <meta name="twitter:site" content="@" />
+
+        <link rel="canonical" href="https://www.example.com/" />
+
+        <!-- Myriad Pro / Roboto -->
+        <link rel="stylesheet" href="https://use.typekit.net/cdq4nkc.css" />
+
+        <!-- Google Tag Manager -->
+        <!-- <script>
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-XXXXXXXX');
+        </script> -->
+        <!-- End Google Tag Manager -->
+    </head>
+    <body class="overflow-x-hidden">
+        <!-- Google Tag Manager (noscript) -->
+        <!-- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXXX" height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript> -->
+        <!-- End Google Tag Manager (noscript) -->
+
+        <div id="app" class="antialiased"></div>
+        <script type="module" src="/src/main.js"></script>
     </body>
 </html>
