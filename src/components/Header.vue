@@ -3,7 +3,10 @@ import gsap from 'gsap';
 import { ref, computed, onMounted } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 
-// defineEmits(['menuItemClicked']);
+// import ScrollTrigger from 'gsap/ScrollTrigger';
+// import { SplitText } from '@/utils/gsap-premium/src/SplitText.js';
+
+// gsap.registerPlugin(ScrollTrigger, SplitText);
 
 // These are VueUse utilities that return a reactive value that will update when the query changes
 const isDesktop = useMediaQuery('(min-width: 1024px)');
