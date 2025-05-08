@@ -81,12 +81,12 @@ const showMenu = computed(() => {
 
 onMounted(() => {
     // Open by default on desktop
-    isMenuOpen.value = isDesktop.value;
+    // isMenuOpen.value = isDesktop.value;
 });
 </script>
 
 <template>
-    <div class="pointer-events-none fixed top-0 z-30 grid h-auto w-full grid-cols-wrapper">
+    <div class="pointer-events-none fixed top-0 grid h-auto w-full grid-cols-wrapper z-10">
         <a href="#maincontent" class="sr-only focus:not-sr-only">Skip to main content</a>
         <div class="col-main">
             <div class="w-full">

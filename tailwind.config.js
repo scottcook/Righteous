@@ -9,6 +9,7 @@ export default {
             'brand-cream': '#F5F4EB',
             'brand-charcoal': '#151515',
             'brand-pink': '#EA3779',
+            'brand-gray': '#595959',
         },
         fontFamily: {
             grotesk: ['"Space Grotesk"', 'sans-serif'] /* font-light, font-normal, font-medium, font-semibold, font-bold */,

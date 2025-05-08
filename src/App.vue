@@ -5,10 +5,14 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import ScrollSmoother from '@/utils/gsap-premium/src/ScrollSmoother';
 
 import Header from './components/Header.vue';
+import Masthead from './components/Masthead.vue';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 onMounted(() => {
+    window.history.scrollRestoration = 'manual';
+    ScrollTrigger.clearScrollMemory('manual');
+
     if (!ScrollSmoother.get()) {
         ScrollSmoother.create({
             wrapper: '#smooth-wrapper',
@@ -25,24 +29,10 @@ onMounted(() => {
 <template>
     <Header />
     <!-- <TalkButton /> -->
-    <div id="smooth-wrapper">
+    <div id="smooth-wrapper" class="z-20">
         <div id="smooth-content">
             <main id="maincontent" class="">
-                <!-- Masthead -->
-                <section id="masthead" class="text-black h-screen flex items-center justify-center">
-                    <!-- <div class="grid w-full grid-cols-wrapper bg-brand-gray lg:bg-brand-orange">
-                <div class="relative col-full row-start-1 overflow-hidden h-full">
-                    <img src="./assets/images/masthead.jpg" alt="Masthead Image" class="absolute w-full h-full object-cover object-center" />
-                </div>
-                <div class="relative col-main row-start-1 lg:min-h-[750px] flex items-center justify-center">
-                    <div class="w-full text-white py-36">
-                        <h2 class="text-center uppercase text-[43px] lg:text-[58px] xl:text-[78px] font-myriad-pro leading-[1.05] font-bold">
-                            Operators love our machines. Residents love the&nbsp;results.
-                        </h2>
-                    </div>
-                </div>
-            </div> -->
-                </section>
+                <Masthead />
                 <div class="content-wrapper">
                     <!-- Service -->
                     <!-- <section id="service" class="">
@@ -602,4 +592,4 @@ onMounted(() => {
     <!-- <Footer /> -->
 </template>
 
-<style scoped></style>
+<style scoped lang="postcss"></style>
