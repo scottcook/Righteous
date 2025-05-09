@@ -50,6 +50,20 @@ const setupScrollAnimation = async () => {
             scrub: true,
             pin: true,
             pinSpacing: true,
+            onUpdate: (self) => {
+                const nav = document.querySelector('#nav');
+                if (self.progress < 0.01 && nav?.classList.contains('z-50')) {
+                    nav.classList.remove('z-50');
+                }
+            },
+            onLeave: () => {
+                const nav = document.querySelector('#nav');
+                nav?.classList.add('z-50');
+            },
+            onLeaveBack: () => {
+                const nav = document.querySelector('#nav');
+                nav?.classList.remove('z-50');
+            },
         },
     });
 
@@ -69,7 +83,7 @@ const setupScrollAnimation = async () => {
             logoRef.value,
             {
                 yPercent: 7,
-                ease: 'power2.out',
+                ease: 'power1.out',
             },
             '<'
         );
@@ -116,9 +130,9 @@ const setupLogoAnimation = async () => {
         {
             opacity: 1,
             scale: 1,
-            stagger: 0.1,
-            ease: 'power2.inOut',
-            duration: 1,
+            stagger: 0.08,
+            ease: 'back.inOut(1.2)',
+            duration: 0.9,
         },
         '0.2'
     );
@@ -165,7 +179,7 @@ defineExpose({ updateClipAndScale: setupScrollAnimation });
         <div class="overflow-hidden w-full h-full relative">
             <div ref="mediaRef" class="w-full h-full">
                 <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="w-full h-full object-cover object-center" />
-                <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center"><h2 class="font-canela text-white text-[13vw]">Righteous</h2></div>
+                <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center"><h2 class="font-canela text-white text-[13vw] tracking-tight">Righteous</h2></div>
             </div>
         </div>
     </section>
