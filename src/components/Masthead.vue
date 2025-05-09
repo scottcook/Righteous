@@ -2,13 +2,15 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import SplitText from '@/utils/gsap-premium/src/SplitText';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const mediaRef = ref(null);
 const sectionRef = ref(null);
 const imageRef = ref(null);
 const copyRef = ref(null);
+const descriptionRef = ref(null);
 
 let resizeTimeout = null;
 
@@ -18,22 +20,19 @@ const getClipSettings = () => {
     const targetWidth = screenWidth > maxWidth ? maxWidth : screenWidth - 40;
     const horizontalCropPercent = ((screenWidth - targetWidth) / 2 / screenWidth) * 100;
     const copyHeight = copyRef.value?.offsetHeight || 0;
-
-    // Match your original nav height logic
     const navHeight = screenWidth >= 1024 ? 102 : 70;
 
     return { horizontalCropPercent, copyHeight, navHeight };
 };
 
-const clearTriggers = () => {
-    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-};
-
 const setupScrollAnimation = () => {
     const { horizontalCropPercent, copyHeight, navHeight } = getClipSettings();
 
+    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+
     gsap.set(mediaRef.value, { clipPath: 'inset(0% 0% 0% 0% round 0px)' });
     gsap.set(imageRef.value, { scale: 1 });
+    gsap.set(descriptionRef.value, { opacity: 1 });
 
     const tl = gsap.timeline({
         scrollTrigger: {
@@ -57,12 +56,25 @@ const setupScrollAnimation = () => {
         },
         '<'
     );
+
+    const split = new SplitText(descriptionRef.value, { type: 'lines' });
+
+    tl.fromTo(
+        split.lines,
+        { opacity: 0, y: 20 },
+        {
+            opacity: 1,
+            y: 0,
+            stagger: 0.15,
+            ease: 'power1.inOut',
+        },
+        '>-0.2'
+    );
 };
 
 const handleResize = () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        clearTriggers();
         setupScrollAnimation();
         ScrollTrigger.refresh();
     }, 200);
@@ -87,9 +99,9 @@ defineExpose({ updateClipAndScale: setupScrollAnimation });
         <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
             <div class="w-full grid grid-cols-wrapper">
                 <div class="col-main pb-12 pt-9">
-                    <p class="text-brand-gray max-w-[680px] font-helveticaDisplay font-medium text-[28px] leading-9">
-                        <span class="text-black">We’re Righteous.</span><br />A small team of product and agency veterans, crafting clean strategy, smart UX, and tight code for brands and startups who
-                        want results -- without the pitch theater.
+                    <p ref="descriptionRef" class="text-brand-gray max-w-[680px] font-helveticaDisplay font-medium text-[28px] leading-9">
+                        <span class="text-black">We’re Righteous.</span><br />
+                        A small team of product and agency veterans, crafting clean strategy, smart UX, and tight code for brands and startups who want results -- without the pitch theater.
                     </p>
                 </div>
             </div>
