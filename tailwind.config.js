@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
     content: ['./index.html', './src/**/*.{vue,js}'],
+    safelist: ['z-50'],
     theme: {
         colors: {
             current: 'currentColor',

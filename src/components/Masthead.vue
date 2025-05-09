@@ -52,8 +52,11 @@ const setupScrollAnimation = async () => {
             pinSpacing: true,
             onUpdate: (self) => {
                 const nav = document.querySelector('#nav');
-                if (self.progress < 0.01 && nav?.classList.contains('z-50')) {
+                if (self.progress < 0.1 && nav?.classList.contains('z-50')) {
                     nav.classList.remove('z-50');
+                }
+                if (self.progress > 0.15) {
+                    nav.classList.add('z-50');
                 }
             },
             onLeave: () => {
@@ -166,7 +169,7 @@ defineExpose({ updateClipAndScale: setupScrollAnimation });
         <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
             <div class="w-full grid grid-cols-wrapper">
                 <div class="relative col-main pb-12 pt-9 bg-brand-cream">
-                    <p ref="descriptionRef" class="text-brand-gray max-w-[530px] lg:max-w-[680px] font-helveticaDisplay font-medium text-[24px] lg:text-[28px] leading-7 lg:leading-9">
+                    <p ref="descriptionRef" class="text-brand-gray max-w-[530px] lg:max-w-[700px] font-helveticaDisplay font-medium text-[24px] lg:text-[28px] leading-7 lg:leading-9">
                         <span class="text-black">We’re Righteous.</span><br />
                         A small team of product and agency veterans, crafting clean strategy, smart UX, and tight code for brands and startups who want results -- without the pitch theater.
                     </p>

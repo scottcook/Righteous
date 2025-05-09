@@ -93,7 +93,12 @@ onMounted(() => {
                 <div class="overlay-menu fixed inset-0 block w-full lg:hidden" :class="isMenuOpen ? 'open' : 'pointer-events-none'"></div>
                 <div class="nav-header-wrapper" ref="navWrapper">
                     <header class="py-4 lg:py-7 flex justify-between">
-                        <a href="" class="pointer-events-auto text-[24px] lg:text-[30px] origin-left font-canela font-black">Righteous</a>
+                        <a
+                            href=""
+                            class="pointer-events-auto text-[24px] lg:text-[30px] origin-left font-canela font-black transition-colors ease-in-out duration-500"
+                            :class="isMenuOpen ? 'text-white' : 'text-black'"
+                            >Righteous</a
+                        >
                         <Transition @enter="menuTransitionEnter" @leave="menuTransitionLeave" v-bind:css="false">
                             <nav
                                 @click="closeMenu"
@@ -111,7 +116,7 @@ onMounted(() => {
                             </nav>
                         </Transition>
                         <div class="pointer-events-auto flex w-7 items-center justify-end" v-if="!isDesktop">
-                            <button @click="toggleMenu" type="button" class="relative text-brand-charcoal focus:outline-none">
+                            <button @click="toggleMenu" type="button" class="relative focus:outline-none" :class="isMenuOpen ? 'text-white' : 'text-brand-charcoal'">
                                 <svg class="h-7 w-7 fill-current stroke-current" enable-background="new 0 0 40 40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                     <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
                                         <path d="m2 8h36" class="origin-20" :class="isMenuOpen ? '-translate-x-1 rotate-[45deg]' : 'rotate-0'" />
@@ -167,6 +172,6 @@ svg path {
 }
 
 nav li > a.header-nav-item {
-    @apply relative flex items-center px-3 py-3 rounded-sm font-helveticaDisplay font-medium uppercase leading-none tracking-[0.025em] text-black text-[16px] lg:text-[12px] bg-[#EFECE6];
+    @apply relative flex items-center px-3 py-3 rounded-sm font-helveticaDisplay font-medium uppercase leading-none tracking-[0.025em] text-white lg:text-black text-[16px] lg:text-[12px] lg:bg-[#EFECE6];
 }
 </style>
