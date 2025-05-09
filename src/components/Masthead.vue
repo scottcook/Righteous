@@ -68,8 +68,8 @@ const setupScrollAnimation = async () => {
         .to(
             logoRef.value,
             {
-                yPercent: 5,
-                ease: 'power1.out',
+                yPercent: 7,
+                ease: 'power2.out',
             },
             '<'
         );
