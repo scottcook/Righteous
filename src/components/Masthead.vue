@@ -80,7 +80,7 @@ const setupScrollAnimation = async () => {
             gsap.to(imageRef.value, { scale: 1.1, ease: 'power1.in', duration: 1 }),
 
             //
-            gsap.to(logoRef.value, { yPercent: 7, ease: 'power1.out', duration: 1 }),
+            gsap.to(logoRef.value, { yPercent: 7, ease: 'power2.out', duration: 1 }),
         ],
         '+=0.0'
     );
@@ -107,8 +107,9 @@ const setupScrollAnimation = async () => {
                     opacity: 1,
                     y: 0,
                     rotation: 0,
-                    ease: 'back.inOut',
+                    ease: 'back.inOut(1.7)',
                     duration: 1,
+                    delay: 0.5,
                 }
             ),
         ],
@@ -124,8 +125,8 @@ const setupScrollAnimation = async () => {
                 {
                     yPercent: 0,
                     rotation: 1,
-                    ease: 'power1.in',
-                    duration: 2,
+                    ease: 'power1.inOut',
+                    duration: 3,
                 }
             ),
 
@@ -135,8 +136,8 @@ const setupScrollAnimation = async () => {
                 {
                     yPercent: 0,
                     rotation: 1,
-                    ease: 'power1.in',
-                    duration: 2,
+                    ease: 'back.inOut(0.7)',
+                    duration: 3,
                     delay: 0.5,
                 }
             ),
@@ -157,9 +158,9 @@ const setupScrollAnimation = async () => {
             //
             gsap.to(taglineSplit.chars, {
                 color: 'white',
-                stagger: 0.1,
+                stagger: 0.02,
                 ease: 'power1.in',
-                duration: 0.5,
+                duration: 0.02,
             }),
 
             //
@@ -169,9 +170,9 @@ const setupScrollAnimation = async () => {
                 {
                     yPercent: 0,
                     rotation: -10,
-                    ease: 'power1.inOut',
-                    duration: 0.5,
-                    delay: 0.5,
+                    ease: 'back.out(0.7)',
+                    duration: 1.6,
+                    delay: 0.2,
                 }
             ),
 
@@ -182,9 +183,9 @@ const setupScrollAnimation = async () => {
                 {
                     yPercent: 0,
                     rotation: 10,
-                    ease: 'power1.inOut',
-                    duration: 0.5,
-                    delay: 0.5,
+                    ease: 'back.out(0.7)',
+                    duration: 1.6,
+                    delay: 0.4,
                 }
             ),
 
@@ -195,9 +196,9 @@ const setupScrollAnimation = async () => {
                 {
                     yPercent: 0,
                     rotation: -10,
-                    ease: 'power1.inOut',
-                    duration: 0.5,
-                    delay: 0.5,
+                    ease: 'back.out(0.7)',
+                    duration: 1.6,
+                    delay: 0.6,
                 }
             ),
 
@@ -208,13 +209,13 @@ const setupScrollAnimation = async () => {
                 {
                     yPercent: 0,
                     rotation: -2,
-                    ease: 'power1.inOut',
-                    duration: 0.5,
-                    delay: 0.5,
+                    ease: 'back.out(0.7)',
+                    duration: 1.6,
+                    delay: 0.8,
                 }
             ),
         ],
-        '+=0.6'
+        '-=0.6'
     );
 
     console.log('Timeline duration:', tl.duration());
