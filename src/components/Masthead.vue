@@ -7,15 +7,19 @@ import SplitText from '@/utils/gsap-premium/src/SplitText';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const mediaRef = ref(null);
-const sectionRef = ref(null);
+const mastheadRef = ref(null);
+const storiesRef = ref(null);
+const taglineRef = ref(null);
 const imageRef = ref(null);
 const copyRef = ref(null);
 const descriptionRef = ref(null);
 const handRef = ref(null);
 const logoRef = ref(null);
 
+let scrollTriggerInstance = null;
 let descriptionSplit = null;
 let logoSplit = null;
+let taglineSplit = null;
 
 const resizeTick = inject('resizeTick');
 
@@ -44,7 +48,8 @@ const setupScrollAnimation = async () => {
 
     const { horizontalCropPercent, copyHeight, navHeight } = getClipSettings();
 
-    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    scrollTriggerInstance?.kill();
+    taglineSplit && taglineSplit.revert();
     descriptionSplit && descriptionSplit.revert();
 
     gsap.set(mediaRef.value, { clipPath: 'inset(0% 0% 0% 0% round 0px)', willChange: 'clip-path' });
@@ -54,66 +59,91 @@ const setupScrollAnimation = async () => {
 
     const tl = gsap.timeline({ paused: true });
 
+    descriptionSplit = new SplitText(descriptionRef.value, { type: 'lines' });
+    taglineSplit = new SplitText(taglineRef.value, { type: 'words, chars' });
+
     tl.to(mediaRef.value, {
         clipPath: `inset(${navHeight}px ${horizontalCropPercent}% ${copyHeight}px ${horizontalCropPercent}% round 8px)`,
         ease: 'power2.out',
-    })
-        .to(
-            imageRef.value,
-            {
-                scale: 1.1,
-                ease: 'power1.in',
-            },
-            '<'
-        )
-        .to(
-            logoRef.value,
-            {
-                yPercent: 7,
-                ease: 'power1.out',
-            },
-            '<'
-        );
+    });
+    tl.to(
+        imageRef.value,
+        {
+            scale: 1.1,
+            ease: 'power1.in',
+        },
+        '<'
+    );
+    tl.to(
+        logoRef.value,
+        {
+            yPercent: 7,
+            ease: 'power1.out',
+        },
+        '<'
+    );
 
-    if (descriptionRef.value?.offsetHeight) {
-        descriptionSplit = new SplitText(descriptionRef.value, { type: 'lines' });
+    tl.fromTo(
+        descriptionSplit.lines,
+        { opacity: 0, y: 30 },
+        {
+            opacity: 1,
+            y: 0,
+            stagger: 0.15,
+            ease: 'power1.inOut',
+        },
+        '>-0.2'
+    );
 
-        tl.fromTo(
-            descriptionSplit.lines,
-            { opacity: 0, y: 30 },
-            {
-                opacity: 1,
-                y: 0,
-                stagger: 0.15,
-                ease: 'power1.inOut',
-            },
-            '>-0.2'
-        );
+    tl.fromTo(
+        handRef.value,
+        { opacity: 0, y: 50, rotation: 10 },
+        {
+            opacity: 1,
+            y: 0,
+            rotation: 0,
+            ease: 'back.inOut',
+        },
+        '>-0.4'
+    );
 
-        tl.fromTo(
-            handRef.value,
-            { opacity: 0, y: 50, rotation: 10 },
-            {
-                opacity: 1,
-                y: 0,
-                rotation: 0,
-                ease: 'back.inOut',
-            },
-            '>-0.4'
-        );
-    }
+    tl.fromTo(
+        [storiesRef.value, taglineRef.value],
+        { yPercent: 100, rotation: -30 },
+        {
+            yPercent: 0,
+            rotation: 1,
+            ease: 'power1.in',
+            duration: 2.8,
+            stagger: 0.2,
+        },
+        '>'
+    );
 
-    const st = ScrollTrigger.create({
-        trigger: sectionRef.value,
+    tl.to(
+        taglineSplit.chars,
+        {
+            color: 'white',
+            stagger: 0.01,
+            ease: 'power1.in',
+            duration: 0.01,
+        },
+        '-=0.4'
+    );
+
+    console.log('Timeline duration:', tl.duration());
+
+    scrollTriggerInstance = ScrollTrigger.create({
+        trigger: mastheadRef.value,
         start: 'top top',
-        end: '+=200%',
+        end: '+=300%',
         scrub: true,
         pin: true,
         pinSpacing: true,
         onUpdate: (self) => {
             toggleNavZ(self.progress > 0.15);
-            tl.progress(Math.min(self.progress * 2, 1)); // animation over 50% of scroll
         },
+        animation: tl,
         onLeave: () => toggleNavZ(true),
         onLeaveBack: () => toggleNavZ(false),
     });
@@ -148,13 +178,14 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+    taglineSplit && taglineSplit.revert();
     logoSplit && logoSplit.revert();
     descriptionSplit && descriptionSplit.revert();
 });
 </script>
 
 <template>
-    <section ref="sectionRef" class="relative w-screen h-screen pointer-events-none min-h-[720px]">
+    <section ref="mastheadRef" class="relative w-screen h-screen pointer-events-none">
         <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
             <div class="w-full grid grid-cols-wrapper">
                 <div class="relative col-main pb-12 pt-9 bg-brand-cream">
@@ -177,8 +208,16 @@ onUnmounted(() => {
             </div>
         </div>
     </section>
+
+    <section ref="storiesRef" class="fixed bottom-0 left-0 right-0 w-screen min-h-screen bg-brand-charcoal">
+        <div class="w-full grid grid-cols-wrapper">
+            <div class="relative col-main pt-[18vh]">
+                <p ref="taglineRef" class="text-brand-gray max-w-[530px] lg:max-w-[650px] font-helveticaDisplay font-light text-[24px] lg:text-[40px] leading-7 lg:leading-[1.25] tracking-tight">
+                    We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
+                </p>
+            </div>
+        </div>
+    </section>
 </template>
 
-<style scoped>
-/* Styles are now handled inline with will-change */
-</style>
+<style scoped></style>
