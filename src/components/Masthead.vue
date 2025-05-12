@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import SplitText from '@/utils/gsap-premium/src/SplitText';
@@ -14,9 +14,19 @@ const descriptionRef = ref(null);
 const handRef = ref(null);
 const logoRef = ref(null);
 
-let resizeTimeout = null;
 let descriptionSplit = null;
 let logoSplit = null;
+
+const resizeTick = inject('resizeTick');
+
+watch(resizeTick, () => {
+    setupScrollAnimation();
+});
+
+const toggleNavZ = (show) => {
+    const nav = document.querySelector('#nav');
+    if (nav) nav.classList.toggle('z-50', show);
+};
 
 const getClipSettings = () => {
     const screenWidth = window.innerWidth;
@@ -37,38 +47,12 @@ const setupScrollAnimation = async () => {
     ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     descriptionSplit && descriptionSplit.revert();
 
-    gsap.set(mediaRef.value, { clipPath: 'inset(0% 0% 0% 0% round 0px)' });
-    gsap.set(imageRef.value, { scale: 1 });
+    gsap.set(mediaRef.value, { clipPath: 'inset(0% 0% 0% 0% round 0px)', willChange: 'clip-path' });
+    gsap.set(imageRef.value, { scale: 1, willChange: 'transform' });
     gsap.set(descriptionRef.value, { opacity: 1 });
     gsap.set(handRef.value, { opacity: 0 });
 
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: sectionRef.value,
-            start: 'top top',
-            end: '+=100%',
-            scrub: true,
-            pin: true,
-            pinSpacing: true,
-            onUpdate: (self) => {
-                const nav = document.querySelector('#nav');
-                if (self.progress < 0.1 && nav?.classList.contains('z-50')) {
-                    nav.classList.remove('z-50');
-                }
-                if (self.progress > 0.15) {
-                    nav.classList.add('z-50');
-                }
-            },
-            onLeave: () => {
-                const nav = document.querySelector('#nav');
-                nav?.classList.add('z-50');
-            },
-            onLeaveBack: () => {
-                const nav = document.querySelector('#nav');
-                nav?.classList.remove('z-50');
-            },
-        },
-    });
+    const tl = gsap.timeline({ paused: true });
 
     tl.to(mediaRef.value, {
         clipPath: `inset(${navHeight}px ${horizontalCropPercent}% ${copyHeight}px ${horizontalCropPercent}% round 8px)`,
@@ -91,31 +75,48 @@ const setupScrollAnimation = async () => {
             '<'
         );
 
-    descriptionSplit = new SplitText(descriptionRef.value, { type: 'lines' });
+    if (descriptionRef.value?.offsetHeight) {
+        descriptionSplit = new SplitText(descriptionRef.value, { type: 'lines' });
 
-    tl.fromTo(
-        descriptionSplit.lines,
-        { opacity: 0, y: 30 },
-        {
-            opacity: 1,
-            y: 0,
-            stagger: 0.15,
-            ease: 'power1.inOut',
-        },
-        '>-0.2'
-    );
+        tl.fromTo(
+            descriptionSplit.lines,
+            { opacity: 0, y: 30 },
+            {
+                opacity: 1,
+                y: 0,
+                stagger: 0.15,
+                ease: 'power1.inOut',
+            },
+            '>-0.2'
+        );
 
-    tl.fromTo(
-        handRef.value,
-        { opacity: 0, y: 50, rotation: 10 },
-        {
-            opacity: 1,
-            y: 0,
-            rotation: 0,
-            ease: 'back.inOut',
+        tl.fromTo(
+            handRef.value,
+            { opacity: 0, y: 50, rotation: 10 },
+            {
+                opacity: 1,
+                y: 0,
+                rotation: 0,
+                ease: 'back.inOut',
+            },
+            '>-0.4'
+        );
+    }
+
+    const st = ScrollTrigger.create({
+        trigger: sectionRef.value,
+        start: 'top top',
+        end: '+=200%',
+        scrub: true,
+        pin: true,
+        pinSpacing: true,
+        onUpdate: (self) => {
+            toggleNavZ(self.progress > 0.15);
+            tl.progress(Math.min(self.progress * 2, 1)); // animation over 50% of scroll
         },
-        '>-0.4'
-    );
+        onLeave: () => toggleNavZ(true),
+        onLeaveBack: () => toggleNavZ(false),
+    });
 };
 
 const setupLogoAnimation = async () => {
@@ -141,27 +142,15 @@ const setupLogoAnimation = async () => {
     );
 };
 
-const handleResize = () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        setupScrollAnimation();
-        ScrollTrigger.refresh();
-    }, 250);
-};
-
 onMounted(async () => {
     await setupScrollAnimation();
     await setupLogoAnimation();
-    window.addEventListener('resize', handleResize);
 });
 
 onUnmounted(() => {
-    window.removeEventListener('resize', handleResize);
-    clearTimeout(resizeTimeout);
+    logoSplit && logoSplit.revert();
     descriptionSplit && descriptionSplit.revert();
 });
-
-defineExpose({ updateClipAndScale: setupScrollAnimation });
 </script>
 
 <template>
@@ -182,18 +171,14 @@ defineExpose({ updateClipAndScale: setupScrollAnimation });
         <div class="overflow-hidden w-full h-full relative">
             <div ref="mediaRef" class="w-full h-full">
                 <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="w-full h-full object-cover object-center" />
-                <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center"><h2 class="font-canela text-brand-cream text-[13vw] tracking-tight">Righteous</h2></div>
+                <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center">
+                    <h2 class="font-canela text-brand-cream text-[13vw] tracking-tight">Righteous</h2>
+                </div>
             </div>
         </div>
     </section>
 </template>
 
 <style scoped>
-[ref='mediaWrapper'] {
-    will-change: clip-path;
-}
-
-[ref='imageRef'] {
-    will-change: transform;
-}
+/* Styles are now handled inline with will-change */
 </style>
