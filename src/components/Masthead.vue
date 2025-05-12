@@ -8,8 +8,13 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const mediaRef = ref(null);
 const mastheadRef = ref(null);
+const mastheadInnerRef = ref(null);
 const storiesRef = ref(null);
 const taglineRef = ref(null);
+const storyImage1Ref = ref(null);
+const storyImage2Ref = ref(null);
+const storyImage3Ref = ref(null);
+const storyImage4Ref = ref(null);
 const imageRef = ref(null);
 const copyRef = ref(null);
 const descriptionRef = ref(null);
@@ -62,73 +67,154 @@ const setupScrollAnimation = async () => {
     descriptionSplit = new SplitText(descriptionRef.value, { type: 'lines' });
     taglineSplit = new SplitText(taglineRef.value, { type: 'words, chars' });
 
-    tl.to(mediaRef.value, {
-        clipPath: `inset(${navHeight}px ${horizontalCropPercent}% ${copyHeight}px ${horizontalCropPercent}% round 8px)`,
-        ease: 'power2.out',
-    });
-    tl.to(
-        imageRef.value,
-        {
-            scale: 1.1,
-            ease: 'power1.in',
-        },
-        '<'
-    );
-    tl.to(
-        logoRef.value,
-        {
-            yPercent: 7,
-            ease: 'power1.out',
-        },
-        '<'
+    tl.add(
+        [
+            //
+            gsap.to(mediaRef.value, {
+                clipPath: `inset(${navHeight}px ${horizontalCropPercent}% ${copyHeight}px ${horizontalCropPercent}% round 8px)`,
+                ease: 'power2.out',
+                duration: 1,
+            }),
+
+            //
+            gsap.to(imageRef.value, { scale: 1.1, ease: 'power1.in', duration: 1 }),
+
+            //
+            gsap.to(logoRef.value, { yPercent: 7, ease: 'power1.out', duration: 1 }),
+        ],
+        '+=0.0'
     );
 
-    tl.fromTo(
-        descriptionSplit.lines,
-        { opacity: 0, y: 30 },
-        {
-            opacity: 1,
-            y: 0,
-            stagger: 0.15,
-            ease: 'power1.inOut',
-        },
-        '>-0.2'
-    );
+    tl.add(
+        [
+            gsap.fromTo(
+                descriptionSplit.lines,
+                { opacity: 0, y: 30 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.15,
+                    ease: 'power2.out',
+                    duration: 0.5,
+                }
+            ),
 
-    tl.fromTo(
-        handRef.value,
-        { opacity: 0, y: 50, rotation: 10 },
-        {
-            opacity: 1,
-            y: 0,
-            rotation: 0,
-            ease: 'back.inOut',
-        },
-        '>-0.4'
-    );
-
-    tl.fromTo(
-        [storiesRef.value, taglineRef.value],
-        { yPercent: 100, rotation: -30 },
-        {
-            yPercent: 0,
-            rotation: 1,
-            ease: 'power1.in',
-            duration: 2.8,
-            stagger: 0.2,
-        },
-        '>'
-    );
-
-    tl.to(
-        taglineSplit.chars,
-        {
-            color: 'white',
-            stagger: 0.01,
-            ease: 'power1.in',
-            duration: 0.01,
-        },
+            //
+            gsap.fromTo(
+                handRef.value,
+                { opacity: 0, y: 50, rotation: 10 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    rotation: 0,
+                    ease: 'back.inOut',
+                    duration: 1,
+                }
+            ),
+        ],
         '-=0.4'
+    );
+
+    tl.add(
+        [
+            //
+            gsap.fromTo(
+                storiesRef.value,
+                { yPercent: 200, rotation: -30 },
+                {
+                    yPercent: 0,
+                    rotation: 1,
+                    ease: 'power1.in',
+                    duration: 2,
+                }
+            ),
+
+            gsap.fromTo(
+                taglineRef.value,
+                { yPercent: 100, rotation: -30 },
+                {
+                    yPercent: 0,
+                    rotation: 1,
+                    ease: 'power1.in',
+                    duration: 2,
+                    delay: 0.5,
+                }
+            ),
+
+            //
+            gsap.to(mastheadInnerRef.value, {
+                scale: 0.9,
+                opacity: 0.6,
+                ease: 'power1.in',
+                duration: 2,
+            }),
+        ],
+        '+=1.0'
+    );
+
+    tl.add(
+        [
+            //
+            gsap.to(taglineSplit.chars, {
+                color: 'white',
+                stagger: 0.1,
+                ease: 'power1.in',
+                duration: 0.5,
+            }),
+
+            //
+            gsap.fromTo(
+                storyImage1Ref.value,
+                { yPercent: 100, rotation: -40 },
+                {
+                    yPercent: 0,
+                    rotation: -10,
+                    ease: 'power1.inOut',
+                    duration: 0.5,
+                    delay: 0.5,
+                }
+            ),
+
+            //
+            gsap.fromTo(
+                storyImage2Ref.value,
+                { yPercent: 100, rotation: -20 },
+                {
+                    yPercent: 0,
+                    rotation: 10,
+                    ease: 'power1.inOut',
+                    duration: 0.5,
+                    delay: 0.5,
+                }
+            ),
+
+            //
+            gsap.fromTo(
+                storyImage3Ref.value,
+                { yPercent: 100, rotation: -30 },
+                {
+                    yPercent: 0,
+                    rotation: -10,
+                    ease: 'power1.inOut',
+                    duration: 0.5,
+                    delay: 0.5,
+                }
+            ),
+
+            //
+            gsap.fromTo(
+                storyImage4Ref.value,
+                { yPercent: 100, rotation: -40 },
+                {
+                    yPercent: 0,
+                    rotation: -2,
+                    ease: 'power1.inOut',
+                    duration: 0.5,
+                    delay: 0.5,
+                }
+            ),
+        ],
+        '+=0.6'
     );
 
     console.log('Timeline duration:', tl.duration());
@@ -136,7 +222,7 @@ const setupScrollAnimation = async () => {
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: mastheadRef.value,
         start: 'top top',
-        end: '+=300%',
+        end: '+=400%',
         scrub: true,
         pin: true,
         pinSpacing: true,
@@ -186,35 +272,52 @@ onUnmounted(() => {
 
 <template>
     <section ref="mastheadRef" class="relative w-screen h-screen pointer-events-none">
-        <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
-            <div class="w-full grid grid-cols-wrapper">
-                <div class="relative col-main pb-12 pt-9 bg-brand-cream">
-                    <p ref="descriptionRef" class="text-brand-gray max-w-[530px] lg:max-w-[700px] font-helveticaDisplay font-medium text-[24px] lg:text-[28px] leading-7 lg:leading-9">
-                        <span class="text-black">We’re Righteous.</span><br />
-                        A small team of product and agency veterans, crafting clean strategy, smart UX, and tight code for brands and startups who want results -- without the pitch theater.
-                    </p>
-                    <div ref="handRef" class="mix-blend-exclusion absolute right-0 bottom-0 top-0">
-                        <img src="@/assets/images/skelehand.png" alt="Skelehand" class="h-full w-auto transform scale-110 opacity-10 md:opacity-100" />
+        <div ref="mastheadInnerRef" class="relative w-screen h-screen">
+            <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
+                <div class="w-full grid grid-cols-wrapper">
+                    <div class="relative col-main pb-12 pt-9 bg-brand-cream">
+                        <p ref="descriptionRef" class="text-brand-gray max-w-[530px] lg:max-w-[700px] font-helveticaDisplay font-medium text-[24px] lg:text-[28px] leading-7 lg:leading-9">
+                            <span class="text-black">We’re Righteous.</span><br />
+                            A small team of product and agency veterans, crafting clean strategy, smart UX, and tight code for brands and startups who want results -- without the pitch theater.
+                        </p>
+                        <div ref="handRef" class="mix-blend-exclusion absolute right-0 bottom-0 top-0">
+                            <img src="@/assets/images/skelehand.png" alt="Skelehand" class="h-full w-auto transform scale-110 opacity-10 md:opacity-100" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-hidden w-full h-full relative">
+                <div ref="mediaRef" class="w-full h-full">
+                    <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="w-full h-full object-cover object-center" />
+                    <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center">
+                        <h2 class="font-canela text-brand-cream text-[13vw] tracking-tight">Righteous</h2>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="overflow-hidden w-full h-full relative">
-            <div ref="mediaRef" class="w-full h-full">
-                <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="w-full h-full object-cover object-center" />
-                <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center">
-                    <h2 class="font-canela text-brand-cream text-[13vw] tracking-tight">Righteous</h2>
+        <div ref="storiesRef" class="absolute top-0 left-0 right-0 w-screen min-h-screen bg-brand-charcoal">
+            <div class="absolute inset-0 w-full h-full min-w-[1024px] lg:min-w-[1440px] left-1/2 transform -translate-x-1/2 lg:translate-y-[20%]">
+                <div ref="storyImage1Ref" class="absolute bottom-0 left-0 rounded-lg overflow-hidden w-[40%] z-20">
+                    <img src="@/assets/images/britny-fox.png" alt="Placeholder" class="w-full h-auto" />
+                </div>
+                <div ref="storyImage2Ref" class="absolute bottom-0 left-[25%] rounded-lg overflow-hidden w-[34%] z-30">
+                    <img src="@/assets/images/stussy.png" alt="Placeholder" class="w-full h-auto" />
+                </div>
+                <div ref="storyImage3Ref" class="absolute bottom-0 left-[50%] rounded-lg overflow-hidden w-[28%] z-40">
+                    <img src="@/assets/images/blondie.png" alt="Placeholder" class="w-full h-auto" />
+                </div>
+                <div ref="storyImage4Ref" class="absolute bottom-0 left-[75%] rounded-lg overflow-hidden w-[36%] z-10">
+                    <img src="@/assets/images/mtv.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section ref="storiesRef" class="fixed bottom-0 left-0 right-0 w-screen min-h-screen bg-brand-charcoal">
-        <div class="w-full grid grid-cols-wrapper">
-            <div class="relative col-main pt-[18vh]">
-                <p ref="taglineRef" class="text-brand-gray max-w-[530px] lg:max-w-[650px] font-helveticaDisplay font-light text-[24px] lg:text-[40px] leading-7 lg:leading-[1.25] tracking-tight">
-                    We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
-                </p>
+            <div class="relative w-full grid grid-cols-wrapper">
+                <div class="relative col-main pt-[14vh] lg:pt-[18vh]">
+                    <p ref="taglineRef" class="text-brand-gray max-w-[650px] font-helveticaDisplay font-light text-[34px] lg:text-[40px] leading-[1.125] lg:leading-[1.25] tracking-tight">
+                        We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
+                        <br />
+                        <span class="inline-block font-grotesk text-[12px] bg-[#323231] px-3 py-1 rounded-sm font-medium tracking-widest">ATLANTA + ST. LOUIS</span>
+                    </p>
+                </div>
             </div>
         </div>
     </section>
