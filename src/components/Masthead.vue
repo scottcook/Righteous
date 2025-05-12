@@ -165,7 +165,7 @@ defineExpose({ updateClipAndScale: setupScrollAnimation });
 </script>
 
 <template>
-    <section ref="sectionRef" class="relative w-screen h-screen pointer-events-none">
+    <section ref="sectionRef" class="relative w-screen h-screen pointer-events-none min-h-[720px]">
         <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
             <div class="w-full grid grid-cols-wrapper">
                 <div class="relative col-main pb-12 pt-9 bg-brand-cream">
@@ -182,7 +182,7 @@ defineExpose({ updateClipAndScale: setupScrollAnimation });
         <div class="overflow-hidden w-full h-full relative">
             <div ref="mediaRef" class="w-full h-full">
                 <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="w-full h-full object-cover object-center" />
-                <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center"><h2 class="font-canela text-white text-[13vw] tracking-tight">Righteous</h2></div>
+                <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center"><h2 class="font-canela text-brand-cream text-[13vw] tracking-tight">Righteous</h2></div>
             </div>
         </div>
     </section>
