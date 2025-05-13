@@ -32,9 +32,10 @@ onMounted(() => {
         ScrollSmoother.create({
             wrapper: '#smooth-wrapper',
             content: '#smooth-content',
-            smooth: 1.2,
+            smooth: 1.25,
             effects: true,
             normalizeScroll: true,
+            ease: 'power3.out',
             smoothTouch: 0.1,
         });
     }
