@@ -18,6 +18,7 @@ const storyImage3Ref = ref(null);
 const storyImage4Ref = ref(null);
 const storyImage5Ref = ref(null);
 const imageRef = ref(null);
+const videoRef = ref(null);
 const copyRef = ref(null);
 const descriptionRef = ref(null);
 const handRef = ref(null);
@@ -32,7 +33,15 @@ const resizeTick = inject('resizeTick');
 
 watch(resizeTick, () => {
     setupScrollAnimation();
+    // Ensure video is resumed if applicable after resize
+    if (videoRef.value && ScrollTrigger.getById('mastheadTrigger')?.progress <= 0.5) {
+        videoRef.value.play();
+    }
 });
+
+const handleVideoReady = () => {
+    gsap.to(imageRef.value, { opacity: 0, duration: 1, ease: 'power2.out' });
+};
 
 const getClipSettings = () => {
     const screenWidth = window.innerWidth;
@@ -55,7 +64,7 @@ const setupScrollAnimation = async () => {
     descriptionSplit && descriptionSplit.revert();
 
     gsap.set(mediaRef.value, { clipPath: 'inset(0px 0px 0px 0px round 0px)', willChange: 'clip-path' });
-    gsap.set(imageRef.value, { scale: 1, willChange: 'transform' });
+    gsap.set(imageRef.value, { scale: 1, willChange: 'transform', opacity: 1 });
     gsap.set(descriptionRef.value, { opacity: 1 });
     gsap.set(handRef.value, { opacity: 0 });
 
@@ -281,11 +290,18 @@ const setupScrollAnimation = async () => {
         scrub: true,
         pin: true,
         pinSpacing: true,
-
         animation: tl,
         onUpdate: (self) => {
             isNavZActive.value = self.progress > 0.025;
             isNavInverted.value = self.progress > 0.5;
+
+            if (videoRef.value) {
+                if (self.progress > 0.5) {
+                    videoRef.value.pause();
+                } else {
+                    videoRef.value.play();
+                }
+            }
         },
         onLeave: () => {
             isNavZActive.value = true;
@@ -349,7 +365,11 @@ onUnmounted(() => {
             </div>
             <div class="overflow-hidden w-full h-full relative">
                 <div ref="mediaRef" class="w-full h-full">
-                    <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="w-full h-full object-cover object-center" />
+                    <video ref="videoRef" autoplay muted loop playsinline @canplay="handleVideoReady" class="absolute inset-0 w-full h-full object-cover object-center">
+                        <source src="@/assets/videos/righteous-hero2.mp4" type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                    <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="absolute inset-0 w-full h-full object-cover object-center" />
                     <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center">
                         <h2 class="font-canela text-brand-cream text-[13vw] tracking-tight">Righteous</h2>
                     </div>
