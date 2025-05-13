@@ -95,8 +95,8 @@ onMounted(() => {
                     <header class="py-4 lg:py-7 flex justify-between">
                         <a
                             href=""
-                            class="pointer-events-auto text-[24px] lg:text-[30px] origin-left font-canela font-black transition-colors ease-in-out duration-500"
-                            :class="isMenuOpen ? 'text-white' : 'text-black'"
+                            class="nav-logo pointer-events-auto text-[24px] lg:text-[30px] origin-left font-canela font-black transition-colors ease-in-out duration-500"
+                            :class="isMenuOpen ? 'text-white' : ''"
                             >Righteous</a
                         >
                         <Transition @enter="menuTransitionEnter" @leave="menuTransitionLeave" v-bind:css="false">
@@ -116,7 +116,7 @@ onMounted(() => {
                             </nav>
                         </Transition>
                         <div class="pointer-events-auto flex w-7 items-center justify-end" v-if="!isDesktop">
-                            <button @click="toggleMenu" type="button" class="relative focus:outline-none" :class="isMenuOpen ? 'text-white' : 'text-brand-charcoal'">
+                            <button @click="toggleMenu" type="button" class="nav-menu-toggle relative focus:outline-none" :class="isMenuOpen ? 'text-white' : ''">
                                 <svg class="h-7 w-7 fill-current stroke-current" enable-background="new 0 0 40 40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                     <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
                                         <path d="m2 8h36" class="origin-20" :class="isMenuOpen ? '-translate-x-1 rotate-[45deg]' : 'rotate-0'" />
@@ -195,5 +195,21 @@ svg path {
 .nav-header-wrapper.header-inverted nav li > a.header-nav-item.active {
     @apply text-white lg:text-black lg:bg-opacity-100 lg:bg-[#EFECE6];
     border-radius: 22px;
+}
+
+.nav-header-wrapper .nav-menu-toggle {
+    @apply text-brand-charcoal;
+}
+
+.nav-header-wrapper.header-inverted .nav-menu-toggle {
+    @apply text-white;
+}
+
+.nav-header-wrapper .nav-logo {
+    @apply text-brand-charcoal;
+}
+
+.nav-header-wrapper.header-inverted .nav-logo {
+    @apply text-white;
 }
 </style>
