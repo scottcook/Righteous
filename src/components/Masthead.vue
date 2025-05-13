@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue';
+import { isNavZActive, isNavInverted } from '@/composables/useScrollState';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import SplitText from '@/utils/gsap-premium/src/SplitText';
@@ -32,16 +33,6 @@ const resizeTick = inject('resizeTick');
 watch(resizeTick, () => {
     setupScrollAnimation();
 });
-
-const toggleNavZ = (show) => {
-    const nav = document.querySelector('#nav');
-    if (nav) nav.classList.toggle('z-50', show);
-};
-
-const toggleNavInvert = (invert) => {
-    const nav = document.querySelector('.nav-header-wrapper');
-    if (nav) nav.classList.toggle('header-inverted', invert);
-};
 
 const getClipSettings = () => {
     const screenWidth = window.innerWidth;
@@ -290,14 +281,18 @@ const setupScrollAnimation = async () => {
         scrub: true,
         pin: true,
         pinSpacing: true,
-        onUpdate: (self) => {
-            // These will have to change based on timeline changing.
-            toggleNavZ(self.progress > 0.025);
-            toggleNavInvert(self.progress > 0.5);
-        },
+
         animation: tl,
-        onLeave: () => toggleNavZ(true),
-        onLeaveBack: () => toggleNavZ(false),
+        onUpdate: (self) => {
+            isNavZActive.value = self.progress > 0.025;
+            isNavInverted.value = self.progress > 0.5;
+        },
+        onLeave: () => {
+            isNavZActive.value = true;
+        },
+        onLeaveBack: () => {
+            isNavZActive.value = false;
+        },
     });
 };
 

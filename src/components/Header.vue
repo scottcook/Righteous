@@ -1,17 +1,13 @@
 <script setup>
 import gsap from 'gsap';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
+import { isNavZActive, isNavInverted } from '@/composables/useScrollState';
+import SplitText from '@/utils/gsap-premium/src/SplitText';
+let logoSplit = null;
 
-// import ScrollTrigger from 'gsap/ScrollTrigger';
-// import { SplitText } from '@/utils/gsap-premium/src/SplitText.js';
-
-// gsap.registerPlugin(ScrollTrigger, SplitText);
-
-// These are VueUse utilities that return a reactive value that will update when the query changes
 const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-// Refs for managing internal state
 const isMenuOpen = ref(false);
 const navItems = ref([
     { id: 'services', label: 'Services' },
@@ -20,29 +16,87 @@ const navItems = ref([
     { id: 'contact', label: 'Contact' },
 ]);
 
-// This is a template ref
 const navWrapper = ref(null);
+const logoRef = ref(null);
+
+const toggleNavZ = (show) => {
+    const nav = document.querySelector('#nav');
+    if (nav) nav.classList.toggle('z-50', show);
+};
+
+const toggleNavInvert = (invert) => {
+    const nav = document.querySelector('.nav-header-wrapper');
+    if (nav) nav.classList.toggle('header-inverted', invert);
+
+    if (invert) {
+        const charsToFade = [...logoSplit.chars].slice(1).reverse(); // all but first, reversed
+        gsap.to(charsToFade, {
+            opacity: 0,
+            stagger: 0.01,
+            ease: 'cubic.out',
+            duration: 0.3,
+        });
+        gsap.to('.nav-logo-text', {
+            x: 12,
+            ease: 'cubic.out',
+            duration: 0.3,
+        });
+        gsap.fromTo(
+            '.nav-logo-bg',
+            { opacity: 0, scale: 0 },
+            {
+                opacity: 1,
+                scale: 1,
+                ease: 'back.out',
+                duration: 0.3,
+            }
+        );
+    } else {
+        const charsToFade = [...logoSplit.chars].slice(1); // same chars, same order
+        gsap.to(charsToFade, {
+            opacity: 1,
+            stagger: 0.03,
+            ease: 'cubic.out',
+            duration: 0.6,
+        });
+        gsap.to('.nav-logo-text', {
+            x: 0,
+            ease: 'cubic.out',
+            duration: 0.3,
+        });
+        gsap.fromTo(
+            '.nav-logo-bg',
+            { opacity: 1, scale: 1 },
+            {
+                opacity: 0,
+                scale: 0,
+                ease: 'back.out',
+                duration: 0.5,
+            }
+        );
+    }
+};
+
+// 👇 Reactively trigger your header class logic
+watch(isNavZActive, toggleNavZ);
+watch(isNavInverted, toggleNavInvert);
 
 function toggleMenu() {
-    // console.log('toggleMenu', isMenuOpen.value);
-
-    if (isDesktop.value === false) {
+    if (!isDesktop.value) {
         isMenuOpen.value = !isMenuOpen.value;
     } else {
-        // Always visible on desktop
         isMenuOpen.value = true;
     }
 }
 
 function closeMenu() {
-    if (isDesktop.value === false) {
+    if (!isDesktop.value) {
         isMenuOpen.value = false;
     }
 }
 
 function menuTransitionEnter(el, done) {
     let q = gsap.utils.selector(navWrapper.value);
-
     gsap.fromTo(
         [q('nav'), q('nav li')],
         {
@@ -63,7 +117,6 @@ function menuTransitionEnter(el, done) {
 
 function menuTransitionLeave(el, done) {
     let q = gsap.utils.selector(navWrapper.value);
-
     gsap.to([q('nav li').reverse(), q('nav')], {
         x: 120,
         opacity: 0,
@@ -75,13 +128,21 @@ function menuTransitionLeave(el, done) {
 }
 
 const showMenu = computed(() => {
-    // console.log(isMenuOpen.value || isDesktop.value);
     return isMenuOpen.value || isDesktop.value;
 });
 
-onMounted(() => {
-    // Open by default on desktop
-    // isMenuOpen.value = isDesktop.value;
+const setupLogoAnimation = async () => {
+    await nextTick();
+
+    logoSplit && logoSplit.revert();
+
+    gsap.set(logoRef.value, { opacity: 1 });
+
+    logoSplit = new SplitText(logoRef.value, { type: 'chars' });
+};
+
+onMounted(async () => {
+    await setupLogoAnimation();
 });
 </script>
 
@@ -95,9 +156,10 @@ onMounted(() => {
                     <header class="py-4 lg:py-7 flex justify-between">
                         <a
                             href=""
-                            class="nav-logo pointer-events-auto text-[24px] lg:text-[30px] origin-left font-canela font-black transition-colors ease-in-out duration-500"
-                            :class="isMenuOpen ? 'text-white' : ''"
-                            >Righteous</a
+                            ref="logoRef"
+                            class="relative pointer-events-auto text-[24px] lg:text-[30px] origin-left font-canela font-black transition-colors ease-in-out duration-500 text-black"
+                            ><span class="absolute w-[46px] h-[46px] rounded-full bg-brand-cream left-0 nav-logo-bg opacity-0"></span
+                            ><span class="relative block whitespace-nowrap nav-logo-text">Righteous</span></a
                         >
                         <Transition @enter="menuTransitionEnter" @leave="menuTransitionLeave" v-bind:css="false">
                             <nav
@@ -202,14 +264,6 @@ svg path {
 }
 
 .nav-header-wrapper.header-inverted .nav-menu-toggle {
-    @apply text-white;
-}
-
-.nav-header-wrapper .nav-logo {
-    @apply text-brand-charcoal;
-}
-
-.nav-header-wrapper.header-inverted .nav-logo {
     @apply text-white;
 }
 </style>
