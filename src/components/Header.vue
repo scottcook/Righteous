@@ -171,7 +171,29 @@ svg path {
     }
 }
 
-nav li > a.header-nav-item {
-    @apply relative flex items-center px-3 py-3 rounded-sm font-helveticaDisplay font-medium uppercase leading-none tracking-[0.025em] text-white lg:text-black text-[16px] lg:text-[12px] lg:bg-[#EFECE6];
+.nav-header-wrapper nav li > a.header-nav-item {
+    @apply relative flex items-center px-3 py-3 font-helveticaDisplay font-medium uppercase leading-none tracking-[0.025em] text-white lg:text-black text-[16px] lg:text-[12px] bg-opacity-10 lg:bg-opacity-100 bg-[#EFECE6];
+
+    border-radius: 2px;
+    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.nav-header-wrapper nav li > a.header-nav-item:hover,
+.nav-header-wrapper nav li > a.header-nav-item.active {
+    @apply text-white lg:text-white bg-black;
+    border-radius: 22px;
+}
+
+.nav-header-wrapper.header-inverted nav li > a.header-nav-item {
+    @apply lg:bg-opacity-10 lg:text-white;
+
+    border-radius: 2px;
+    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.nav-header-wrapper.header-inverted nav li > a.header-nav-item:hover,
+.nav-header-wrapper.header-inverted nav li > a.header-nav-item.active {
+    @apply text-white lg:text-black lg:bg-opacity-100 lg:bg-[#EFECE6];
+    border-radius: 22px;
 }
 </style>

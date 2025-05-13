@@ -38,6 +38,11 @@ const toggleNavZ = (show) => {
     if (nav) nav.classList.toggle('z-50', show);
 };
 
+const toggleNavInvert = (invert) => {
+    const nav = document.querySelector('.nav-header-wrapper');
+    if (nav) nav.classList.toggle('header-inverted', invert);
+};
+
 const getClipSettings = () => {
     const screenWidth = window.innerWidth;
     const maxWidth = 1440;
@@ -278,8 +283,6 @@ const setupScrollAnimation = async () => {
         '+=1.0'
     );
 
-    console.log('Timeline duration:', tl.duration());
-
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: mastheadRef.value,
         start: 'top top',
@@ -288,7 +291,9 @@ const setupScrollAnimation = async () => {
         pin: true,
         pinSpacing: true,
         onUpdate: (self) => {
-            toggleNavZ(self.progress > 0.15);
+            // These will have to change based on timeline changing.
+            toggleNavZ(self.progress > 0.025);
+            toggleNavInvert(self.progress > 0.5);
         },
         animation: tl,
         onLeave: () => toggleNavZ(true),
