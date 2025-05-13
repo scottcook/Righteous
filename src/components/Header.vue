@@ -154,10 +154,7 @@ onMounted(async () => {
                 <div class="overlay-menu fixed inset-0 block w-full lg:hidden" :class="isMenuOpen ? 'open' : 'pointer-events-none'"></div>
                 <div class="nav-header-wrapper" ref="navWrapper">
                     <header class="py-4 lg:py-7 flex justify-between">
-                        <a
-                            href=""
-                            ref="logoRef"
-                            class="relative pointer-events-auto text-[24px] lg:text-[30px] origin-left font-canela font-black transition-colors ease-in-out duration-500 text-black"
+                        <a href="" ref="logoRef" class="relative pointer-events-auto text-[30px] origin-left font-canela font-black transition-colors ease-in-out duration-500 text-black"
                             ><span class="absolute w-[46px] h-[46px] rounded-full bg-brand-cream left-0 nav-logo-bg opacity-0"></span
                             ><span class="relative block whitespace-nowrap nav-logo-text">Righteous</span></a
                         >
