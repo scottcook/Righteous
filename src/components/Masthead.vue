@@ -15,6 +15,7 @@ const storyImage1Ref = ref(null);
 const storyImage2Ref = ref(null);
 const storyImage3Ref = ref(null);
 const storyImage4Ref = ref(null);
+const storyImage5Ref = ref(null);
 const imageRef = ref(null);
 const copyRef = ref(null);
 const descriptionRef = ref(null);
@@ -57,7 +58,7 @@ const setupScrollAnimation = async () => {
     taglineSplit && taglineSplit.revert();
     descriptionSplit && descriptionSplit.revert();
 
-    gsap.set(mediaRef.value, { clipPath: 'inset(0% 0% 0% 0% round 0px)', willChange: 'clip-path' });
+    gsap.set(mediaRef.value, { clipPath: 'inset(0px 0px 0px 0px round 0px)', willChange: 'clip-path' });
     gsap.set(imageRef.value, { scale: 1, willChange: 'transform' });
     gsap.set(descriptionRef.value, { opacity: 1 });
     gsap.set(handRef.value, { opacity: 0 });
@@ -222,6 +223,61 @@ const setupScrollAnimation = async () => {
         '-=0.6'
     );
 
+    tl.add(
+        [
+            //
+            gsap.to(storyImage1Ref.value, {
+                xPercent: -60,
+                rotation: -16,
+                ease: 'back.out(0.7)',
+                duration: 1.6,
+                delay: 0.0,
+            }),
+
+            //
+            gsap.to(storyImage2Ref.value, {
+                xPercent: -55,
+                rotation: 2,
+                ease: 'back.out(0.7)',
+                duration: 1.6,
+                delay: 0.2,
+            }),
+
+            //
+            gsap.to(storyImage3Ref.value, {
+                xPercent: 60,
+                rotation: -4,
+                ease: 'back.out(0.7)',
+                duration: 1.6,
+                delay: 0.0,
+            }),
+
+            //
+            gsap.to(storyImage4Ref.value, {
+                xPercent: 45,
+                rotation: 4,
+                ease: 'back.out(0.7)',
+                duration: 1.6,
+                delay: 0.2,
+            }),
+
+            //
+            gsap.fromTo(
+                storyImage5Ref.value,
+                { yPercent: 85, rotation: -40, opacity: 0 },
+                {
+                    yPercent: -12,
+                    rotation: 2,
+                    opacity: 1,
+                    ease: 'back.out(0.7)',
+                    duration: 1.6,
+                    delay: 0.6,
+                }
+            ),
+        ],
+        '+=1.0'
+    );
+
     console.log('Timeline duration:', tl.duration());
 
     scrollTriggerInstance = ScrollTrigger.create({
@@ -308,6 +364,37 @@ onUnmounted(() => {
                 <div ref="storyImage2Ref" class="absolute top-0 left-[25%] rounded-lg overflow-hidden w-[34%] z-30">
                     <img src="@/assets/images/stussy.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
+                <div ref="storyImage5Ref" class="absolute top-0 left-[50%] w-[45%] sm:w-[50%] z-50">
+                    <div class="transform -translate-x-1/2 rounded-lg overflow-hidden">
+                        <img src="@/assets/images/team.png" alt="Placeholder" class="w-full h-auto" />
+                        <div class="bg-[#FD26B7] absolute inset-0 mix-blend-multiply"></div>
+                        <div
+                            class="absolute top-1/2 left-1/2 sm:translate-x-0 -translate-x-1/2 sm:left-0 w-3/5 transform sm:-translate-y-1/2 flex gap-1 sm:gap-4 flex-col sm:flex-row sm:w-full p-4 tracking-wider"
+                        >
+                            <div class="bg-brand-charcoal flex-1 rounded-md text-white px-2 py-2 leading-tight sm:leading-snug font-grotesk text-[12px] transform sm:translate-x-0 -translate-x-1/4">
+                                <p>Ash Warren</p>
+                                <p class="text-[10px]">Development</p>
+                                <p class="uppercase text-brand-pink mt-1">Hosoi</p>
+                            </div>
+                            <div class="bg-brand-charcoal flex-1 rounded-md text-white px-2 py-2 leading-tight sm:leading-snug font-grotesk text-[12px]">
+                                <p>Jeff Black</p>
+                                <p class="text-[10px]">Director</p>
+                                <p class="uppercase text-brand-pink mt-1">Roskopp</p>
+                            </div>
+                            <div class="bg-brand-charcoal flex-1 rounded-md text-white px-2 py-2 leading-tight sm:leading-snug font-grotesk text-[12px] transform sm:translate-x-0 translate-x-1/4">
+                                <p>Scott Cook</p>
+                                <p class="text-[10px]">Creative</p>
+                                <p class="uppercase text-brand-pink mt-1">Hawk</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute top-0 transform -translate-y-full py-2 tracking-wider w-[37.5%] sm:w-1/2 text-right">
+                        <div class="text-white leading-snug font-grotesk text-[8px] sm:text-[10px]">
+                            <p class="uppercase text-brand-pink">Close, But No Cigar</p>
+                            <p class="mt-1">This is what AI thinks we look like. 👎🏻 <br />This is why you still need us.</p>
+                        </div>
+                    </div>
+                </div>
                 <div ref="storyImage3Ref" class="absolute top-0 left-[50%] rounded-lg overflow-hidden w-[28%] z-40">
                     <img src="@/assets/images/blondie.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
@@ -316,8 +403,11 @@ onUnmounted(() => {
                 </div>
             </div>
             <div class="relative w-full grid grid-cols-wrapper">
-                <div class="relative col-main pt-[14vh] lg:pt-[18vh]">
-                    <p ref="taglineRef" class="text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[34px] lg:text-[40px] leading-[1.125] lg:leading-[1.25] tracking-tight">
+                <div class="relative col-main pt-[12vh] lg:pt-[18vh]">
+                    <p
+                        ref="taglineRef"
+                        class="text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[30px] sm:text-[34px] lg:text-[40px] leading-[1.125] lg:leading-[1.25] tracking-tight"
+                    >
                         We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
                         <br />
                         <span class="inline-block font-grotesk text-[12px] bg-[#323231] px-3 py-1 rounded-sm font-medium tracking-widest">ATLANTA + ST. LOUIS</span>
