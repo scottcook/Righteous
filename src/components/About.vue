@@ -1,12 +1,17 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue';
+import { isNavInverted } from '@/composables/useScrollState';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import SplitText from '@/utils/gsap-premium/src/SplitText';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
-const sectionRef = ref(null);
+const aboutRef = ref(null);
+const taglineRef = ref(null);
+
 let scrollTriggerInstance = null;
+let taglineSplit = null;
 
 const resizeTick = inject('resizeTick');
 
@@ -18,6 +23,51 @@ const setupScrollAnimation = async () => {
     await nextTick();
 
     scrollTriggerInstance?.kill();
+    taglineSplit && taglineSplit.revert();
+
+    const tl = gsap.timeline({ paused: true });
+
+    taglineSplit = new SplitText(taglineRef.value, { type: 'lines' });
+
+    tl.add(
+        [
+            //
+            gsap.fromTo(
+                taglineSplit.lines,
+                { opacity: 0, y: 30 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.15,
+                    ease: 'power2.out',
+                    duration: 0.5,
+                }
+            ),
+        ],
+        '+=0.0'
+    );
+
+    scrollTriggerInstance = ScrollTrigger.create({
+        trigger: aboutRef.value,
+        start: 'top top',
+        end: '+=100%',
+        scrub: true,
+        pin: true,
+        pinSpacing: true,
+        animation: tl,
+        onUpdate: (self) => {
+            // isNavInverted.value = self.progress > 0.385;
+        },
+        onEnter: () => {
+            isNavInverted.value = false;
+        },
+        // onLeave: () => {
+        //     isNavZActive.value = true;
+        // },
+        onLeaveBack: () => {
+            isNavInverted.value = true;
+        },
+    });
 };
 
 onMounted(async () => {
@@ -26,6 +76,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
     scrollTriggerInstance?.kill();
+
+    taglineSplit && taglineSplit.revert();
 });
 </script>
 

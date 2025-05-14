@@ -33,7 +33,7 @@ onMounted(() => {
             wrapper: '#smooth-wrapper',
             content: '#smooth-content',
             smooth: 1.25,
-            effects: true,
+            effects: false,
             normalizeScroll: true,
             ease: 'power3.out',
             smoothTouch: 0.1,

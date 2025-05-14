@@ -363,6 +363,8 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+    scrollTriggerInstance?.kill();
+
     taglineSplit && taglineSplit.revert();
     logoSplit && logoSplit.revert();
     descriptionSplit && descriptionSplit.revert();
