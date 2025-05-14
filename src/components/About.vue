@@ -16,8 +16,54 @@ const glareRef = ref(null);
 
 let scrollTriggerInstance = null;
 let taglineSplit = null;
+const isRotating = ref(true);
+const logoCircleRef = ref(null);
+const logoCircleInnerRef = ref(null);
+let rotationTween = null;
 
 const resizeTick = inject('resizeTick');
+
+const startRotation = () => {
+    if (rotationTween) return;
+
+    const logos = logoCircleInnerRef.value?.querySelectorAll('.rotating-logo') || [];
+
+    rotationTween = gsap.to(
+        {},
+        {
+            duration: 60,
+            repeat: -1,
+            ease: 'linear',
+            onUpdate: () => {
+                const angle = (performance.now() / 1000 / 60) * 360;
+                logos.forEach((el, index) => {
+                    const baseAngle = (360 / logos.length) * index;
+                    const totalAngle = angle + baseAngle;
+                    const x = Math.cos((totalAngle * Math.PI) / 180) * (logoCircleInnerRef.value.offsetWidth / 2);
+                    const y = Math.sin((totalAngle * Math.PI) / 180) * (logoCircleInnerRef.value.offsetHeight / 2);
+
+                    const depthScale = gsap.utils.mapRange(-logoCircleInnerRef.value.offsetHeight / 2, logoCircleInnerRef.value.offsetHeight / 2, 1, 0.0, y);
+
+                    gsap.set(el, {
+                        x,
+                        y,
+                        scale: depthScale,
+                        zIndex: Math.round(depthScale * 100),
+                        rotation: 0,
+                    });
+                });
+            },
+        }
+    );
+};
+
+const stopRotation = () => {
+    if (rotationTween) {
+        rotationTween.kill();
+        rotationTween = null;
+    }
+};
+
 const tiltEffectEnabled = ref(false);
 let bounds = null;
 
@@ -112,17 +158,8 @@ const enableCardTilt = () => {
         });
     };
 
-    const handleCardClick = () => {
-        gsap.to($card, {
-            rotationY: '+=360',
-            ease: 'back.inOut(0.7)',
-            duration: 1.2,
-        });
-    };
-
     $card.addEventListener('mouseenter', handleMouseEnter);
     $card.addEventListener('mouseleave', handleMouseLeave);
-    $card.addEventListener('click', handleCardClick);
 
     tiltEffectEnabled.value = true;
 };
@@ -179,7 +216,6 @@ const setupScrollAnimation = async () => {
 
     tl.add(
         [
-            //
             gsap.fromTo(
                 cardInnerRef.value,
                 { yPercent: -105, rotation: 23, opacity: 0, transformOrigin: '50% 50%' },
@@ -195,8 +231,6 @@ const setupScrollAnimation = async () => {
                     },
                 }
             ),
-
-            //
             gsap.fromTo(
                 cardShadowRef.value,
                 { yPercent: 105, rotation: -23, opacity: 0, transformOrigin: '50% 50%' },
@@ -214,6 +248,22 @@ const setupScrollAnimation = async () => {
         '-=0.8'
     );
 
+    tl.add(
+        [
+            gsap.fromTo(
+                logoCircleRef.value,
+                { yPercent: 100, opacity: 0 },
+                {
+                    yPercent: 0,
+                    opacity: 1,
+                    ease: 'power2.out',
+                    duration: 2,
+                }
+            ),
+        ],
+        '+=0.0'
+    );
+
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: aboutRef.value,
         start: 'top top',
@@ -223,9 +273,17 @@ const setupScrollAnimation = async () => {
         pinSpacing: true,
         animation: tl,
         onEnter: () => {
+            startRotation();
             isNavInverted.value = false;
         },
+        onEnterBack: () => {
+            startRotation();
+        },
+        onLeave: () => {
+            // stopRotation();
+        },
         onLeaveBack: () => {
+            stopRotation();
             isNavInverted.value = true;
         },
     });
@@ -233,32 +291,38 @@ const setupScrollAnimation = async () => {
 
 onMounted(async () => {
     await setupScrollAnimation();
+    startRotation();
 });
 
 onUnmounted(() => {
     scrollTriggerInstance?.kill();
     taglineSplit && taglineSplit.revert();
     disableCardTilt();
+    stopRotation();
+});
+
+watch(isRotating, (val) => {
+    val ? startRotation() : stopRotation();
 });
 </script>
 
 <template>
     <section ref="aboutRef" class="relative w-screen min-h-screen">
-        <div ref="aboutInnerRef" class="relative w-screen h-screen bg-brand-cream">
+        <div ref="aboutInnerRef" class="relative w-screen h-auto min-h-screen bg-brand-cream flex flex-col justify-between">
             <div class="relative w-full grid grid-cols-wrapper">
-                <div class="relative col-main pt-[12vh] lg:pt-[24vh] flex justify-between">
+                <div class="relative col-main pt-[12vh] lg:pt-[24vh] flex flex-col lg:flex-row justify-between lg:gap-8 h-[66vh]">
                     <p
                         ref="taglineRef"
-                        class="text-brand-charcoal max-w-[700px] font-helveticaDisplay font-light text-[30px] sm:text-[34px] lg:text-[40px] leading-[1.25] tracking-tight flex-shrink-0 ml-12"
+                        class="text-brand-charcoal max-w-[540px] lg:max-w-[700px] font-helveticaDisplay font-light text-[24px] md:text-[34px] lg:text-[3\6px] xl:text-[40px] leading-[1.25] tracking-tight flex-shrink-0 lg:ml-6 xl:ml-12"
                     >
                         We’ve done time inside big agencies and product monoliths. We’ve sat through the 90-slide decks.<br /><span class="font-medium mt-10 block"
                             >We formed Righteous to be the antidote.</span
                         >
                     </p>
-                    <div ref="cardRef" class="relative flex-shrink-0 w-[256px] h-[360px] mr-12">
+                    <div ref="cardRef" class="relative flex-shrink-0 w-[204px] lg:w-[256px] h-[280px] lg:h-[360px] mt-12 md:mt-auto ml-auto mr-6 xl:mr-12">
                         <div
                             ref="cardInnerRef"
-                            class="relative rounded-xl overflow-hidden text-center py-12 leading-none bg-brand-charcoal text-white font-grotesk uppercase text-[28px] flex flex-col justify-between items-center w-full h-full"
+                            class="relative rounded-xl overflow-hidden text-center py-12 leading-none bg-brand-charcoal text-white font-grotesk uppercase text-[20px] lg:text-[28px] flex flex-col justify-between items-center w-full h-full"
                         >
                             <div class="absolute top-5 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-white"></div>
                             <div class="absolute bottom-5 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-white"></div>
@@ -269,20 +333,39 @@ onUnmounted(() => {
                                 <p>Marketing</p>
                                 <p>Kickflips</p>
                             </div>
-                            <div class="inline-flex items-center justify-center bg-[#E336AB] rounded-full w-[64px] h-[64px] mt-auto">
-                                <span class="font-canela font-black text-[38px] text-black">R</span>
+                            <div class="inline-flex items-center justify-center bg-[#E336AB] rounded-full w-[48px] h-[48px] lg:w-[64px] lg:h-[64px] mt-auto">
+                                <span class="font-canela font-black text-[28px] lg:text-[38px] text-black">R</span>
                             </div>
                             <div ref="glareRef" class="absolute w-full h-full inset-0"></div>
                         </div>
                         <div
                             ref="cardShadowRef"
-                            class="relative rounded-xl overflow-hidden w-full h-full blur"
+                            class="relative rounded-xl overflow-hidden w-full h-full blur-sm"
                             style="background-image: linear-gradient(to bottom, rgba(21, 21, 21, 0.1) 0%, rgba(21, 21, 21, 0) 30%)"
                         ></div>
                     </div>
                 </div>
             </div>
+            <div class="relative col-main">
+                <div class="relative w-full min-w-[1024px] max-w-[1280px] h-[33vh] mx-auto">
+                    <div ref="logoCircleRef" class="absolute w-full h-[600px] mx-auto z-10 top-12">
+                        <div ref="logoCircleInnerRef" class="absolute inset-0 flex items-center justify-center w-full h-full">
+                            <div
+                                v-for="(logo, index) in 10"
+                                :key="index"
+                                class="rotating-logo"
+                                :style="{
+                                    position: 'absolute',
+                                }"
+                            >
+                                <img src="@/assets/images/logo-example.png" alt="Logo" class="min-w-[150px] max-w-[300px] w-[20vw] h-autos" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        <div class="absolute w-full h-[100px] bottom-0 left-0 right-0 z-20" style="background-image: linear-gradient(to bottom, rgba(245, 244, 235, 0) 0%, rgba(245, 244, 235, 1) 50%)"></div>
     </section>
 </template>
 
