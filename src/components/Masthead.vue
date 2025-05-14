@@ -237,7 +237,7 @@ const setupScrollAnimation = async () => {
         [
             //
             gsap.to(storyImage1Ref.value, {
-                xPercent: -60,
+                xPercent: -55,
                 rotation: -16,
                 ease: 'power2.inOut',
                 duration: 2.0,
@@ -399,8 +399,8 @@ onUnmounted(() => {
             </div>
         </div>
         <div ref="storiesRef" class="absolute top-0 left-0 right-0 w-screen min-h-screen">
-            <div class="absolute top-1/2 right-0 bottom-0 w-full h-1/2 min-w-[1024px] lg:min-w-[1440px] left-1/2 transform -translate-x-1/2 lg:translate-y-[20%]">
-                <div ref="storyImage1Ref" class="absolute top-0 left-0 rounded-lg overflow-hidden w-[40%] z-20 shadow-2xl">
+            <div class="absolute top-1/2 right-0 bottom-0 h-1/2 w-[1024px] lg:w-[1440px] left-1/2 transform -translate-x-1/2 lg:translate-y-[20%]">
+                <div ref="storyImage1Ref" class="absolute top-0 left-[-5%] rounded-lg overflow-hidden w-[40%] z-20 shadow-2xl">
                     <img src="@/assets/images/britny-fox.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
                 <div ref="storyImage2Ref" class="absolute top-0 left-[25%] rounded-lg overflow-hidden w-[32%] z-30 shadow-2xl">
@@ -440,12 +440,12 @@ onUnmounted(() => {
                 <div ref="storyImage3Ref" class="absolute top-0 left-[50%] rounded-lg overflow-hidden w-[28%] z-40 shadow-2xl">
                     <img src="@/assets/images/blondie.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
-                <div ref="storyImage4Ref" class="absolute top-0 left-[75%] rounded-lg overflow-hidden w-[36%] z-10 shadow-2xl">
+                <div ref="storyImage4Ref" class="absolute top-0 left-[70%] rounded-lg overflow-hidden w-[36%] z-10 shadow-2xl">
                     <img src="@/assets/images/mtv.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
             </div>
             <div class="relative w-full grid grid-cols-wrapper">
-                <div class="relative col-main pt-[12vh] lg:pt-[18vh]">
+                <div class="relative col-main pt-[12vh] lg:pt-[24vh]">
                     <p ref="taglineRef" class="text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[30px] sm:text-[34px] lg:text-[40px] leading-[1.25] tracking-tight">
                         We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
                         <br />

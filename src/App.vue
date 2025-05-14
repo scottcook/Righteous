@@ -54,6 +54,7 @@ onUnmounted(() => {
         <div id="smooth-content">
             <main id="maincontent" class="">
                 <Masthead />
+                <div class="h-[150px] lg:h-[300px]"></div>
                 <About />
             </main>
         </div>
