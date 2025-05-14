@@ -33,14 +33,27 @@ const setupScrollAnimation = async () => {
         [
             //
             gsap.fromTo(
+                taglineRef.value,
+                { yPercent: 100, rotation: -17 },
+                {
+                    yPercent: 0,
+                    rotation: -2,
+                    ease: 'back.inOut(0.7)',
+                    duration: 1.5,
+                }
+            ),
+
+            //
+            gsap.fromTo(
                 taglineSplit.lines,
-                { opacity: 0, y: 30 },
+                { opacity: 0, y: 50 },
                 {
                     opacity: 1,
                     y: 0,
                     stagger: 0.15,
                     ease: 'power2.out',
                     duration: 0.5,
+                    delay: 0.5,
                 }
             ),
         ],
