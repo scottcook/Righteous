@@ -8,9 +8,9 @@
 
 @font-face {
     font-family: 'Helvetica Now Display';
-    src: url('@/assets/fonts/HelveticaNowDisplay-LightIta.woff2') format('woff2');
+    src: url('@/assets/fonts/HelveticaNowDisplay-Light.woff2') format('woff2');
     font-weight: 300;
-    font-style: italic;
+    font-style: normal;
     font-display: swap;
 }
 
@@ -24,9 +24,9 @@
 
 @font-face {
     font-family: 'Helvetica Now Display';
-    src: url('@/assets/fonts/HelveticaNowDisplay-BoldIta.woff2') format('woff2');
+    src: url('@/assets/fonts/HelveticaNowDisplay-Bold.woff2') format('woff2');
     font-weight: bold;
-    font-style: italic;
+    font-style: normal;
     font-display: swap;
 }
 

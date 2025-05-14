@@ -6,7 +6,7 @@ import ScrollSmoother from '@/utils/gsap-premium/src/ScrollSmoother';
 
 import Header from './components/Header.vue';
 import Masthead from './components/Masthead.vue';
-import AboutOne from './components/AboutOne.vue';
+import About from './components/About.vue';
 import { useResizeBus } from './composables/useResizeBus';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
@@ -54,7 +54,7 @@ onUnmounted(() => {
         <div id="smooth-content">
             <main id="maincontent" class="">
                 <Masthead />
-                <!-- <AboutOne /> -->
+                <About />
             </main>
         </div>
     </div>

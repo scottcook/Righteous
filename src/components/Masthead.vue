@@ -76,6 +76,11 @@ const setupScrollAnimation = async () => {
     tl.add(
         [
             //
+            gsap.set(storiesRef.value, {
+                backgroundColor: '#151515',
+            }),
+
+            //
             gsap.to(mediaRef.value, {
                 clipPath: `inset(${navHeight}px ${horizontalCropPercent}% ${copyHeight}px ${horizontalCropPercent}% round 8px)`,
                 ease: 'power2.out',
@@ -234,8 +239,8 @@ const setupScrollAnimation = async () => {
             gsap.to(storyImage1Ref.value, {
                 xPercent: -60,
                 rotation: -16,
-                ease: 'back.out(0.7)',
-                duration: 1.6,
+                ease: 'power2.inOut',
+                duration: 2.0,
                 delay: 0.0,
             }),
 
@@ -243,8 +248,8 @@ const setupScrollAnimation = async () => {
             gsap.to(storyImage2Ref.value, {
                 xPercent: -55,
                 rotation: 2,
-                ease: 'back.out(0.7)',
-                duration: 1.6,
+                ease: 'power2.inOut',
+                duration: 2.0,
                 delay: 0.2,
             }),
 
@@ -252,8 +257,8 @@ const setupScrollAnimation = async () => {
             gsap.to(storyImage3Ref.value, {
                 xPercent: 60,
                 rotation: -4,
-                ease: 'back.out(0.7)',
-                duration: 1.6,
+                ease: 'power2.inOut',
+                duration: 2.0,
                 delay: 0.0,
             }),
 
@@ -261,8 +266,8 @@ const setupScrollAnimation = async () => {
             gsap.to(storyImage4Ref.value, {
                 xPercent: 45,
                 rotation: 4,
-                ease: 'back.out(0.7)',
-                duration: 1.6,
+                ease: 'power2.inOut',
+                duration: 2.0,
                 delay: 0.2,
             }),
 
@@ -274,29 +279,46 @@ const setupScrollAnimation = async () => {
                     yPercent: -12,
                     rotation: 2,
                     opacity: 1,
-                    ease: 'back.out(0.7)',
+                    ease: 'power2.out',
                     duration: 1.6,
                     delay: 0.6,
                 }
             ),
         ],
-        '+=1.0'
+        '+=1.4'
+    );
+
+    tl.add(
+        [
+            //
+            gsap.fromTo(
+                storiesRef.value,
+                { backgroundColor: '#151515' },
+                {
+                    backgroundColor: '#151515',
+                    ease: 'power1.inOut',
+                    duration: 1.0,
+                    delay: 2.0,
+                }
+            ),
+        ],
+        '+=0.0'
     );
 
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: mastheadRef.value,
         start: 'top top',
-        end: '+=400%',
+        end: '+=500%',
         scrub: true,
         pin: true,
         pinSpacing: true,
         animation: tl,
         onUpdate: (self) => {
             isNavZActive.value = self.progress > 0.025;
-            isNavInverted.value = self.progress > 0.5;
+            isNavInverted.value = self.progress > 0.385;
 
             if (videoRef.value) {
-                if (self.progress > 0.5) {
+                if (self.progress > 0.385) {
                     videoRef.value.pause();
                 } else {
                     videoRef.value.play();
@@ -348,7 +370,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <section ref="mastheadRef" class="relative w-screen h-screen pointer-events-none">
+    <section ref="mastheadRef" class="relative w-screen h-screen pointer-events-none z-10">
         <div ref="mastheadInnerRef" class="relative w-screen h-screen">
             <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
                 <div class="w-full grid grid-cols-wrapper">
@@ -376,12 +398,12 @@ onUnmounted(() => {
                 </div>
             </div>
         </div>
-        <div ref="storiesRef" class="absolute top-0 left-0 right-0 w-screen min-h-screen bg-brand-charcoal">
+        <div ref="storiesRef" class="absolute top-0 left-0 right-0 w-screen min-h-screen">
             <div class="absolute top-1/2 right-0 bottom-0 w-full h-1/2 min-w-[1024px] lg:min-w-[1440px] left-1/2 transform -translate-x-1/2 lg:translate-y-[20%]">
-                <div ref="storyImage1Ref" class="absolute top-0 left-0 rounded-lg overflow-hidden w-[40%] z-20">
+                <div ref="storyImage1Ref" class="absolute top-0 left-0 rounded-lg overflow-hidden w-[40%] z-20 shadow-2xl">
                     <img src="@/assets/images/britny-fox.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
-                <div ref="storyImage2Ref" class="absolute top-0 left-[25%] rounded-lg overflow-hidden w-[34%] z-30">
+                <div ref="storyImage2Ref" class="absolute top-0 left-[25%] rounded-lg overflow-hidden w-[32%] z-30 shadow-2xl">
                     <img src="@/assets/images/stussy.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
                 <div ref="storyImage5Ref" class="absolute top-0 left-[50%] w-[45%] sm:w-[50%] z-50">
@@ -415,19 +437,16 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </div>
-                <div ref="storyImage3Ref" class="absolute top-0 left-[50%] rounded-lg overflow-hidden w-[28%] z-40">
+                <div ref="storyImage3Ref" class="absolute top-0 left-[50%] rounded-lg overflow-hidden w-[28%] z-40 shadow-2xl">
                     <img src="@/assets/images/blondie.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
-                <div ref="storyImage4Ref" class="absolute top-0 left-[75%] rounded-lg overflow-hidden w-[36%] z-10">
+                <div ref="storyImage4Ref" class="absolute top-0 left-[75%] rounded-lg overflow-hidden w-[36%] z-10 shadow-2xl">
                     <img src="@/assets/images/mtv.png" alt="Placeholder" class="w-full h-auto" />
                 </div>
             </div>
             <div class="relative w-full grid grid-cols-wrapper">
                 <div class="relative col-main pt-[12vh] lg:pt-[18vh]">
-                    <p
-                        ref="taglineRef"
-                        class="text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[30px] sm:text-[34px] lg:text-[40px] leading-[1.125] lg:leading-[1.25] tracking-tight"
-                    >
+                    <p ref="taglineRef" class="text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[30px] sm:text-[34px] lg:text-[40px] leading-[1.25] tracking-tight">
                         We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
                         <br />
                         <span class="inline-block font-grotesk text-[12px] bg-[#323231] px-3 py-1 rounded-sm font-medium tracking-widest">ATLANTA + ST. LOUIS</span>

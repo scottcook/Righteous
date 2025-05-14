@@ -231,7 +231,7 @@ svg path {
 }
 
 .nav-header-wrapper nav li > a.header-nav-item {
-    @apply relative flex items-center px-3 py-3 font-helveticaDisplay font-medium uppercase leading-none tracking-[0.025em] text-white lg:text-black text-[16px] lg:text-[12px] bg-opacity-10 lg:bg-opacity-100 bg-[#EFECE6];
+    @apply relative flex items-center px-3 py-3 font-helveticaDisplay font-medium uppercase leading-none tracking-[0.1em] text-white lg:text-black text-[16px] lg:text-[12px] bg-opacity-10 lg:bg-opacity-100 bg-[#EFECE6];
 
     border-radius: 2px;
     transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
