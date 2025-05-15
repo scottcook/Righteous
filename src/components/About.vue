@@ -39,7 +39,7 @@ let bounds = null;
 // Injected dependencies
 const resizeTick = inject('resizeTick');
 
-// Watchers
+// === Watchers ===
 watch(resizeTick, () => {
     updateCassetteScrollDistance();
     setupScrollAnimation();
@@ -49,7 +49,7 @@ watch(isRotating, (val) => {
     val ? startRotation() : stopRotation();
 });
 
-// Calculate cassette scroll value
+// === Helpers ===
 const updateCassetteScrollDistance = () => {
     nextTick(() => {
         const height = cassetteInnerRef.value?.offsetHeight || 0;
@@ -58,7 +58,8 @@ const updateCassetteScrollDistance = () => {
     });
 };
 
-// Rotation animation
+// === Animations ===
+// Rotating logos in a circular layout
 const startRotation = () => {
     if (rotationTween) return;
     const logos = logoCircleInnerRef.value?.querySelectorAll('.rotating-logo') || [];
@@ -94,13 +95,11 @@ const startRotation = () => {
 };
 
 const stopRotation = () => {
-    if (rotationTween) {
-        rotationTween.kill();
-        rotationTween = null;
-    }
+    rotationTween?.kill();
+    rotationTween = null;
 };
 
-// Card tilt logic
+// Card tilt effect on hover
 const enableCardTilt = () => {
     if (!cardInnerRef.value || !glareRef.value || tiltEffectEnabled.value) return;
 
@@ -145,15 +144,7 @@ const enableCardTilt = () => {
 
         gsap.to($glare, {
             autoAlpha: 1,
-            backgroundImage: `
-                radial-gradient(
-                    circle at
-                    ${center.x * 2 + bounds.width / 2}px
-                    ${center.y * 2 + bounds.height / 2}px,
-                    rgba(255, 255, 255, 0.33),
-                    rgba(0, 0, 0, 0.06)
-                )
-            `,
+            backgroundImage: `radial-gradient(circle at ${center.x * 2 + bounds.width / 2}px ${center.y * 2 + bounds.height / 2}px, rgba(255, 255, 255, 0.33), rgba(0, 0, 0, 0.06))`,
         });
     };
 
@@ -172,7 +163,6 @@ const enableCardTilt = () => {
 
     $card.addEventListener('mouseenter', handleMouseEnter);
     $card.addEventListener('mouseleave', handleMouseLeave);
-
     tiltEffectEnabled.value = true;
 };
 
@@ -184,7 +174,7 @@ const disableCardTilt = () => {
     tiltEffectEnabled.value = false;
 };
 
-// Scroll animation
+// === Scroll-triggered animation timeline ===
 const setupScrollAnimation = async () => {
     await nextTick();
     scrollTriggerInstance?.kill();
@@ -193,45 +183,23 @@ const setupScrollAnimation = async () => {
     descriptionSplit?.revert();
 
     const tl = gsap.timeline({ paused: true });
+
     taglineSplit = new SplitText(taglineRef.value, { type: 'lines' });
     headerSplit = new SplitText(cassetteHeaderRef.value, { type: 'words, chars' });
     descriptionSplit = new SplitText(cassetteDescriptionRef.value, { type: 'lines' });
 
-    // Section 1: Tagline
-    tl.add(
-        [
-            gsap.fromTo(
-                taglineRef.value,
-                { yPercent: 100, rotation: -17 },
-                {
-                    yPercent: 0,
-                    rotation: -2,
-                    ease: 'back.inOut(0.7)',
-                    duration: 2.5,
-                }
-            ),
-            gsap.fromTo(
-                taglineSplit.lines,
-                { opacity: 0, y: 50 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    stagger: 0.5,
-                    ease: 'power2.out',
-                    duration: 1,
-                    delay: 1,
-                }
-            ),
-        ],
-        '+=0.0'
-    );
+    // Section 1: Intro tagline
+    tl.add([
+        gsap.fromTo(taglineRef.value, { yPercent: 100, rotation: -17 }, { yPercent: 0, rotation: -2, ease: 'back.inOut(0.7)', duration: 2.5 }),
+        gsap.fromTo(taglineSplit.lines, { opacity: 0, y: 50 }, { opacity: 1, y: 0, stagger: 0.5, ease: 'power2.out', duration: 1, delay: 1 }),
+    ]);
 
-    // Section 2: Card & Shadow
+    // Section 2: Tilt card
     tl.add(
         [
             gsap.fromTo(
                 cardInnerRef.value,
-                { yPercent: -105, rotation: 23, opacity: 0, transformOrigin: '50% 50%' },
+                { yPercent: -105, rotation: 23, opacity: 0 },
                 {
                     yPercent: -5,
                     rotation: 3,
@@ -243,7 +211,7 @@ const setupScrollAnimation = async () => {
             ),
             gsap.fromTo(
                 cardShadowRef.value,
-                { yPercent: 105, rotation: -23, opacity: 0, transformOrigin: '50% 50%' },
+                { yPercent: 105, rotation: -23, opacity: 0 },
                 {
                     yPercent: 10,
                     xPercent: 3,
@@ -257,36 +225,13 @@ const setupScrollAnimation = async () => {
         '-=1.0'
     );
 
-    // Section 3: Logos
-    tl.add(
-        [
-            gsap.fromTo(
-                logoCircleRef.value,
-                { yPercent: 100, opacity: 0 },
-                {
-                    yPercent: 0,
-                    opacity: 1,
-                    ease: 'power2.out',
-                    duration: 2,
-                }
-            ),
-        ],
-        '-=0.8'
-    );
+    // Section 3: Circle logos
+    tl.add([gsap.fromTo(logoCircleRef.value, { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'power2.out', duration: 2 })], '-=0.8');
 
-    // Section 4: Cassette & media fade
+    // Section 4: Cassette overlay & image
     tl.add(
         [
-            gsap.fromTo(
-                cassetteRef.value,
-                { yPercent: 200, rotation: 30 },
-                {
-                    yPercent: 0,
-                    rotation: -1,
-                    ease: 'power1.inOut',
-                    duration: 3,
-                }
-            ),
+            gsap.fromTo(cassetteRef.value, { yPercent: 200, rotation: 30 }, { yPercent: 0, rotation: -1, ease: 'power1.inOut', duration: 3 }),
             gsap.fromTo(
                 cassetteImageRef.value,
                 { yPercent: 100, rotation: 30, scale: 0.8 },
@@ -304,39 +249,36 @@ const setupScrollAnimation = async () => {
         '+=1.0'
     );
 
-    // Section 5: Cassette Inner sub-scroll
-    tl.add(
-        [
-            gsap.to(cassetteInnerRef.value, {
-                y: () => cassetteScrollDistance.value,
-                ease: 'sine.inOut',
-                duration: 3,
-            }),
-            gsap.to(headerSplit.chars, {
-                color: 'white',
-                stagger: 0.025,
-                ease: 'power1.in',
-                duration: 0.025,
-                delay: 0,
-            }),
-            gsap.fromTo(
-                descriptionSplit.lines,
-                { opacity: 0, y: 50, rotation: 5, transformOrigin: '0, 0' },
-                {
-                    opacity: 1,
-                    y: 0,
-                    rotation: 0,
-                    stagger: 0.15,
-                    ease: 'power2.out',
-                    duration: 0.5,
-                    delay: 2.0,
-                }
-            ),
-        ],
-        '+=0.0'
-    );
-    // Section 6: Final delay
-    tl.add([gsap.to({}, { duration: 2 })], '+=0.0');
+    // Section 5: Scroll cassette content upward
+    tl.add([
+        gsap.to(cassetteInnerRef.value, {
+            y: () => cassetteScrollDistance.value,
+            ease: 'sine.inOut',
+            duration: 3,
+        }),
+        gsap.to(headerSplit.chars, {
+            color: 'white',
+            stagger: 0.025,
+            ease: 'power1.in',
+            duration: 0.025,
+        }),
+        gsap.fromTo(
+            descriptionSplit.lines,
+            { opacity: 0, y: 50, rotation: 5 },
+            {
+                opacity: 1,
+                y: 0,
+                rotation: 0,
+                stagger: 0.15,
+                ease: 'power2.out',
+                duration: 0.5,
+                delay: 2.0,
+            }
+        ),
+    ]);
+
+    // Section 6: Add hold/pause to scroll
+    tl.add(gsap.to({}, { duration: 2 }));
 
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: aboutRef.value,
@@ -347,18 +289,11 @@ const setupScrollAnimation = async () => {
         pinSpacing: true,
         animation: tl,
         onUpdate: (self) => {
-            isNavInverted.value = self.progress > 0.6;
-            isNoiseActive.value = self.progress <= 0.6;
-
-            if (self.progress > 0.6) {
-                stopRotation();
-            } else {
-                startRotation();
-            }
+            isNavInverted.value = self.progress > 0.59;
+            isNoiseActive.value = self.progress <= 0.59;
+            self.progress > 0.59 ? stopRotation() : startRotation();
         },
-        onEnter: () => {
-            isNavInverted.value = false;
-        },
+        onEnter: () => (isNavInverted.value = false),
         onLeaveBack: () => {
             isNavInverted.value = true;
             stopRotation();
@@ -366,10 +301,9 @@ const setupScrollAnimation = async () => {
     });
 };
 
-// Lifecycle
 onMounted(async () => {
     nextTick(() => {
-        updateCassetteScrollDistance(); // ensure DOM has rendered
+        updateCassetteScrollDistance();
         setupScrollAnimation();
     });
 });
@@ -377,6 +311,8 @@ onMounted(async () => {
 onUnmounted(() => {
     scrollTriggerInstance?.kill();
     taglineSplit?.revert();
+    headerSplit?.revert();
+    descriptionSplit?.revert();
     disableCardTilt();
     stopRotation();
 });

@@ -57,7 +57,7 @@ const getClipSettings = () => {
     return { horizontalCropPercent, copyHeight, navHeight };
 };
 
-// Animation
+// Animations
 const setupScrollAnimation = async () => {
     await nextTick();
 
