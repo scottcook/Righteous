@@ -287,11 +287,9 @@ const setupScrollAnimation = async () => {
         pinSpacing: true,
         animation: tl,
         onUpdate: (self) => {
-            isNavZActive.value = self.progress > 0.025;
+            isNavZActive.value = self.progress > 0.02;
             isNavInverted.value = self.progress > 0.385;
             isNoiseActive.value = self.progress <= 0.385;
-
-            console.log(self.progress);
 
             if (videoRef.value) {
                 if (self.progress > 0.385) {

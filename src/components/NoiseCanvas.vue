@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-brand-cream fixed inset-0 pointer-events-none"></div>
-    <canvas ref="noiseCanvas" class="fixed inset-0 pointer-events-none"></canvas>
+    <div class="bg-brand-cream fixed inset-0 pointer-events-none -z-100"></div>
+    <canvas ref="noiseCanvas" class="fixed inset-0 pointer-events-none -z-100"></canvas>
 </template>
 
 <script setup>

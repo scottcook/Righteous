@@ -50,10 +50,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Header />
-    <div id="smooth-wrapper" class="z-20">
+    <div id="smooth-wrapper">
         <NoiseCanvas />
-        <div id="smooth-content">
+        <Header />
+        <div id="smooth-content" class="z-20">
             <main id="maincontent" class="">
                 <Masthead />
                 <div class="h-[150px] lg:h-[300px]"></div>

@@ -212,7 +212,6 @@ const setupScrollAnimation = async () => {
                     opacity: 1,
                     ease: 'back.out(0.7)',
                     duration: 1.5,
-                    onComplete: enableCardTilt,
                 }
             ),
             gsap.fromTo(
@@ -314,6 +313,8 @@ const setupScrollAnimation = async () => {
     // Section 6: Add hold/pause to scroll
     tl.add(gsap.to({}, { duration: 2 }));
 
+    let lastTiltState = null;
+
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: aboutRef.value,
         start: 'top top',
@@ -323,14 +324,30 @@ const setupScrollAnimation = async () => {
         pinSpacing: true,
         animation: tl,
         onUpdate: (self) => {
-            isNavInverted.value = self.progress > 0.58;
-            isNoiseActive.value = self.progress <= 0.58;
-            self.progress > 0.58 ? stopRotation() : startRotation();
+            const progress = self.progress;
+
+            // Toggle nav and noise state
+            isNavInverted.value = progress > 0.6;
+            isNoiseActive.value = progress <= 0.6;
+
+            // Start or stop rotation
+            progress > 0.6 ? stopRotation() : startRotation();
+
+            // Only call tilt methods when state changes
+            if (progress > 0.6 && lastTiltState !== 'disabled') {
+                disableCardTilt();
+                lastTiltState = 'disabled';
+            } else if (progress > 0.23 && progress <= 0.6 && lastTiltState !== 'enabled') {
+                enableCardTilt();
+                lastTiltState = 'enabled';
+            }
         },
         onEnter: () => (isNavInverted.value = false),
         onLeaveBack: () => {
             isNavInverted.value = true;
             stopRotation();
+            disableCardTilt();
+            lastTiltState = 'disabled';
         },
     });
 };
