@@ -1,28 +1,45 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue';
-import { isNavInverted, isNoiseActive } from '@/composables/useScrollState';
+import { isNavZActive, isNavInverted, isNoiseActive } from '@/composables/useScrollState';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import SplitText from '@/utils/gsap-premium/src/SplitText';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
+// DOM refs
 const aboutRef = ref(null);
 const taglineRef = ref(null);
 const cardRef = ref(null);
 const cardInnerRef = ref(null);
 const cardShadowRef = ref(null);
 const glareRef = ref(null);
-
-let scrollTriggerInstance = null;
-let taglineSplit = null;
-const isRotating = ref(true);
 const logoCircleRef = ref(null);
 const logoCircleInnerRef = ref(null);
+
+// GSAP instances
+let scrollTriggerInstance = null;
+let taglineSplit = null;
 let rotationTween = null;
 
+// State
+const isRotating = ref(true);
+const tiltEffectEnabled = ref(false);
+let bounds = null;
+
+// Injected dependencies
 const resizeTick = inject('resizeTick');
 
+// Watchers
+watch(resizeTick, () => {
+    setupScrollAnimation();
+});
+
+watch(isRotating, (val) => {
+    val ? startRotation() : stopRotation();
+});
+
+// Rotation animation
 const startRotation = () => {
     if (rotationTween) return;
 
@@ -39,10 +56,11 @@ const startRotation = () => {
                 logos.forEach((el, index) => {
                     const baseAngle = (360 / logos.length) * index;
                     const totalAngle = angle + baseAngle;
-                    const x = Math.cos((totalAngle * Math.PI) / 180) * (logoCircleInnerRef.value.offsetWidth / 2);
-                    const y = Math.sin((totalAngle * Math.PI) / 180) * (logoCircleInnerRef.value.offsetHeight / 2);
-
-                    const depthScale = gsap.utils.mapRange(-logoCircleInnerRef.value.offsetHeight / 2, logoCircleInnerRef.value.offsetHeight / 2, 1, 0.0, y);
+                    const radiusX = logoCircleInnerRef.value.offsetWidth / 2;
+                    const radiusY = logoCircleInnerRef.value.offsetHeight / 2;
+                    const x = Math.cos((totalAngle * Math.PI) / 180) * radiusX;
+                    const y = Math.sin((totalAngle * Math.PI) / 180) * radiusY;
+                    const depthScale = gsap.utils.mapRange(-radiusY, radiusY, 1, 0.0, y);
 
                     gsap.set(el, {
                         x,
@@ -64,9 +82,7 @@ const stopRotation = () => {
     }
 };
 
-const tiltEffectEnabled = ref(false);
-let bounds = null;
-
+// Card tilt logic
 const enableCardTilt = () => {
     if (!cardInnerRef.value || !glareRef.value || tiltEffectEnabled.value) return;
 
@@ -101,8 +117,8 @@ const enableCardTilt = () => {
         });
 
         gsap.to($shadow, {
-            rotationX: rotationX,
-            rotationY: rotationY,
+            rotationX,
+            rotationY,
             scale: 1.05,
             transformPerspective: 500,
             ease: 'power2.out',
@@ -112,50 +128,28 @@ const enableCardTilt = () => {
         gsap.to($glare, {
             autoAlpha: 1,
             backgroundImage: `
-        radial-gradient(
-          circle at
-          ${center.x * 2 + bounds.width / 2}px
-          ${center.y * 2 + bounds.height / 2}px,
-          rgba(255, 255, 255, 0.33),
-          rgba(0, 0, 0, 0.06)
-        )
-      `,
+                radial-gradient(
+                    circle at
+                    ${center.x * 2 + bounds.width / 2}px
+                    ${center.y * 2 + bounds.height / 2}px,
+                    rgba(255, 255, 255, 0.33),
+                    rgba(0, 0, 0, 0.06)
+                )
+            `,
         });
     };
 
     const handleMouseEnter = () => {
         bounds = $card.getBoundingClientRect();
         document.addEventListener('mousemove', moveToMouse);
-        gsap.to($card, {
-            scale: 1.1,
-            rotationX: 0,
-            rotationY: 0,
-            duration: 0.6,
-        });
+        gsap.to($card, { scale: 1.1, rotationX: 0, rotationY: 0, duration: 0.6 });
     };
 
     const handleMouseLeave = () => {
         document.removeEventListener('mousemove', moveToMouse);
-        gsap.to($card, {
-            scale: 1,
-            rotationX: 0,
-            rotationY: 0,
-            duration: 0.6,
-            ease: 'power2.out',
-        });
-
-        gsap.to($shadow, {
-            rotationX: 0,
-            rotationY: 0,
-            scale: 1,
-            duration: 0.6,
-            ease: 'power2.out',
-        });
-
-        gsap.to($glare, {
-            autoAlpha: 0,
-            duration: 0.6,
-        });
+        gsap.to($card, { scale: 1, rotationX: 0, rotationY: 0, duration: 0.6, ease: 'power2.out' });
+        gsap.to($shadow, { rotationX: 0, rotationY: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
+        gsap.to($glare, { autoAlpha: 0, duration: 0.6 });
     };
 
     $card.addEventListener('mouseenter', handleMouseEnter);
@@ -168,51 +162,43 @@ const disableCardTilt = () => {
     if (!cardInnerRef.value || !tiltEffectEnabled.value) return;
     cardInnerRef.value.removeEventListener('mouseenter', () => {});
     cardInnerRef.value.removeEventListener('mouseleave', () => {});
-    cardInnerRef.value.removeEventListener('click', () => {});
     document.removeEventListener('mousemove', () => {});
     tiltEffectEnabled.value = false;
 };
 
-watch(resizeTick, () => {
-    setupScrollAnimation();
-});
-
+// Scroll animation
 const setupScrollAnimation = async () => {
     await nextTick();
     scrollTriggerInstance?.kill();
-    taglineSplit && taglineSplit.revert();
+    taglineSplit?.revert();
 
     const tl = gsap.timeline({ paused: true });
-
     taglineSplit = new SplitText(taglineRef.value, { type: 'lines' });
 
-    tl.add(
-        [
-            gsap.fromTo(
-                taglineRef.value,
-                { yPercent: 100, rotation: -17 },
-                {
-                    yPercent: 0,
-                    rotation: -2,
-                    ease: 'back.inOut(0.7)',
-                    duration: 1.5,
-                }
-            ),
-            gsap.fromTo(
-                taglineSplit.lines,
-                { opacity: 0, y: 50 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    stagger: 0.2,
-                    ease: 'power2.out',
-                    duration: 0.5,
-                    delay: 0.5,
-                }
-            ),
-        ],
-        '+=0.0'
-    );
+    tl.add([
+        gsap.fromTo(
+            taglineRef.value,
+            { yPercent: 100, rotation: -17 },
+            {
+                yPercent: 0,
+                rotation: -2,
+                ease: 'back.inOut(0.7)',
+                duration: 1.5,
+            }
+        ),
+        gsap.fromTo(
+            taglineSplit.lines,
+            { opacity: 0, y: 50 },
+            {
+                opacity: 1,
+                y: 0,
+                stagger: 0.2,
+                ease: 'power2.out',
+                duration: 0.5,
+                delay: 0.5,
+            }
+        ),
+    ]);
 
     tl.add(
         [
@@ -225,10 +211,7 @@ const setupScrollAnimation = async () => {
                     opacity: 1,
                     ease: 'back.out(0.7)',
                     duration: 1.5,
-                    transformOrigin: '50% 50%',
-                    onComplete: () => {
-                        enableCardTilt();
-                    },
+                    onComplete: enableCardTilt,
                 }
             ),
             gsap.fromTo(
@@ -241,28 +224,24 @@ const setupScrollAnimation = async () => {
                     opacity: 1,
                     ease: 'back.out(0.7)',
                     duration: 1.5,
-                    transformOrigin: '50% 50%',
                 }
             ),
         ],
         '-=0.8'
     );
 
-    tl.add(
-        [
-            gsap.fromTo(
-                logoCircleRef.value,
-                { yPercent: 100, opacity: 0 },
-                {
-                    yPercent: 0,
-                    opacity: 1,
-                    ease: 'power2.out',
-                    duration: 2,
-                }
-            ),
-        ],
-        '+=0.0'
-    );
+    tl.add([
+        gsap.fromTo(
+            logoCircleRef.value,
+            { yPercent: 100, opacity: 0 },
+            {
+                yPercent: 0,
+                opacity: 1,
+                ease: 'power2.out',
+                duration: 2,
+            }
+        ),
+    ]);
 
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: aboutRef.value,
@@ -279,9 +258,6 @@ const setupScrollAnimation = async () => {
         onEnterBack: () => {
             startRotation();
         },
-        onLeave: () => {
-            // stopRotation();
-        },
         onLeaveBack: () => {
             stopRotation();
             isNavInverted.value = true;
@@ -289,20 +265,16 @@ const setupScrollAnimation = async () => {
     });
 };
 
+// Lifecycle
 onMounted(async () => {
     await setupScrollAnimation();
-    startRotation();
 });
 
 onUnmounted(() => {
     scrollTriggerInstance?.kill();
-    taglineSplit && taglineSplit.revert();
+    taglineSplit?.revert();
     disableCardTilt();
     stopRotation();
-});
-
-watch(isRotating, (val) => {
-    val ? startRotation() : stopRotation();
 });
 </script>
 

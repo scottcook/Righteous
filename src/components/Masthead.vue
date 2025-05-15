@@ -7,6 +7,7 @@ import SplitText from '@/utils/gsap-premium/src/SplitText';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
+// DOM refs
 const mediaRef = ref(null);
 const mastheadRef = ref(null);
 const mastheadInnerRef = ref(null);
@@ -24,21 +25,24 @@ const descriptionRef = ref(null);
 const handRef = ref(null);
 const logoRef = ref(null);
 
+// GSAP instances
 let scrollTriggerInstance = null;
 let descriptionSplit = null;
 let logoSplit = null;
 let taglineSplit = null;
 
+// Injected dependencies
 const resizeTick = inject('resizeTick');
 
+// Watchers
 watch(resizeTick, () => {
     setupScrollAnimation();
-    // Ensure video is resumed if applicable after resize
     if (videoRef.value && ScrollTrigger.getById('mastheadTrigger')?.progress <= 0.5) {
         videoRef.value.play();
     }
 });
 
+// Helpers
 const handleVideoReady = () => {
     gsap.to(imageRef.value, { opacity: 0, duration: 1, ease: 'power2.out' });
 };
@@ -50,18 +54,18 @@ const getClipSettings = () => {
     const horizontalCropPercent = ((screenWidth - targetWidth) / 2 / screenWidth) * 100;
     const copyHeight = copyRef.value?.offsetHeight || 0;
     const navHeight = screenWidth >= 1024 ? 102 : 70;
-
     return { horizontalCropPercent, copyHeight, navHeight };
 };
 
+// Animation
 const setupScrollAnimation = async () => {
     await nextTick();
 
     const { horizontalCropPercent, copyHeight, navHeight } = getClipSettings();
 
     scrollTriggerInstance?.kill();
-    taglineSplit && taglineSplit.revert();
-    descriptionSplit && descriptionSplit.revert();
+    taglineSplit?.revert();
+    descriptionSplit?.revert();
 
     gsap.set(mediaRef.value, { clipPath: 'inset(0px 0px 0px 0px round 0px)', willChange: 'clip-path' });
     gsap.set(imageRef.value, { scale: 1, willChange: 'transform', opacity: 1 });
@@ -73,29 +77,22 @@ const setupScrollAnimation = async () => {
     descriptionSplit = new SplitText(descriptionRef.value, { type: 'lines' });
     taglineSplit = new SplitText(taglineRef.value, { type: 'words, chars' });
 
+    // Section 1: Setup + media crop
     tl.add(
         [
-            //
-            gsap.set(storiesRef.value, {
-                backgroundColor: '#151515',
-            }),
-
-            //
+            gsap.set(storiesRef.value, { backgroundColor: '#151515' }),
             gsap.to(mediaRef.value, {
                 clipPath: `inset(${navHeight}px ${horizontalCropPercent}% ${copyHeight}px ${horizontalCropPercent}% round 8px)`,
                 ease: 'power2.out',
                 duration: 1,
             }),
-
-            //
             gsap.to(imageRef.value, { scale: 1.1, ease: 'power1.in', duration: 1 }),
-
-            //
             gsap.to(logoRef.value, { yPercent: -7, scale: 0.9, ease: 'power2.out', duration: 1 }),
         ],
         '+=0.0'
     );
 
+    // Section 2: Description & hand
     tl.add(
         [
             gsap.fromTo(
@@ -109,8 +106,6 @@ const setupScrollAnimation = async () => {
                     duration: 0.5,
                 }
             ),
-
-            //
             gsap.fromTo(
                 handRef.value,
                 { opacity: 0, y: 50, rotation: 10 },
@@ -127,9 +122,9 @@ const setupScrollAnimation = async () => {
         '-=0.4'
     );
 
+    // Section 3: Tagline and media fade
     tl.add(
         [
-            //
             gsap.fromTo(
                 storiesRef.value,
                 { yPercent: 200, rotation: -30 },
@@ -140,7 +135,6 @@ const setupScrollAnimation = async () => {
                     duration: 3,
                 }
             ),
-
             gsap.fromTo(
                 taglineRef.value,
                 { yPercent: 100, rotation: -30 },
@@ -152,29 +146,20 @@ const setupScrollAnimation = async () => {
                     delay: 0.5,
                 }
             ),
-
-            //
-            gsap.to(mastheadInnerRef.value, {
-                scale: 0.9,
-                opacity: 0.6,
-                ease: 'power1.in',
-                duration: 2,
-            }),
+            gsap.to(mastheadInnerRef.value, { scale: 0.9, opacity: 0.6, ease: 'power1.in', duration: 2 }),
         ],
         '+=1.0'
     );
 
+    // Section 4: Highlight text + story entries in
     tl.add(
         [
-            //
             gsap.to(taglineSplit.chars, {
                 color: 'white',
                 stagger: 0.02,
                 ease: 'power1.in',
                 duration: 0.02,
             }),
-
-            //
             gsap.fromTo(
                 storyImage1Ref.value,
                 { yPercent: 120, rotation: -40, opacity: 0 },
@@ -187,8 +172,6 @@ const setupScrollAnimation = async () => {
                     delay: 0.2,
                 }
             ),
-
-            //
             gsap.fromTo(
                 storyImage2Ref.value,
                 { yPercent: 100, rotation: -20, opacity: 0 },
@@ -201,8 +184,6 @@ const setupScrollAnimation = async () => {
                     delay: 0.4,
                 }
             ),
-
-            //
             gsap.fromTo(
                 storyImage3Ref.value,
                 { yPercent: 110, rotation: -30, opacity: 0 },
@@ -215,8 +196,6 @@ const setupScrollAnimation = async () => {
                     delay: 0.6,
                 }
             ),
-
-            //
             gsap.fromTo(
                 storyImage4Ref.value,
                 { yPercent: 125, rotation: -40, opacity: 0 },
@@ -233,45 +212,13 @@ const setupScrollAnimation = async () => {
         '-=0.6'
     );
 
+    // Section 5: Shift story images
     tl.add(
         [
-            //
-            gsap.to(storyImage1Ref.value, {
-                xPercent: -55,
-                rotation: -16,
-                ease: 'power2.inOut',
-                duration: 2.0,
-                delay: 0.0,
-            }),
-
-            //
-            gsap.to(storyImage2Ref.value, {
-                xPercent: -55,
-                rotation: 2,
-                ease: 'power2.inOut',
-                duration: 2.0,
-                delay: 0.2,
-            }),
-
-            //
-            gsap.to(storyImage3Ref.value, {
-                xPercent: 60,
-                rotation: -4,
-                ease: 'power2.inOut',
-                duration: 2.0,
-                delay: 0.0,
-            }),
-
-            //
-            gsap.to(storyImage4Ref.value, {
-                xPercent: 45,
-                rotation: 4,
-                ease: 'power2.inOut',
-                duration: 2.0,
-                delay: 0.2,
-            }),
-
-            //
+            gsap.to(storyImage1Ref.value, { xPercent: -55, rotation: -16, ease: 'power2.inOut', duration: 2 }),
+            gsap.to(storyImage2Ref.value, { xPercent: -55, rotation: 2, ease: 'power2.inOut', duration: 2, delay: 0.2 }),
+            gsap.to(storyImage3Ref.value, { xPercent: 60, rotation: -4, ease: 'power2.inOut', duration: 2 }),
+            gsap.to(storyImage4Ref.value, { xPercent: 45, rotation: 4, ease: 'power2.inOut', duration: 2, delay: 0.2 }),
             gsap.fromTo(
                 storyImage5Ref.value,
                 { yPercent: 85, rotation: -40, opacity: 0 },
@@ -280,7 +227,7 @@ const setupScrollAnimation = async () => {
                     rotation: 2,
                     opacity: 1,
                     ease: 'back.out(0.7)',
-                    duration: 3.0,
+                    duration: 3,
                     delay: 0.6,
                 }
             ),
@@ -288,24 +235,23 @@ const setupScrollAnimation = async () => {
         '+=1.4'
     );
 
-    tl.add(
-        [
-            //
-            gsap.fromTo(
-                storiesRef.value,
-                { backgroundColor: '#151515' },
-                {
-                    backgroundColor: '#151515',
-                    ease: 'power1.inOut',
-                    duration: 1.0,
-                    delay: 2.0,
-                }
-            ),
-        ],
-        '+=0.0'
-    );
+    // Section 6: Final color lock
+    tl.add([
+        gsap.fromTo(
+            storiesRef.value,
+            { backgroundColor: '#151515' },
+            {
+                backgroundColor: '#151515',
+                ease: 'power1.inOut',
+                duration: 1,
+                delay: 2,
+            }
+        ),
+    ]);
 
+    // ScrollTrigger setup
     scrollTriggerInstance = ScrollTrigger.create({
+        id: 'mastheadTrigger',
         trigger: mastheadRef.value,
         start: 'top top',
         end: '+=500%',
@@ -339,16 +285,15 @@ const setupScrollAnimation = async () => {
 
 const setupLogoAnimation = async () => {
     await nextTick();
-
-    logoSplit && logoSplit.revert();
-
+    logoSplit?.revert();
     gsap.set(logoRef.value, { opacity: 1 });
-
     logoSplit = new SplitText(logoRef.value, { type: 'chars' });
-
     gsap.fromTo(
         logoSplit.chars,
-        { opacity: 0, scale: 2 },
+        {
+            opacity: 0,
+            scale: 2,
+        },
         {
             opacity: 1,
             scale: 1,
@@ -367,10 +312,9 @@ onMounted(async () => {
 
 onUnmounted(() => {
     scrollTriggerInstance?.kill();
-
-    taglineSplit && taglineSplit.revert();
-    logoSplit && logoSplit.revert();
-    descriptionSplit && descriptionSplit.revert();
+    taglineSplit?.revert();
+    logoSplit?.revert();
+    descriptionSplit?.revert();
 });
 </script>
 
