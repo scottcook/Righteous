@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue';
-import { isNavInverted } from '@/composables/useScrollState';
+import { isNavInverted, isNoiseActive } from '@/composables/useScrollState';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import SplitText from '@/utils/gsap-premium/src/SplitText';
@@ -308,7 +308,7 @@ watch(isRotating, (val) => {
 
 <template>
     <section ref="aboutRef" class="relative w-screen min-h-screen">
-        <div ref="aboutInnerRef" class="relative w-screen h-auto min-h-screen bg-brand-cream flex flex-col justify-between">
+        <div ref="aboutInnerRef" class="relative w-screen h-auto min-h-screen flex flex-col justify-between">
             <div class="relative w-full grid grid-cols-wrapper">
                 <div class="relative col-main pt-[12vh] lg:pt-[24vh] flex flex-col lg:flex-row justify-between lg:gap-8 h-[66vh]">
                     <p

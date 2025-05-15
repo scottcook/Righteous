@@ -8,6 +8,7 @@ import Header from './components/Header.vue';
 import Masthead from './components/Masthead.vue';
 import About from './components/About.vue';
 import { useResizeBus } from './composables/useResizeBus';
+import NoiseCanvas from './components/NoiseCanvas.vue';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -51,6 +52,7 @@ onUnmounted(() => {
 <template>
     <Header />
     <div id="smooth-wrapper" class="z-20">
+        <NoiseCanvas />
         <div id="smooth-content">
             <main id="maincontent" class="">
                 <Masthead />

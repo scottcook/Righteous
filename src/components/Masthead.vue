@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue';
-import { isNavZActive, isNavInverted } from '@/composables/useScrollState';
+import { isNavZActive, isNavInverted, isNoiseActive } from '@/composables/useScrollState';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import SplitText from '@/utils/gsap-premium/src/SplitText';
@@ -279,8 +279,8 @@ const setupScrollAnimation = async () => {
                     yPercent: -12,
                     rotation: 2,
                     opacity: 1,
-                    ease: 'power2.out',
-                    duration: 1.6,
+                    ease: 'back.out(0.7)',
+                    duration: 3.0,
                     delay: 0.6,
                 }
             ),
@@ -316,6 +316,7 @@ const setupScrollAnimation = async () => {
         onUpdate: (self) => {
             isNavZActive.value = self.progress > 0.025;
             isNavInverted.value = self.progress > 0.385;
+            isNoiseActive.value = self.progress <= 0.385;
 
             if (videoRef.value) {
                 if (self.progress > 0.385) {
@@ -327,9 +328,11 @@ const setupScrollAnimation = async () => {
         },
         onLeave: () => {
             isNavZActive.value = true;
+            isNoiseActive.value = true;
         },
         onLeaveBack: () => {
             isNavZActive.value = false;
+            isNoiseActive.value = false;
         },
     });
 };
@@ -376,7 +379,7 @@ onUnmounted(() => {
         <div ref="mastheadInnerRef" class="relative w-screen h-screen">
             <div ref="copyRef" class="absolute bottom-0 left-0 right-0 w-full">
                 <div class="w-full grid grid-cols-wrapper">
-                    <div class="relative col-main pb-12 pt-9 bg-brand-cream">
+                    <div class="relative col-main pb-12 pt-9">
                         <p ref="descriptionRef" class="text-brand-gray max-w-[530px] lg:max-w-[700px] font-helveticaDisplay font-medium text-[24px] lg:text-[28px] leading-7 lg:leading-9">
                             <span class="text-black">We’re Righteous.</span><br />
                             A small team of product and agency veterans, crafting clean strategy, smart UX, and tight code for brands and startups who want results -- without the pitch theater.
@@ -388,12 +391,13 @@ onUnmounted(() => {
                 </div>
             </div>
             <div class="overflow-hidden w-full h-full relative">
-                <div ref="mediaRef" class="w-full h-full">
+                <div ref="mediaRef" class="relative w-full h-full">
                     <video ref="videoRef" autoplay muted loop playsinline @canplay="handleVideoReady" class="absolute inset-0 w-full h-full object-cover object-center">
                         <source src="@/assets/videos/righteous-hero2.mp4" type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
                     <img ref="imageRef" src="@/assets/images/placeholder-image.jpg" alt="Placeholder" class="absolute inset-0 w-full h-full object-cover object-center" />
+                    <div class="radial-gradient-overlay"></div>
                     <div ref="logoRef" class="absolute inset-0 w-full h-full flex items-center justify-center">
                         <h2 class="font-canela text-brand-cream text-[13vw] tracking-tight">Righteous</h2>
                     </div>
@@ -459,4 +463,15 @@ onUnmounted(() => {
     </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+.radial-gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.33) 0%, rgba(0, 0, 0, 0.1) 100%);
+}
+</style>
