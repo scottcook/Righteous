@@ -26,6 +26,7 @@ const cassetteDescriptionRef = ref(null);
 // GSAP instances
 let scrollTriggerInstance = null;
 let taglineSplit = null;
+let tagline2Split = null;
 let headerSplit = null;
 let descriptionSplit = null;
 let rotationTween = null;
@@ -179,20 +180,25 @@ const setupScrollAnimation = async () => {
     await nextTick();
     scrollTriggerInstance?.kill();
     taglineSplit?.revert();
+    tagline2Split?.revert();
     headerSplit?.revert();
     descriptionSplit?.revert();
 
     const tl = gsap.timeline({ paused: true });
 
     taglineSplit = new SplitText(taglineRef.value, { type: 'lines' });
+    tagline2Split = new SplitText(taglineRef.value, { type: 'words, chars' });
     headerSplit = new SplitText(cassetteHeaderRef.value, { type: 'words, chars' });
     descriptionSplit = new SplitText(cassetteDescriptionRef.value, { type: 'lines' });
 
     // Section 1: Intro tagline
-    tl.add([
-        gsap.fromTo(taglineRef.value, { yPercent: 100, rotation: -17 }, { yPercent: 0, rotation: -2, ease: 'back.inOut(0.7)', duration: 2.5 }),
-        gsap.fromTo(taglineSplit.lines, { opacity: 0, y: 50 }, { opacity: 1, y: 0, stagger: 0.5, ease: 'power2.out', duration: 1, delay: 1 }),
-    ]);
+    tl.add(
+        [
+            gsap.fromTo(taglineRef.value, { yPercent: 100, rotation: -17 }, { yPercent: 0, rotation: -2, ease: 'back.inOut(0.7)', duration: 2.5 }),
+            gsap.fromTo(taglineSplit.lines, { opacity: 0, y: 50 }, { opacity: 1, y: 0, stagger: 0.5, ease: 'power2.out', duration: 1, delay: 1 }),
+        ],
+        '+=0.0'
+    );
 
     // Section 2: Tilt card
     tl.add(
@@ -222,11 +228,11 @@ const setupScrollAnimation = async () => {
                 }
             ),
         ],
-        '-=1.0'
+        '-=0.8'
     );
 
     // Section 3: Circle logos
-    tl.add([gsap.fromTo(logoCircleRef.value, { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'power2.out', duration: 2 })], '-=0.8');
+    tl.add([gsap.fromTo(logoCircleRef.value, { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'power2.out', duration: 2 })], '-=0.5');
 
     // Section 4: Cassette overlay & image
     tl.add(
@@ -245,37 +251,65 @@ const setupScrollAnimation = async () => {
                 }
             ),
             gsap.to(aboutInnerRef.value, { scale: 0.9, opacity: 0.6, ease: 'power1.in', duration: 2 }),
+
+            gsap.to(tagline2Split.chars, {
+                color: '#F5F4EB',
+                stagger: 0.02,
+                ease: 'power1.in',
+                duration: 0.02,
+                delay: 0.0,
+            }),
+            gsap.to(cardInnerRef.value, {
+                xPercent: 105,
+                rotation: 23,
+                opacity: 0,
+                ease: 'back.inOut(0.7)',
+                duration: 1.5,
+                delay: 0.5,
+            }),
+
+            gsap.to(cardShadowRef.value, {
+                xPercent: 105,
+                rotation: 23,
+                opacity: 0,
+                ease: 'back.inOut(0.7)',
+                duration: 1.5,
+                delay: 0.5,
+            }),
         ],
-        '+=1.0'
+        '+=2.4'
     );
 
     // Section 5: Scroll cassette content upward
-    tl.add([
-        gsap.to(cassetteInnerRef.value, {
-            y: () => cassetteScrollDistance.value,
-            ease: 'sine.inOut',
-            duration: 3,
-        }),
-        gsap.to(headerSplit.chars, {
-            color: 'white',
-            stagger: 0.025,
-            ease: 'power1.in',
-            duration: 0.025,
-        }),
-        gsap.fromTo(
-            descriptionSplit.lines,
-            { opacity: 0, y: 100, rotation: 5 },
-            {
-                opacity: 1,
-                y: 0,
-                rotation: 0,
-                stagger: 0.15,
-                ease: 'power2.out',
-                duration: 0.5,
-                delay: 2.0,
-            }
-        ),
-    ]);
+    tl.add(
+        [
+            gsap.to(cassetteInnerRef.value, {
+                y: () => cassetteScrollDistance.value,
+                ease: 'sine.inOut',
+                duration: 3,
+            }),
+            gsap.to(headerSplit.chars, {
+                color: 'white',
+                stagger: 0.025,
+                ease: 'power1.in',
+                duration: 0.025,
+            }),
+            gsap.fromTo(
+                descriptionSplit.lines,
+                { opacity: 0, y: 100, rotation: 5 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    rotation: 0,
+                    stagger: 0.15,
+                    ease: 'power2.out',
+                    duration: 0.5,
+                    delay: 2.0,
+                }
+            ),
+        ],
+        '+=1.0'
+    );
 
     // Section 6: Add hold/pause to scroll
     tl.add(gsap.to({}, { duration: 2 }));
@@ -283,15 +317,15 @@ const setupScrollAnimation = async () => {
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: aboutRef.value,
         start: 'top top',
-        end: '+=500%',
+        end: '+=600%',
         scrub: true,
         pin: true,
         pinSpacing: true,
         animation: tl,
         onUpdate: (self) => {
-            isNavInverted.value = self.progress > 0.59;
-            isNoiseActive.value = self.progress <= 0.59;
-            self.progress > 0.59 ? stopRotation() : startRotation();
+            isNavInverted.value = self.progress > 0.58;
+            isNoiseActive.value = self.progress <= 0.58;
+            self.progress > 0.58 ? stopRotation() : startRotation();
         },
         onEnter: () => (isNavInverted.value = false),
         onLeaveBack: () => {
@@ -311,6 +345,7 @@ onMounted(async () => {
 onUnmounted(() => {
     scrollTriggerInstance?.kill();
     taglineSplit?.revert();
+    tagline2Split?.revert();
     headerSplit?.revert();
     descriptionSplit?.revert();
     disableCardTilt();
@@ -380,9 +415,9 @@ onUnmounted(() => {
         <div class="absolute w-full h-[100px] bottom-0 left-0 right-0" style="background-image: linear-gradient(to bottom, rgba(245, 244, 235, 0) 0%, rgba(245, 244, 235, 1) 50%)"></div>
         <div ref="cassetteRef" class="absolute top-0 left-0 right-0 w-screen h-screen overflow-hidden bg-[#FF63CC]">
             <div class="absolute inset-0 w-full h-full mix-blend-hard-light opacity-10"><img src="@/assets/images/band.jpg" alt="Placeholder" class="w-full h-full object-cover object-bottom" /></div>
-            <div ref="cassetteInnerRef" class="relative w-full h-auto">
+            <div ref="cassetteInnerRef" class="relative w-full h-auto min-h-screen">
                 <div class="relative w-full grid grid-cols-wrapper">
-                    <div class="relative col-main py-[12vh] lg:py-[24vh] flex items-center flex-col text-center">
+                    <div class="relative col-main py-[12vh] lg:py-[24vh] flex items-center justify-center flex-col text-center">
                         <div ref="cassetteImageRef" class="w-full h-auto max-w-[480px] lg:max-w-[640px] xl:max-w-[720px] rounded-lg overflow-hidden shadow-2xl z-10">
                             <img src="@/assets/images/cassette.jpg" alt="Placeholder" class="w-full h-auto" width="1481" height="899" />
                         </div>
@@ -394,7 +429,7 @@ onUnmounted(() => {
                         </h2>
                         <p
                             ref="cassetteDescriptionRef"
-                            class="text-[#1F1F1F] max-w-[740px] lg:max-w-[990px] xl:max-w-[1120px] font-helveticaDisplay font-medium text-[18px] lg:text-[25px] xl:text-[32px] leading-[1.375] lg:leading-[1.25] tracking-snug mt-8"
+                            class="text-[#1F1F1F] max-w-[740px] lg:max-w-[990px] xl:max-w-[1120px] font-helveticaDisplay font-medium text-[18px] lg:text-[25px] xl:text-[32px] leading-[1.375] lg:leading-[1.25] tracking-snug mt-5 lg:mt-8"
                         >
                             We grew up taping songs off the radio, blowing dust out of cartridges, and side‑eyeing every “new and improved” ad that forgot who paid for the cable. Today we channel that
                             same hacker spirit into building products and experiences that work as hard as they look good. Righteous is run by creatives who’ve logged 20+ years sharpening brands and

@@ -18,6 +18,7 @@ const storyImage2Ref = ref(null);
 const storyImage3Ref = ref(null);
 const storyImage4Ref = ref(null);
 const storyImage5Ref = ref(null);
+const storyImage5CaptionRef = ref(null);
 const imageRef = ref(null);
 const videoRef = ref(null);
 const copyRef = ref(null);
@@ -156,7 +157,7 @@ const setupScrollAnimation = async () => {
                 scale: 1.5,
                 transformOrigin: '0 0',
                 ease: 'power2.inOut',
-                duration: 0.5,
+                duration: 1,
                 delay: 0.5,
             }),
             gsap.to(handRef.value, {
@@ -170,7 +171,7 @@ const setupScrollAnimation = async () => {
                 delay: 0.7,
             }),
         ],
-        '+=1.0'
+        '+=2.0'
     );
 
     // Section 4: Highlight text + story entries in
@@ -242,7 +243,7 @@ const setupScrollAnimation = async () => {
             gsap.to(storyImage3Ref.value, { xPercent: 60, rotation: -4, ease: 'power2.inOut', duration: 2 }),
             gsap.to(storyImage4Ref.value, { xPercent: 45, rotation: 4, ease: 'power2.inOut', duration: 2, delay: 0.2 }),
             gsap.fromTo(
-                storyImage5Ref.value,
+                [storyImage5Ref.value, storyImage5CaptionRef.value],
                 { yPercent: 85, rotation: -40, opacity: 0 },
                 {
                     yPercent: -12,
@@ -251,6 +252,7 @@ const setupScrollAnimation = async () => {
                     ease: 'back.out(0.7)',
                     duration: 3,
                     delay: 0.6,
+                    stagger: 0.2,
                 }
             ),
         ],
@@ -271,12 +273,15 @@ const setupScrollAnimation = async () => {
         ),
     ]);
 
+    // Section 7: Add hold/pause to scroll
+    tl.add(gsap.to({}, { duration: 0.4 }));
+
     // ScrollTrigger setup
     scrollTriggerInstance = ScrollTrigger.create({
         id: 'mastheadTrigger',
         trigger: mastheadRef.value,
         start: 'top top',
-        end: '+=500%',
+        end: '+=600%',
         scrub: true,
         pin: true,
         pinSpacing: true,
@@ -285,6 +290,8 @@ const setupScrollAnimation = async () => {
             isNavZActive.value = self.progress > 0.025;
             isNavInverted.value = self.progress > 0.385;
             isNoiseActive.value = self.progress <= 0.385;
+
+            console.log(self.progress);
 
             if (videoRef.value) {
                 if (self.progress > 0.385) {
@@ -380,7 +387,7 @@ onUnmounted(() => {
                 </div>
                 <div ref="storyImage5Ref" class="absolute top-0 left-[50%] w-[45%] sm:w-[50%] z-50">
                     <div class="transform -translate-x-1/2 rounded-lg overflow-hidden">
-                        <img src="@/assets/images/team.jpg" alt="Placeholder" class="w-full h-auto" />
+                        <img src="@/assets/images/team.jpg" alt="Placeholder" class="w-full h-auto relative" />
                         <div class="bg-[#FD26B7] absolute inset-0 mix-blend-multiply"></div>
                         <div
                             class="absolute top-1/2 left-1/2 sm:translate-x-0 -translate-x-1/2 sm:left-0 w-3/5 transform sm:-translate-y-1/2 flex gap-1 sm:gap-4 flex-col sm:flex-row sm:w-full p-4 tracking-wider"
@@ -402,7 +409,7 @@ onUnmounted(() => {
                             </div>
                         </div>
                     </div>
-                    <div class="absolute top-0 transform -translate-y-full py-2 tracking-wider w-[37.5%] sm:w-1/2 text-right">
+                    <div ref="storyImage5CaptionRef" class="absolute top-0 transform -translate-y-full py-2 tracking-wider w-[37.5%] sm:w-1/2 text-right -z-10">
                         <div class="text-white leading-snug font-grotesk text-[8px] sm:text-[10px]">
                             <p class="uppercase text-brand-pink">Close, But No Cigar</p>
                             <p class="mt-1">This is what AI thinks we look like. 👎🏻 <br />This is why you still need us.</p>
