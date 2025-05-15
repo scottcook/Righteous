@@ -351,14 +351,14 @@ onUnmounted(() => {
         <div ref="storiesRef" class="absolute top-0 left-0 right-0 w-screen min-h-screen">
             <div class="absolute top-1/2 right-0 bottom-0 h-1/2 w-[1024px] lg:w-[1440px] left-1/2 transform -translate-x-1/2 lg:translate-y-[20%]">
                 <div ref="storyImage1Ref" class="absolute top-0 left-[-5%] rounded-lg overflow-hidden w-[40%] z-20 shadow-2xl">
-                    <img src="@/assets/images/britny-fox.png" alt="Placeholder" class="w-full h-auto" />
+                    <img src="@/assets/images/britny-fox.jpg" alt="Placeholder" class="w-full h-auto" />
                 </div>
                 <div ref="storyImage2Ref" class="absolute top-0 left-[25%] rounded-lg overflow-hidden w-[32%] z-30 shadow-2xl">
-                    <img src="@/assets/images/stussy.png" alt="Placeholder" class="w-full h-auto" />
+                    <img src="@/assets/images/stussy.jpg" alt="Placeholder" class="w-full h-auto" />
                 </div>
                 <div ref="storyImage5Ref" class="absolute top-0 left-[50%] w-[45%] sm:w-[50%] z-50">
                     <div class="transform -translate-x-1/2 rounded-lg overflow-hidden">
-                        <img src="@/assets/images/team.png" alt="Placeholder" class="w-full h-auto" />
+                        <img src="@/assets/images/team.jpg" alt="Placeholder" class="w-full h-auto" />
                         <div class="bg-[#FD26B7] absolute inset-0 mix-blend-multiply"></div>
                         <div
                             class="absolute top-1/2 left-1/2 sm:translate-x-0 -translate-x-1/2 sm:left-0 w-3/5 transform sm:-translate-y-1/2 flex gap-1 sm:gap-4 flex-col sm:flex-row sm:w-full p-4 tracking-wider"
@@ -388,10 +388,10 @@ onUnmounted(() => {
                     </div>
                 </div>
                 <div ref="storyImage3Ref" class="absolute top-0 left-[50%] rounded-lg overflow-hidden w-[28%] z-40 shadow-2xl">
-                    <img src="@/assets/images/blondie.png" alt="Placeholder" class="w-full h-auto" />
+                    <img src="@/assets/images/blondie.jpg" alt="Placeholder" class="w-full h-auto" />
                 </div>
                 <div ref="storyImage4Ref" class="absolute top-0 left-[70%] rounded-lg overflow-hidden w-[36%] z-10 shadow-2xl">
-                    <img src="@/assets/images/mtv.png" alt="Placeholder" class="w-full h-auto" />
+                    <img src="@/assets/images/mtv.jpg" alt="Placeholder" class="w-full h-auto" />
                 </div>
             </div>
             <div class="relative w-full grid grid-cols-wrapper">

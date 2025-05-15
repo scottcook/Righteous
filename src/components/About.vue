@@ -9,6 +9,7 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 
 // DOM refs
 const aboutRef = ref(null);
+const aboutInnerRef = ref(null);
 const taglineRef = ref(null);
 const cardRef = ref(null);
 const cardInnerRef = ref(null);
@@ -16,6 +17,8 @@ const cardShadowRef = ref(null);
 const glareRef = ref(null);
 const logoCircleRef = ref(null);
 const logoCircleInnerRef = ref(null);
+const cassetteRef = ref(null);
+const cassetteInnerRef = ref(null);
 
 // GSAP instances
 let scrollTriggerInstance = null;
@@ -175,31 +178,36 @@ const setupScrollAnimation = async () => {
     const tl = gsap.timeline({ paused: true });
     taglineSplit = new SplitText(taglineRef.value, { type: 'lines' });
 
-    tl.add([
-        gsap.fromTo(
-            taglineRef.value,
-            { yPercent: 100, rotation: -17 },
-            {
-                yPercent: 0,
-                rotation: -2,
-                ease: 'back.inOut(0.7)',
-                duration: 1.5,
-            }
-        ),
-        gsap.fromTo(
-            taglineSplit.lines,
-            { opacity: 0, y: 50 },
-            {
-                opacity: 1,
-                y: 0,
-                stagger: 0.2,
-                ease: 'power2.out',
-                duration: 0.5,
-                delay: 0.5,
-            }
-        ),
-    ]);
+    // Section 1: Tagline
+    tl.add(
+        [
+            gsap.fromTo(
+                taglineRef.value,
+                { yPercent: 100, rotation: -17 },
+                {
+                    yPercent: 0,
+                    rotation: -2,
+                    ease: 'back.inOut(0.7)',
+                    duration: 2.5,
+                }
+            ),
+            gsap.fromTo(
+                taglineSplit.lines,
+                { opacity: 0, y: 50 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.5,
+                    ease: 'power2.out',
+                    duration: 1,
+                    delay: 1,
+                }
+            ),
+        ],
+        '+=0.0'
+    );
 
+    // Section 2: Card & Shadow
     tl.add(
         [
             gsap.fromTo(
@@ -227,26 +235,73 @@ const setupScrollAnimation = async () => {
                 }
             ),
         ],
-        '-=0.8'
+        '-=1.0'
     );
 
-    tl.add([
-        gsap.fromTo(
-            logoCircleRef.value,
-            { yPercent: 100, opacity: 0 },
-            {
-                yPercent: 0,
-                opacity: 1,
-                ease: 'power2.out',
-                duration: 2,
-            }
-        ),
-    ]);
+    // Section 3: Logos
+    tl.add(
+        [
+            gsap.fromTo(
+                logoCircleRef.value,
+                { yPercent: 100, opacity: 0 },
+                {
+                    yPercent: 0,
+                    opacity: 1,
+                    ease: 'power2.out',
+                    duration: 2,
+                }
+            ),
+        ],
+        '-=0.4'
+    );
+
+    // Section 4: Cassette & media fade
+    tl.add(
+        [
+            gsap.fromTo(
+                cassetteRef.value,
+                { yPercent: 200, rotation: 30 },
+                {
+                    yPercent: 0,
+                    rotation: -1,
+                    ease: 'power1.inOut',
+                    duration: 3,
+                }
+            ),
+            // gsap.fromTo(
+            //     taglineRef.value,
+            //     { yPercent: 100, rotation: -30 },
+            //     {
+            //         yPercent: 0,
+            //         rotation: 1,
+            //         ease: 'back.inOut(0.7)',
+            //         duration: 3,
+            //         delay: 0.5,
+            //     }
+            // ),
+            gsap.to(aboutInnerRef.value, { scale: 0.9, opacity: 0.6, ease: 'power1.in', duration: 2 }),
+        ],
+        '+=1.0'
+    );
+
+    // Section 5: Cassette Inner sub-scroll
+    tl.add(
+        gsap.to(cassetteInnerRef.value, {
+            y: () => {
+                const height = cassetteInnerRef.value.offsetHeight;
+                const viewport = window.innerHeight;
+                return -(height - viewport);
+            },
+            ease: 'power1.inOut',
+            duration: 3,
+        }),
+        '+=2.0'
+    );
 
     scrollTriggerInstance = ScrollTrigger.create({
         trigger: aboutRef.value,
         start: 'top top',
-        end: '+=100%',
+        end: '+=500%',
         scrub: true,
         pin: true,
         pinSpacing: true,
@@ -280,7 +335,7 @@ onUnmounted(() => {
 
 <template>
     <section ref="aboutRef" class="relative w-screen min-h-screen">
-        <div ref="aboutInnerRef" class="relative w-screen h-auto min-h-screen flex flex-col justify-between">
+        <div ref="aboutInnerRef" class="relative w-screen h-auto min-h-screen flex flex-col justify-between overflow-hidden">
             <div class="relative w-full grid grid-cols-wrapper">
                 <div class="relative col-main pt-[12vh] lg:pt-[24vh] flex flex-col lg:flex-row justify-between lg:gap-8 h-[66vh]">
                     <p
@@ -337,7 +392,20 @@ onUnmounted(() => {
                 </div>
             </div>
         </div>
-        <div class="absolute w-full h-[100px] bottom-0 left-0 right-0 z-20" style="background-image: linear-gradient(to bottom, rgba(245, 244, 235, 0) 0%, rgba(245, 244, 235, 1) 50%)"></div>
+        <div class="absolute w-full h-[100px] bottom-0 left-0 right-0" style="background-image: linear-gradient(to bottom, rgba(245, 244, 235, 0) 0%, rgba(245, 244, 235, 1) 50%)"></div>
+        <div ref="cassetteRef" class="absolute top-0 left-0 right-0 w-screen h-screen overflow-hidden bg-[#FF63CC]">
+            <div ref="cassetteInnerRef" class="relative w-full h-auto min-h-screen">
+                <div class="relative w-full grid grid-cols-wrapper">
+                    <div class="relative col-main pt-[12vh] lg:pt-[24vh]">
+                        <p ref="" class="text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[30px] sm:text-[34px] lg:text-[40px] leading-[1.25] tracking-tight">
+                            We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
+                            <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                            <span class="inline-block font-grotesk text-[12px] bg-[#323231] px-3 py-1 rounded-sm font-medium tracking-widest">ATLANTA + ST. LOUIS</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 </template>
 

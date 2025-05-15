@@ -58,6 +58,7 @@ onUnmounted(() => {
                 <Masthead />
                 <div class="h-[150px] lg:h-[300px]"></div>
                 <About />
+                <div class="h-[150vh] w-full bg-brand-charcoal"></div>
             </main>
         </div>
     </div>
