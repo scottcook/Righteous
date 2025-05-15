@@ -110,7 +110,7 @@ const setupScrollAnimation = async () => {
                 handRef.value,
                 { opacity: 0, y: 50, rotation: 10 },
                 {
-                    opacity: 1,
+                    opacity: 0.75,
                     y: 0,
                     rotation: 0,
                     ease: 'back.inOut(1.7)',
@@ -147,6 +147,28 @@ const setupScrollAnimation = async () => {
                 }
             ),
             gsap.to(mastheadInnerRef.value, { scale: 0.9, opacity: 0.6, ease: 'power1.in', duration: 2 }),
+
+            gsap.to(descriptionRef.value, {
+                opacity: 0,
+                y: 100,
+                rotation: -5,
+                xPercent: -50,
+                scale: 1.5,
+                transformOrigin: '0 0',
+                ease: 'power2.inOut',
+                duration: 0.5,
+                delay: 0.5,
+            }),
+            gsap.to(handRef.value, {
+                opacity: 0,
+                scale: 2,
+                y: 50,
+                xPercent: 50,
+                rotation: 10,
+                ease: 'back.out(1.7)',
+                duration: 1,
+                delay: 0.7,
+            }),
         ],
         '+=1.0'
     );

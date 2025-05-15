@@ -264,7 +264,7 @@ const setupScrollAnimation = async () => {
         }),
         gsap.fromTo(
             descriptionSplit.lines,
-            { opacity: 0, y: 50, rotation: 5 },
+            { opacity: 0, y: 100, rotation: 5 },
             {
                 opacity: 1,
                 y: 0,
