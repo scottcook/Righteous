@@ -411,8 +411,8 @@ onUnmounted(() => {
                 </div>
             </div>
             <div class="relative col-main">
-                <div class="relative w-full min-w-[1024px] max-w-[1280px] h-[33vh] mx-auto">
-                    <div ref="logoCircleRef" class="absolute w-full h-[600px] mx-auto z-10 top-12">
+                <div class="relative w-[1024px] lg:w-[1280px] h-[33vh] left-1/2 transform -translate-x-1/2">
+                    <div ref="logoCircleRef" class="absolute w-full h-[600px] mx-auto z-10 top-[14vh] lg:top-[10vh]">
                         <div ref="logoCircleInnerRef" class="absolute inset-0 flex items-center justify-center w-full h-full">
                             <div
                                 v-for="(logo, index) in 10"
