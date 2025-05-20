@@ -25,6 +25,9 @@ const copyRef = ref(null);
 const descriptionRef = ref(null);
 const handRef = ref(null);
 const logoRef = ref(null);
+const teamMember1Ref = ref(null);
+const teamMember2Ref = ref(null);
+const teamMember3Ref = ref(null);
 
 // GSAP instances
 let scrollTriggerInstance = null;
@@ -131,17 +134,17 @@ const setupScrollAnimation = async () => {
                 { yPercent: 200, rotation: -30 },
                 {
                     yPercent: 0,
-                    rotation: 1,
+                    rotation: 0,
                     ease: 'power1.inOut',
                     duration: 3,
                 }
             ),
             gsap.fromTo(
                 taglineRef.value,
-                { yPercent: 100, rotation: -30 },
+                { yPercent: 100, rotation: 0 },
                 {
                     yPercent: 0,
-                    rotation: 1,
+                    rotation: 0,
                     ease: 'back.inOut(0.7)',
                     duration: 3,
                     delay: 0.5,
@@ -234,30 +237,36 @@ const setupScrollAnimation = async () => {
         ],
         '-=0.6'
     );
-
-    // Section 5: Shift story images
+    // Ensure background rotation is zero as story images come in
     tl.add(
-        [
-            gsap.to(storyImage1Ref.value, { xPercent: -55, rotation: -16, ease: 'power2.inOut', duration: 2 }),
-            gsap.to(storyImage2Ref.value, { xPercent: -55, rotation: 2, ease: 'power2.inOut', duration: 2, delay: 0.2 }),
-            gsap.to(storyImage3Ref.value, { xPercent: 60, rotation: -4, ease: 'power2.inOut', duration: 2 }),
-            gsap.to(storyImage4Ref.value, { xPercent: 45, rotation: 4, ease: 'power2.inOut', duration: 2, delay: 0.2 }),
-            gsap.fromTo(
-                [storyImage5Ref.value, storyImage5CaptionRef.value],
-                { yPercent: 85, rotation: -40, opacity: 0 },
-                {
-                    yPercent: -12,
-                    rotation: 2,
-                    opacity: 1,
-                    ease: 'back.out(0.7)',
-                    duration: 3,
-                    delay: 0.6,
-                    stagger: 0.2,
-                }
-            ),
-        ],
-        '+=1.4'
+        gsap.to(storiesRef.value, { rotation: 0, duration: 0.6, ease: 'power1.out' })
     );
+
+    // Section 5: Team images in (stacked cards -> spread)
+    tl.add([
+        // Fade out the earlier story images
+        gsap.to([storyImage1Ref.value, storyImage2Ref.value, storyImage3Ref.value, storyImage4Ref.value], {
+            opacity: 0,
+            yPercent: 60,
+            duration: 1.2,
+            ease: 'power2.in',
+            delay: 0.4,
+        }),
+
+        // Team cards animate from stacked / overlapping centre-bottom to final grid spots
+        gsap.fromTo(teamMember1Ref.value,
+            { y: '100vh', x: 150, scale: 0.8, rotation: -6 },
+            { y: 0, x: 0, scale: 1, rotation: 0, ease: 'power3.out', duration: 1.3, delay: 0.15 }
+        ),
+        gsap.fromTo(teamMember2Ref.value,
+            { y: '100vh', x: 0,   scale: 0.8, rotation: 0 },
+            { y: 0, x: 0, scale: 1, rotation: 0, ease: 'power3.out', duration: 1.3, delay: 0.35 }
+        ),
+        gsap.fromTo(teamMember3Ref.value,
+            { y: '100vh', x: -150, scale: 0.8, rotation: 6 },
+            { y: 0, x: 0, scale: 1, rotation: 0, ease: 'power3.out', duration: 1.3, delay: 0.55 }
+        ),
+    ], '+=1.4');
 
     // Section 6: Final color lock
     tl.add([
@@ -271,6 +280,7 @@ const setupScrollAnimation = async () => {
                 delay: 2,
             }
         ),
+    
     ]);
 
     // Section 7: Add hold/pause to scroll
@@ -352,7 +362,7 @@ onUnmounted(() => {
                 <div class="w-full grid grid-cols-wrapper">
                     <div class="relative col-main pb-12 pt-9">
                         <p ref="descriptionRef" class="text-brand-gray max-w-[530px] lg:max-w-[700px] font-helveticaDisplay font-medium text-[24px] lg:text-[28px] leading-7 lg:leading-9">
-                            <span class="text-black">We’re Righteous.</span><br />
+                            <span class="text-black">We're Righteous.</span><br />
                             A small team of product and agency veterans, crafting clean strategy, smart UX, and tight code for brands and startups who want results -- without the pitch theater.
                         </p>
                         <div ref="handRef" class="mix-blend-exclusion absolute right-0 bottom-0 top-0">
@@ -383,37 +393,6 @@ onUnmounted(() => {
                 <div ref="storyImage2Ref" class="absolute top-0 left-[25%] rounded-lg overflow-hidden w-[32%] z-30 shadow-2xl">
                     <img src="@/assets/images/stussy.jpg" alt="Placeholder" class="w-full h-auto" />
                 </div>
-                <div ref="storyImage5Ref" class="absolute top-0 left-[50%] w-[45%] sm:w-[50%] z-50">
-                    <div class="transform -translate-x-1/2 rounded-lg overflow-hidden">
-                        <img src="@/assets/images/team.jpg" alt="Placeholder" class="w-full h-auto relative" />
-                        <div class="bg-[#FD26B7] absolute inset-0 mix-blend-multiply"></div>
-                        <div
-                            class="absolute top-1/2 left-1/2 sm:translate-x-0 -translate-x-1/2 sm:left-0 w-3/5 transform sm:-translate-y-1/2 flex gap-1 sm:gap-4 flex-col sm:flex-row sm:w-full p-4 tracking-wider"
-                        >
-                            <div class="bg-brand-charcoal flex-1 rounded-md text-white px-2 py-2 leading-tight sm:leading-snug font-grotesk text-[12px] transform sm:translate-x-0 -translate-x-1/4">
-                                <p>Ash Warren</p>
-                                <p class="text-[10px]">Development</p>
-                                <p class="uppercase text-brand-pink mt-1">Hosoi</p>
-                            </div>
-                            <div class="bg-brand-charcoal flex-1 rounded-md text-white px-2 py-2 leading-tight sm:leading-snug font-grotesk text-[12px]">
-                                <p>Jeff Black</p>
-                                <p class="text-[10px]">Director</p>
-                                <p class="uppercase text-brand-pink mt-1">Roskopp</p>
-                            </div>
-                            <div class="bg-brand-charcoal flex-1 rounded-md text-white px-2 py-2 leading-tight sm:leading-snug font-grotesk text-[12px] transform sm:translate-x-0 translate-x-1/4">
-                                <p>Scott Cook</p>
-                                <p class="text-[10px]">Creative</p>
-                                <p class="uppercase text-brand-pink mt-1">Hawk</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div ref="storyImage5CaptionRef" class="absolute top-0 transform -translate-y-full py-2 tracking-wider w-[37.5%] sm:w-1/2 text-right -z-10">
-                        <div class="text-white leading-snug font-grotesk text-[8px] sm:text-[10px]">
-                            <p class="uppercase text-brand-pink">Close, But No Cigar</p>
-                            <p class="mt-1">This is what AI thinks we look like. 👎🏻 <br />This is why you still need us.</p>
-                        </div>
-                    </div>
-                </div>
                 <div ref="storyImage3Ref" class="absolute top-0 left-[50%] rounded-lg overflow-hidden w-[28%] z-40 shadow-2xl">
                     <img src="@/assets/images/blondie.jpg" alt="Placeholder" class="w-full h-auto" />
                 </div>
@@ -421,13 +400,43 @@ onUnmounted(() => {
                     <img src="@/assets/images/mtv.jpg" alt="Placeholder" class="w-full h-auto" />
                 </div>
             </div>
-            <div class="relative w-full grid grid-cols-wrapper">
-                <div class="relative col-main pt-[12vh] lg:pt-[24vh]">
-                    <p ref="taglineRef" class="text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[30px] sm:text-[34px] lg:text-[40px] leading-[1.25] tracking-tight">
-                        We've got more stories than Blockbuster had late fees, but we aim to make this one the most memorable.
-                        <br />
-                        <span class="inline-block font-grotesk text-[12px] bg-[#323231] px-3 py-1 rounded-sm font-medium tracking-widest">ATLANTA + ST. LOUIS</span>
-                    </p>
+            <div class="relative w-full grid grid-cols-wrapper mt-8">
+                <div class="col-main pt-[12vh] lg:pt-[12vh]">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8">
+                        <p ref="taglineRef" class="order-0 sm:order-2 text-[#323231] max-w-[650px] font-helveticaDisplay font-light text-[20px] sm:text-[24px] lg:text-[36px] leading-[1.25] tracking-normal sm:text-left">
+                            No filler NPCs. Just veteran agency and product leaders, rolling initiative and making bold moves for brands and products that dare. 
+                            <br />
+                      
+                        </p>
+                        <p class="order-1 sm:order-1 top-0 text-brand-cream max-w-[850px] font-canela font-light text-[30px] sm:text-[34px] lg:text-[90px] leading-[1.25] tracking-tight sm:text-left">
+                            Leadership
+                            <br />
+                            <span class="inline-block font-grotesk text-[12px] bg-[#323231] px-3 py-1 rounded-sm font-medium tracking-widest">ATLANTA + ST. LOUIS</span>
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-y-10 sm:gap-y-0 gap-x-8 md:gap-x-12 lg:gap-x-16 mt-14 mb-24 lg:mb-40 w-full">
+                        <div ref="teamMember1Ref" class="flex flex-col items-center w-full max-w-[380px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[380px] opacity-1 justify-self-start">
+                            <img src="@/assets/images/member1.png" alt="Ash Warren" class="rounded-2xl w-full object-cover aspect-[1/1.1] mb-6 shadow-none border-0" />
+                            <div class="mt-0 text-white px-0 py-0 leading-tight w-full text-center">
+                                <p class="font-grotesk text-[1.2rem] md:text-[1.2rem] font-medium text-brand-cream leading-tight mb-2 text-left">Jeff Black</p>
+                                <p class="font-grotesk text-[1rem] md:text-[1rem] uppercase tracking-wider text-brand-cream text-left">Partner + Director</p>
+                            </div>
+                        </div>
+                        <div ref="teamMember2Ref" class="flex flex-col items-center w-full max-w-[380px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[380px] opacity-1 justify-self-center">
+                            <img src="@/assets/images/member2.png" alt="Jeff Black" class="rounded-2xl w-full object-cover aspect-[1/1.1] mb-6 shadow-none border-0" />
+                            <div class="mt-0 text-white px-0 py-0 leading-tight w-full text-center">
+                                <p class="font-grotesk text-[1.2rem] md:text-[1.2rem] font-medium text-brand-cream leading-tight mb-2 text-left">Ash Warren</p>
+                                <p class="font-grotesk text-[1rem] md:text-[1rem] uppercase tracking-wider text-brand-cream text-left">Partner + Development</p>
+                            </div>
+                        </div>
+                        <div ref="teamMember3Ref" class="flex flex-col items-center w-full max-w-[380px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[380px] opacity-1 justify-self-end">
+                            <img src="@/assets/images/member3.png" alt="Scott Cook" class="rounded-2xl w-full object-cover aspect-[1/1.1] mb-6 shadow-none border-0" />
+                            <div class="mt-0 text-white px-0 py-0 leading-tight w-full text-center">
+                                    <p class="font-grotesk text-[1.2rem] md:text-[1.2rem] font-medium text-brand-cream leading-tight mb-2 text-left">Scott Cook</p>
+                                <p class="font-grotesk text-[1rem] md:text-[1rem] uppercase tracking-wider text-brand-cream text-left">Partner + Creative</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
